@@ -1,0 +1,10 @@
+Package: ctp2nc
+Type: Package
+Title: 2-Stage Phase II Trial Design with Curtailed Sampling
+Version: 0.0.0
+Date: 2016-11-02
+Author: Who wrote it
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: LGPL-2
+RoxygenNote: 5.0.1
