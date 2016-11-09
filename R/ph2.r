@@ -9,7 +9,7 @@
 #' @examples
 #' # Put exmple code here.
 #' @export
-ph2crit = function( n, p, pearly = .1, alpha = .1) {}
+ph2crit = function(n, p, pearly = .1, alpha = .1) {}
 
 #' Stopped negative binomial distribution mass function
 #'
