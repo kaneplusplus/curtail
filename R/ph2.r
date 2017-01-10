@@ -41,51 +41,9 @@ ph2crit = function(n, p, pearly = .1, alpha = .1) {
   return (c(n[1], r2))         # Hmmm. Didn't add up to 1
 }
 
-#' Stopped negative binomial distribution mass function
-#'
-#' Returns the probability density function for minimum number of 
-#' events for either s successes or t failures.
-#'
-#' @param p probability of success in each trial. 
-#' @param s number of successes.
-#' @param t number of failures.
-#' @examples
-#' ph2dspb(p = .8, s = 3, t = 5)
-#' @export
-ph2dspb = function(p, s, t) {
-  
-  if( length(p) != 1 || p < 0 || p > 1 || s < 1 || t < 1 ||
-    !is.wholenumber(s) || !is.wholenumber(t)){
-  
-    warning("Invalid parameter values (PhII)")
-    
-    return(NaN)
-    
-  }
-  
-  tmnb <- rep(0, s + t - 1)    # zero out, over the range
-  
-  for(j in 0 : (t - 1)){      # Last event is success:  eq # (6)
-    
-    tmnb[j + s] <- choose(s + j - 1, s - 1) * p ^ s * (1 - p) ^ j
-    
-  }
-  
-  
-  for(j in 0 : (s - 1)){       # Last event is failure:  eq # (7)
-    
-    tmnb[j + t] <- tmnb[j + t] +
-      
-      choose(t + j - 1, t - 1) * p ^ j * (1 - p) ^ t
-    
-  }
-  
-  return(tmnb / sum(tmnb))    # Normalize
-}
-
 #' Probability of stopping early 
 #'
-#' Probability of stopping the trial after Stage 1
+#' Calculates the probability of stopping the trial after Stage 1
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) or a scalar containing p1
@@ -128,7 +86,7 @@ ph2early = function( p, n, r) {
 
 #' Expected sample size and SD for decision to continue to Stage 2
 #'
-#' Mean and SD of the minimum number of Stage 1 patients necessary to be able
+#' Mean and standard deviation of the minimum number of Stage 1 patients necessary to be able
 #' to decide whether to either continue to Stage 2 or else terminate early
 #'
 #' @param p vector containing the probability of successful outcomes
@@ -315,7 +273,6 @@ ph2mmax = function(p, n, r) {
 
 #' Probability of rejecting the null hypothesis under traditional sampling
 #'
-#'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
 #' @param n vector containing sample sizes planned for Stage 1 (n1) 
@@ -432,6 +389,49 @@ ph2rejcs = function(p, n, r) {
   return(reject)
 }
 
+
+#' Stopped negative binomial distribution mass function
+#'
+#' Returns the probability density function for minimum number of 
+#' events for either s successes or t failures.
+#'
+#' @param p probability of success in each trial. 
+#' @param s number of successes.
+#' @param t number of failures.
+#' @examples
+#' ph2dspb(p = .8, s = 3, t = 5)
+ph2dspb = function(p, s, t) {
+  
+  if( length(p) != 1 || p < 0 || p > 1 || s < 1 || t < 1 ||
+      !is.wholenumber(s) || !is.wholenumber(t)){
+    
+    warning("Invalid parameter values (PhII)")
+    
+    return(NaN)
+    
+  }
+  
+  tmnb <- rep(0, s + t - 1)    # zero out, over the range
+  
+  for(j in 0 : (t - 1)){      # Last event is success:  eq # (6)
+    
+    tmnb[j + s] <- choose(s + j - 1, s - 1) * p ^ s * (1 - p) ^ j
+    
+  }
+  
+  
+  for(j in 0 : (s - 1)){       # Last event is failure:  eq # (7)
+    
+    tmnb[j + t] <- tmnb[j + t] +
+      
+      choose(t + j - 1, t - 1) * p ^ j * (1 - p) ^ t
+    
+  }
+  
+  return(tmnb / sum(tmnb))    # Normalize
+}
+
+
 #' Truncated negative binomial distribution mass function
 #'
 #' Returns the probability density function for the number of events
@@ -449,7 +449,6 @@ ph2rejcs = function(p, n, r) {
 #' @examples
 #' ph2tnb(p = .8, n = 6, r = 4) 
 #` ph2tnb(p = .2, n = 6, r = 3) 
-#' @export
 ph2tnb = function(p, n, r) {
   if(length(p) > 1){ p1 <- p[1] # p can be vector or scalar
   
@@ -494,9 +493,7 @@ ph2tnb = function(p, n, r) {
 
 #' Check validity of parameter values p, n, and r.
 #' 
-#' 
-#'
-#' @param p p vector containing the probability of successful outcomes
+#' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2). Must have 0 <= p2 <= p1 <= 1.
 #' @param n vector containing sample sizes planned for Stage 1 (n1) 
 #'           and Stage 2 (n2).  Both n1 and n2 should be non-negative integers.
@@ -547,3 +544,13 @@ ph2valid = function(p,n,r) {
   
 }
 
+#' Test for integer
+#' 
+#' @param x 
+#' @param tot 
+#' @examples
+#' is.wholenumber(4)
+#' is.wholenumber(3.5)
+is.wholenumber = function(x, tol = .Machine$double.eps ^ 0.5){
+    abs(x - round(x)) < tol
+}
