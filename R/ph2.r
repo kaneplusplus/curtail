@@ -225,6 +225,37 @@ ph2Ess = function(p, n, r) {
 
 }
 
+#' Find the optimal design
+#'
+#'Calculates the expected sample size under curtailed sampling for each combination of 
+#'n1 and n2 for a given total n
+#'
+#' @param p vector containing the probability of successful outcomes
+#'          in Stage 1 (p1) and Stage 2 (p2) 
+#' @param ntot scalar containing the total sample size planned for the trial (n1+n2) 
+#' @param pearly desired probability of early stopping (default = .1).
+#' @param alpha desired significance level (default = .1).
+#' @examples 
+#' optimal(c(.8, .2), 36)
+#' optimal(c(.7, .3), 40, pearly = .08, alpha=.1)
+optimal = function(p, ntot, pearly = .1, alpha = .1){
+  
+  ess <- rep(NA, (ntot-2))
+  for (i in 2:(ntot-1))
+  {
+    nn <- c(i, ntot - i)
+    r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
+    ss <- ph2Ess(p=p, n=nn, r)
+    if(length(ss)!=0){
+      ess[i-1] <- ss
+    }
+  }
+  ess <- data.frame(2:(ntot-1), (ntot-1):2, ess)
+  names(ess) <- c("n1", "n2", "Expected Sample Size")
+  return(print(ess[order(ess[,3]),], row.names = FALSE))
+}
+
+
 #' Evaluate the probability that the maximum sample size is needed
 #'
 #' Evaluate the probability that the maximum sample size n1+n2 is
@@ -270,6 +301,37 @@ ph2mmax = function(p, n, r) {
     ph2mmax * (1 - pearly)
   }
 }
+
+#' Find the minimax design
+#'
+#'Calculates the minimax probability for each combination of n1 and n2 for a given total n
+#'
+#' @param p vector containing the probability of successful outcomes
+#'          in Stage 1 (p1) and Stage 2 (p2) 
+#' @param ntot scalar containing the total sample size planned for the trial (n1+n2) 
+#' @param pearly desired probability of early stopping (default = .1).
+#' @param alpha desired significance level (default = .1).
+#' @examples 
+#' minimax(c(.8, .2), 36)
+#' minimax(c(.7, .3), 40, pearly = .08, alpha=.1)
+minimax = function(p, ntot, pearly = .1, alpha = .1){
+  
+  mmax <- rep(NA, ntot-1)
+  # for each combination of n1 and n2, calculation probability of using maximum sample size
+  for (i in 1:(ntot-1)){
+    nn <- c(i, ntot - i)
+    r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
+    prob <- ph2mmax(p=p, n = nn, r)
+    if(length(prob)!=0){
+      mmax[i] <- prob
+    }
+  }
+  mmax <- data.frame(1:(ntot-1), (ntot-1):1, mmax)
+  names(mmax) <- c("n1", "n2", "Probability")
+
+  return(print(mmax[order(mmax[,3]),], row.names = FALSE))
+}
+
 
 #' Probability of rejecting the null hypothesis under traditional sampling
 #'
