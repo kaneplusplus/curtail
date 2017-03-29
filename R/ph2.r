@@ -58,6 +58,11 @@ ph2crit = function(n, p, pearly = .1, alpha = .1) {
 #' @export
 ph2early = function( p, n, r) {
   
+  if( ! ph2valid(p, n, r)){
+    warning("Invalid parameter values (PhII)")
+    return(NaN)
+  }
+  
   if(length(p) == 2) p1 <- p[1] # p can be vector or scalar
   
   else p1 <- p
@@ -117,9 +122,9 @@ ph2Eearly = function(p, n1, r1) {
   
   tt <- n1 - r1 + 1  # Number of failures to stop early
   
-  e <- sum((1 : n1) * ph2dspb(p1, r1, tt))  # Expected value
+  e <- sum((1 : n1) * ph2snb(p1, r1, tt))  # Expected value
   
-  v <- sum((1 : n1) ^ 2 * ph2dspb(p1, r1, tt)) - e ^ 2   # variance
+  v <- sum((1 : n1) ^ 2 * ph2snb(p1, r1, tt)) - e ^ 2   # variance
   
   return(c(e, sqrt(v)))  # Expected value and SD
   
@@ -213,7 +218,7 @@ ph2Ess = function(p, n, r) {
       t <- n[2]+n[1]-i-r[2]+j+1
       if(s < 0) s <- 0
       if(t < 0) t <- 0
-      ey2 <- esnb(p[2], s, t)
+      ey2 <- ph2esnb(p[2], s, t)
       
       a <- a+ px12*ey2
     }
@@ -241,6 +246,8 @@ ph2Ess = function(p, n, r) {
 optimal = function(p, ntot, pearly = .1, alpha = .1){
   
   ess <- rep(NA, (ntot-2))
+  nOne <- rep(NA, (ntot-2))
+  nTwo <- rep(NA, (ntot-2))
   for (i in 2:(ntot-1))
   {
     nn <- c(i, ntot - i)
@@ -248,13 +255,48 @@ optimal = function(p, ntot, pearly = .1, alpha = .1){
     ss <- ph2Ess(p=p, n=nn, r)
     if(length(ss)!=0){
       ess[i-1] <- ss
+      nOne[i-1] <- nn[1]
+      nTwo[i-1] <- nn[2]
     }
   }
-  ess <- data.frame(2:(ntot-1), (ntot-1):2, ess)
+  ess <- data.frame(nOne, nTwo, ess)
   names(ess) <- c("n1", "n2", "Expected Sample Size")
   return(print(ess[order(ess[,3]),], row.names = FALSE))
 }
 
+#' Finds the minimax and optimals designs
+#'
+#' @param p vector containing the probability of successful outcomes
+#'          in Stage 1 (p1) and Stage 2 (p2) 
+#' @param ntot scalar containing the total sample size planned for the trial (n1+n2) 
+#' @param pearly desired probability of early stopping (default = .1).
+#' @param alpha desired significance level (default = .1).
+#' @examples 
+#' ph2designs(c(.8, .2), 36)
+#' ph2designs(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' @export
+ph2designs = function(p, ntot, pearly = .1, alpha = .1){
+  opt <- optimal(c(.8, .2), 36, .1, .1)
+  mini <- minimax(c(.8, .2), 36, .1, .1)
+  optimalDes <- opt[which.min(opt[,3]),]
+  minimaxDes <- mini[which.min(mini[,3]),]
+  nOpt <- as.vector(c(optimalDes[1,1], optimalDes[1,2]))
+  nMini <- as.vector(c(minimaxDes[1,1], minimaxDes[1,2]))
+  rOpt <- ph2crit(c(optimalDes[1,1], optimalDes[1,2]), p, pearly, alpha)
+  rMini <- ph2crit(c(minimaxDes[1,1], minimaxDes[1,2]), p, pearly, alpha)
+  
+  optimalDesign <- cbind(nOpt[1], rOpt[1], nOpt[2], rOpt[2], ph2early(p, nOpt, rOpt), 
+                         optimalDes[1,3], ph2mmax(p, nOpt, rOpt))
+  minimaxDesign <- cbind(nMini[1], rMini[1], nMini[2], rMini[2], ph2early(p, nMini, rMini), 
+                         ph2Ess(p, nMini, rMini), minimaxDes[1,3])
+  designs <- rbind(optimalDesign, minimaxDesign)
+  rownames(designs) <- c("Optimal", "Minimax")
+  colnames(designs) <- c("n1", "r1", "n2", "r2", "PET", "ECSS", "P(MaxSS)")
+  print(paste("Probability of successful outcome in Stage 1:", p[1]))
+  print(paste("Probability of successful outcome in Stage 2:", p[2]))
+  print(paste("Alpha = ", alpha))
+  return(designs)
+}
 
 #' Evaluate the probability that the maximum sample size is needed
 #'
@@ -327,7 +369,7 @@ minimax = function(p, ntot, pearly = .1, alpha = .1){
     }
   }
   mmax <- data.frame(1:(ntot-1), (ntot-1):1, mmax)
-  names(mmax) <- c("n1", "n2", "Probability")
+  names(mmax) <- c("n1", "n2", "Probability of Maximum Sample Size")
 
   return(print(mmax[order(mmax[,3]),], row.names = FALSE))
 }
@@ -461,8 +503,8 @@ ph2rejcs = function(p, n, r) {
 #' @param s number of successes.
 #' @param t number of failures.
 #' @examples
-#' ph2dspb(p = .8, s = 3, t = 5)
-ph2dspb = function(p, s, t) {
+#' ph2snb(p = .8, s = 3, t = 5)
+ph2snb = function(p, s, t) {
   
   if( length(p) != 1 || p < 0 || p > 1 || s < 1 || t < 1 ||
       !is.wholenumber(s) || !is.wholenumber(t)){
@@ -493,6 +535,41 @@ ph2dspb = function(p, s, t) {
   return(tmnb / sum(tmnb))    # Normalize
 }
 
+
+
+
+#' Stack the distribution by responders and non-responders.
+#'
+#' Stacked distribution function for the stopped negative binomial distribution.
+#' @param x quantile
+#' @param p success probability
+#' @param s number of successes
+#' @param t number of failures
+dsnb_stacked = function(x, p, s, t) {
+  
+  S = function(k, p, s) {
+    if (p < 0 || p > 1) stop("p must be between zero and one.")
+    if (s < 0) stop("s must be non-negative")
+    ret = choose(k-1, s-1) * p^s * (1-p)^(k-s)
+    ret[k < s] = 0
+    ret
+  }
+  ret = cbind(x, S(x, p, s), S(x, 1-p, t))
+  colnames(ret) = c("x", "s", "t")
+  ret
+}
+
+
+#' Expectation of Stopped Negative Binomail Random Variable
+#' 
+#' @param p probability of success in each trial. 
+#' @param s number of successes.
+#' @param t number of failures.
+ph2esnb = function(p, s, t){
+    ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
+    ds[,2:3] = ds[,1] * ds[,2:3]
+    sum(as.vector(ds[,2:3]))
+}
 
 #' Truncated negative binomial distribution mass function
 #'
@@ -605,6 +682,8 @@ ph2valid = function(p,n,r) {
   return(TRUE)               # Valid parameter values
   
 }
+
+
 
 #' Test for integer
 #' 
