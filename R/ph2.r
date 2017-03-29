@@ -295,9 +295,16 @@ ph2designs = function(p, ntot, pearly = .1, alpha = .1){
   print(paste("Probability of successful outcome in Stage 1:", p[1]))
   print(paste("Probability of successful outcome in Stage 2:", p[2]))
   print(paste("Alpha = ", alpha))
+  class(designs) = c("ph2_design", "data.frame")
   return(designs)
 }
 
+#' @export
+plot.ph2_design = function(x, y, ...) {
+  # Fill this in!
+  stop("Not yet implemented.")
+}
+    
 #' Evaluate the probability that the maximum sample size is needed
 #'
 #' Evaluate the probability that the maximum sample size n1+n2 is
