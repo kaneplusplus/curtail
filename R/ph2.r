@@ -261,7 +261,7 @@ optimal = function(p, ntot, pearly = .1, alpha = .1){
   }
   ess <- data.frame(nOne, nTwo, ess)
   names(ess) <- c("n1", "n2", "Expected Sample Size")
-  return(print(ess[order(ess[,3]),], row.names = FALSE))
+  return(ess[order(ess[,3]),])
 }
 
 #' Finds the minimax and optimals designs
@@ -276,8 +276,10 @@ optimal = function(p, ntot, pearly = .1, alpha = .1){
 #' ph2designs(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
 ph2designs = function(p, ntot, pearly = .1, alpha = .1){
-  opt <- optimal(c(.8, .2), 36, .1, .1)
-  mini <- minimax(c(.8, .2), 36, .1, .1)
+  #opt <- optimal(c(.8, .2), 36, .1, .1)
+  #mini <- minimax(c(.8, .2), 36, .1, .1)
+  opt <- optimal(p, ntot, pearly, alpha)
+  mini <- minimax(p, ntot, pearly, alpha)
   optimalDes <- opt[which.min(opt[,3]),]
   minimaxDes <- mini[which.min(mini[,3]),]
   nOpt <- as.vector(c(optimalDes[1,1], optimalDes[1,2]))
@@ -285,24 +287,45 @@ ph2designs = function(p, ntot, pearly = .1, alpha = .1){
   rOpt <- ph2crit(c(optimalDes[1,1], optimalDes[1,2]), p, pearly, alpha)
   rMini <- ph2crit(c(minimaxDes[1,1], minimaxDes[1,2]), p, pearly, alpha)
   
-  optimalDesign <- cbind(nOpt[1], rOpt[1], nOpt[2], rOpt[2], ph2early(p, nOpt, rOpt), 
+  optimalDesign <- cbind(pearly, alpha, p[1], nOpt[1], rOpt[1], p[2], nOpt[2], rOpt[2], ph2early(p, nOpt, rOpt), 
                          optimalDes[1,3], ph2mmax(p, nOpt, rOpt))
-  minimaxDesign <- cbind(nMini[1], rMini[1], nMini[2], rMini[2], ph2early(p, nMini, rMini), 
+  minimaxDesign <- cbind(pearly, alpha, p[1], nMini[1], rMini[1], p[2], nMini[2], rMini[2], ph2early(p, nMini, rMini), 
                          ph2Ess(p, nMini, rMini), minimaxDes[1,3])
-  designs <- rbind(optimalDesign, minimaxDesign)
+  designs <- data.frame(rbind(optimalDesign, minimaxDesign))
   rownames(designs) <- c("Optimal", "Minimax")
-  colnames(designs) <- c("n1", "r1", "n2", "r2", "PET", "ECSS", "P(MaxSS)")
-  print(paste("Probability of successful outcome in Stage 1:", p[1]))
-  print(paste("Probability of successful outcome in Stage 2:", p[2]))
-  print(paste("Alpha = ", alpha))
+  colnames(designs) <- c("Specified PET", "Specified Alpha", "p1", "n1", "r1", "p2", "n2", "r2", "PET", "ECSS", "P(MaxSS)")
   class(designs) = c("ph2_design", "data.frame")
   return(designs)
 }
 
 #' @export
-plot.ph2_design = function(x, y, ...) {
-  # Fill this in!
-  stop("Not yet implemented.")
+plot.ph2_design = function(x, ...) {
+  p <- c(x[1, "p1"], x[1, "p2"])
+  ntot <- x[1, "n1"]+x[1, "n2"]
+  pearly <- x[1, "Specified PET"]
+  alpha <- x[1, "Specified Alpha"]
+  opt <- optimal(p, ntot, pearly, alpha)
+  opt <- opt[order(opt[,1]),]
+  mini <- minimax(p, ntot, pearly, alpha)
+  mini <- mini[order(mini[,1]),]
+  ## Plot optimal and minimax designs together
+  library(plotrix)
+  
+ minOpt <- floor(min(opt[,3]))
+ maxOpt <- ceiling(max(opt[,3]))
+ diffOpt <- maxOpt - minOpt
+ minMini <- min(mini[,3])
+ maxMini <- max(mini[,3])
+ diffMini <- maxMini - minMini
+ 
+ seqMini <- round(seq(minMini, maxMini, length.out=3), 3)
+ twoord.plot(mini[,1], mini[,3], opt[,1], opt[,3],
+              lylim=c(min(seqMini), maxMini+diffMini), rylim=c(minOpt-diffOpt, maxOpt), rytickpos=minOpt:maxOpt,
+              lytickpos = round(seq(minMini, maxMini, length.out=3), 3),
+              rylab="Expected curtailed sample size", 
+              ylab="Probability of maximum sample size", xlab=expression(n[1]),
+              type='l', rcol=1)
+  
 }
     
 #' Evaluate the probability that the maximum sample size is needed
@@ -378,7 +401,7 @@ minimax = function(p, ntot, pearly = .1, alpha = .1){
   mmax <- data.frame(1:(ntot-1), (ntot-1):1, mmax)
   names(mmax) <- c("n1", "n2", "Probability of Maximum Sample Size")
 
-  return(print(mmax[order(mmax[,3]),], row.names = FALSE))
+  return(mmax[order(mmax[,3]),])
 }
 
 
