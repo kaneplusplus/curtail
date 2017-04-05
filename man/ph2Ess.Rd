@@ -7,16 +7,21 @@
 ph2Ess(p, n, r)
 }
 \arguments{
-\item{p}{p}
+\item{p}{vector containing the probability of successful outcomes
+in Stage 1 (p1) and Stage 2 (p2)}
 
-\item{n}{n}
+\item{n}{vector containing sample sizes planned for Stage 1 (n1) 
+and Stage 2 (n2)}
 
-\item{r}{r}
+\item{r}{vector containing the minimum number of Stage 1 successes 
+to continue to Stage 2 (r1) and the minimum number of Stage 2 
+successes to reject the null hypothesis (r2)}
 }
 \description{
-DESCRIPTION HERE
+The expected number of patients who are enrolled and followed to their
+endpoint before critical endpoints in Stage 1 and Stage 2 are achieved
 }
 \examples{
-# Put exmple code here.
+ph2Ess(p = c(.8, .2), n=c(6, 30), r=c(4, 11))
+ph2Ess(p = c(.8, .2), n = c(18, 18), r = c(12, 11))
 }
-

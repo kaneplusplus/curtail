@@ -7,16 +7,22 @@
 ph2tnb(p, n, r)
 }
 \arguments{
-\item{p}{p}
+\item{p}{vector containing the probability of successful outcomes
+in Stage 1 (p1) and Stage 2 (p2) or a scalar containing p1}
 
-\item{n}{n}
+\item{n}{vector containing sample sizes planned for Stage 1 (n1) 
+and Stage 2 (n2) or a scalar containing n1}
 
-\item{r}{r}
+\item{r}{vector containing the minimum number of Stage 1 successes 
+to continue to Stage 2 (r1) and the minimum number of Stage 2 
+successes to reject the null hypothesis (r2) or a scalar containing r1}
 }
 \description{
-DESCRIPTION HERE
+Returns the probability density function for the number of events
+to reach r= r1 successes in Stage 1 with p = p1 probability of success.
+Can also be the number of events to reach r failures with p = (1-p1) probability
+of failure.
 }
 \examples{
-# Put exmple code here.
+ph2tnb(p = .8, n = 6, r = 4) 
 }
-

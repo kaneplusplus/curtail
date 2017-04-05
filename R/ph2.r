@@ -298,6 +298,7 @@ ph2designs = function(p, ntot, pearly = .1, alpha = .1){
   return(designs)
 }
 
+#' @importFrom plotrix twoord.plot
 #' @export
 plot.ph2_design = function(x, ...) {
   p <- c(x[1, "p1"], x[1, "p2"])
@@ -308,8 +309,6 @@ plot.ph2_design = function(x, ...) {
   opt <- opt[order(opt[,1]),]
   mini <- minimax(p, ntot, pearly, alpha)
   mini <- mini[order(mini[,1]),]
-  ## Plot optimal and minimax designs together
-  library(plotrix)
   
  minOpt <- floor(min(opt[,3]))
  maxOpt <- ceiling(max(opt[,3]))

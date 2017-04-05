@@ -7,16 +7,20 @@
 ph2mmax(p, n, r)
 }
 \arguments{
-\item{p}{p}
+\item{p}{vector containing the probability of successful outcomes
+in Stage 1 (p1) and Stage 2 (p2)}
 
-\item{n}{n}
+\item{n}{vector containing sample sizes planned for Stage 1 (n1) 
+and Stage 2 (n2)}
 
-\item{r}{r}
+\item{r}{vector containing the minimum number of Stage 1 successes 
+to continue to Stage 2 (r1) and the minimum number of Stage 2 
+successes to reject the null hypothesis (r2)}
 }
 \description{
-DESCRIPTION HERE
+Evaluate the probability that the maximum sample size n1+n2 is
+required to complete the trial
 }
 \examples{
-# Put exmple code here.
+ph2mmax( p = c(.8, .2), n = c(3,33), r = ph2crit(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
 }
-

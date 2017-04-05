@@ -7,18 +7,27 @@
 ph2crit(n, p, pearly = 0.1, alpha = 0.1)
 }
 \arguments{
-\item{n}{n}
+\item{n}{vector containing sample sizes planned for Stage 1 (n1) 
+and Stage 2 (n2).}
 
-\item{p}{p}
+\item{p}{vector containing the probability of successful outcomes
+in Stage 1 (p1) and Stage 2 (p2).}
 
-\item{pearly}{pearly}
+\item{pearly}{desired probability of early stopping (default = .1).}
 
-\item{alpha}{alpha}
+\item{alpha}{desired significance level (default = .1).}
 }
 \description{
-DESCRIPTION HERE
+Finds r1, the minimum number of Stage 1 successes to continue to 
+Stage 2, and r2, the minimum number of Stage 2 successes to 
+reject the null hypothesis.
+}
+\details{
+Find r1 so that the probability of early stopping
+is less than or equal to pearly. 
+Find r2 from Binomial model with no early stopping
+and significance level alpha.
 }
 \examples{
-# Put exmple code here.
+ph2crit( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
 }
-

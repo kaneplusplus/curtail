@@ -2,21 +2,25 @@
 % Please edit documentation in R/ph2.r
 \name{ph2reject}
 \alias{ph2reject}
-\title{Probability of rejecting the null hypothesis}
+\title{Probability of rejecting the null hypothesis under traditional sampling}
 \usage{
 ph2reject(p, n, r)
 }
 \arguments{
-\item{p}{p}
+\item{p}{vector containing the probability of successful outcomes
+in Stage 1 (p1) and Stage 2 (p2)}
 
-\item{n}{n}
+\item{n}{vector containing sample sizes planned for Stage 1 (n1) 
+and Stage 2 (n2)}
 
-\item{r}{r}
+\item{r}{vector containing the minimum number of Stage 1 successes 
+to continue to Stage 2 (r1) and the minimum number of Stage 2 
+successes to reject the null hypothesis (r2)}
 }
 \description{
-DESCRIPTION HERE
+Probability of rejecting the null hypothesis under traditional sampling
 }
 \examples{
-# Put exmple code here.
+ph2reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+ph2reject(p = c( .8, .2), n = c(12, 24), r = c(0, 11))
 }
-

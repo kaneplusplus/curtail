@@ -2,14 +2,26 @@
 % Please edit documentation in R/ph2.r
 \name{ph2Eearly}
 \alias{ph2Eearly}
-\title{Expected sample size for decision to continue to Stage 2}
+\title{Expected sample size and SD for decision to continue to Stage 2}
 \usage{
 ph2Eearly(p, n1, r1)
 }
+\arguments{
+\item{p}{vector containing the probability of successful outcomes
+in Stage 1 (p1) and Stage 2 (p2) or a scalar containing p1}
+
+\item{n}{vector containing sample sizes planned for Stage 1 (n1) 
+and Stage 2 (n2) or a scalar containing n1}
+
+\item{r}{vector containing the minimum number of Stage 1 successes 
+to continue to Stage 2 (r1) and the minimum number of Stage 2 
+successes to reject the null hypothesis (r2) or a scalar containing r1}
+}
 \description{
-DESCRIPTION HERE
+Mean and standard deviation of the minimum number of Stage 1 patients necessary to be able
+to decide whether to either continue to Stage 2 or else terminate early
 }
 \examples{
-# Put exmple code here.
+ph2Eearly( p = .8, n = 5, r = 3)
+ph2early(p = c(.8, .2), n = c(5, 31), r = 3)
 }
-
