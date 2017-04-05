@@ -339,7 +339,7 @@ ph2mmax = function(p, n, r) {
     {
       y1j <- ck[j]           #  Pr[ Y1 = j | don't stop early]
       conv <- 0
-      for (i in 0 : r[1])     # Y2 is convoluion sum of two binomials
+      for (i in 0 : r[1])     # Y2 is convolution sum of two binomials
       {
         x12 <- dbinom(i, r[1], p[2] / p[1])
         xp2 <- dbinom(r[2] - i - 1, sum(n) - j - 1, p[2])
