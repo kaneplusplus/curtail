@@ -245,18 +245,18 @@ ph2Ess = function(p, n, r) {
 #' optimal(c(.7, .3), 40, pearly = .08, alpha=.1)
 optimal = function(p, ntot, pearly = .1, alpha = .1){
   
-  ess <- rep(NA, (ntot-2))
-  nOne <- rep(NA, (ntot-2))
-  nTwo <- rep(NA, (ntot-2))
-  for (i in 2:(ntot-1))
+  ess <- NULL
+  nOne <- NULL
+  nTwo <- NULL
+  for (i in 1:(ntot))
   {
     nn <- c(i, ntot - i)
     r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
-    ss <- ph2Ess(p=p, n=nn, r)
-    if(length(ss)!=0){
-      ess[i-1] <- ss
-      nOne[i-1] <- nn[1]
-      nTwo[i-1] <- nn[2]
+    if(r[1]>0){
+      ss <- ph2Ess(p=p, n=nn, r)
+      ess <- c(ess, ss)
+      nOne <-c(nOne, nn[1])
+      nTwo <-c(nTwo, nn[2])
     }
   }
   ess <- data.frame(nOne, nTwo, ess)
@@ -387,19 +387,24 @@ ph2mmax = function(p, n, r) {
 #' minimax(c(.7, .3), 40, pearly = .08, alpha=.1)
 minimax = function(p, ntot, pearly = .1, alpha = .1){
   
-  mmax <- rep(NA, ntot-1)
-  # for each combination of n1 and n2, calculation probability of using maximum sample size
+  mmax <- NULL
+  nOne <- NULL
+  nTwo <- NULL
+  # for each combination of n1 and n2, calculate probability of using maximum sample size
   for (i in 1:(ntot-1)){
     nn <- c(i, ntot - i)
     r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
-    prob <- ph2mmax(p=p, n = nn, r)
-    if(length(prob)!=0){
-      mmax[i] <- prob
+    if(r[1]>0){
+      prob <- ph2mmax(p=p, n = nn, r)
+      mmax <- c(mmax, prob)
+      nOne <- c(nOne, nn[1])
+      nTwo <- c(nTwo, nn[2])
     }
+    
   }
-  mmax <- data.frame(1:(ntot-1), (ntot-1):1, mmax)
+  mmax <- data.frame(nOne, nTwo, mmax)
   names(mmax) <- c("n1", "n2", "Probability of Maximum Sample Size")
-
+  
   return(mmax[order(mmax[,3]),])
 }
 
