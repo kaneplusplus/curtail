@@ -13,7 +13,3 @@ test_that("ph2early function works", {
   expect_equal(resp, 0.09888)
   expect_is(resp, 'numeric')
 })
-
-
-
-})
