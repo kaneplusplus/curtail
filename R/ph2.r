@@ -723,9 +723,9 @@ ph2early = function( p, n, r) {
 #' successes to reject the null hypothesis (r2) or a scalar containing r1
 #' @examples
 #' ph2Eearly( p = .8, n = 5, r = 3)
-#' ph2early(p = c(.8, .2), n = c(5, 31), r = 3)
+#' ph2Eearly(p = c(.8, .2), n = c(5, 31), r = 3)
 #' @export
-ph2Eearly = function(p, n1, r1) {
+ph2Eearly = function(p, n, r) {
   if(length(p) > 1){ p1 <- p[1] # p can be vector or scalar
   
   }else p1 <- p
@@ -850,6 +850,42 @@ ph2Ess = function(p, n, r) {
 
 }
 
+
+#' Find the minimax design
+#'
+#'Calculates the minimax probability for each combination of n1 and n2 for a given total n
+#'
+#' @param p vector containing the probability of successful outcomes
+#'          in Stage 1 (p1) and Stage 2 (p2) 
+#' @param ntot scalar containing the total sample size planned for the trial (n1+n2) 
+#' @param pearly desired probability of early stopping (default = .1).
+#' @param alpha desired significance level (default = .1).
+#' @examples 
+#' minimax(c(.8, .2), 36)
+#' minimax(c(.7, .3), 40, pearly = .08, alpha=.1)
+minimax = function(p, ntot, pearly = .1, alpha = .1){
+  
+  mmax <- NULL
+  nOne <- NULL
+  nTwo <- NULL
+  # for each combination of n1 and n2, calculate probability of using maximum sample size
+  for (i in 1:(ntot-1)){
+    nn <- c(i, ntot - i)
+    r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
+    if(r[1]>0){
+      prob <- ph2mmax(p=p, n = nn, r)
+      mmax <- c(mmax, prob)
+      nOne <- c(nOne, nn[1])
+      nTwo <- c(nTwo, nn[2])
+    }
+    
+  }
+  mmax <- data.frame(nOne, nTwo, mmax)
+  names(mmax) <- c("n1", "n2", "Probability of Maximum Sample Size")
+  
+  return(mmax[order(mmax[,3]),])
+}
+
 #' Find the optimal design
 #'
 #'Calculates the expected sample size under curtailed sampling for each combination of 
@@ -863,6 +899,7 @@ ph2Ess = function(p, n, r) {
 #' @examples 
 #' optimal(c(.8, .2), 36)
 #' optimal(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' @export
 optimal = function(p, ntot, pearly = .1, alpha = .1){
   
   ess <- NULL
@@ -997,40 +1034,6 @@ ph2mmax = function(p, n, r) {
   }
 }
 
-#' Find the minimax design
-#'
-#'Calculates the minimax probability for each combination of n1 and n2 for a given total n
-#'
-#' @param p vector containing the probability of successful outcomes
-#'          in Stage 1 (p1) and Stage 2 (p2) 
-#' @param ntot scalar containing the total sample size planned for the trial (n1+n2) 
-#' @param pearly desired probability of early stopping (default = .1).
-#' @param alpha desired significance level (default = .1).
-#' @examples 
-#' minimax(c(.8, .2), 36)
-#' minimax(c(.7, .3), 40, pearly = .08, alpha=.1)
-minimax = function(p, ntot, pearly = .1, alpha = .1){
-  
-  mmax <- NULL
-  nOne <- NULL
-  nTwo <- NULL
-  # for each combination of n1 and n2, calculate probability of using maximum sample size
-  for (i in 1:(ntot-1)){
-    nn <- c(i, ntot - i)
-    r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
-    if(r[1]>0){
-      prob <- ph2mmax(p=p, n = nn, r)
-      mmax <- c(mmax, prob)
-      nOne <- c(nOne, nn[1])
-      nTwo <- c(nTwo, nn[2])
-    }
-    
-  }
-  mmax <- data.frame(nOne, nTwo, mmax)
-  names(mmax) <- c("n1", "n2", "Probability of Maximum Sample Size")
-  
-  return(mmax[order(mmax[,3]),])
-}
 
 
 #' Probability of rejecting the null hypothesis under traditional sampling
