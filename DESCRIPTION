@@ -1,11 +1,11 @@
-Package: ctp2nc
+Package: curtail
 Type: Package
-Title: 2-Stage Phase II Trial Design with Curtailed Sampling
+Title: One and Two Stage Curtailed Trial Design
 Version: 0.0.0
 Date: 2016-11-02
 Author: Michelle DeVeaux
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
-Imports: plotrix
+Imports: ggplot2, foreach, reshape2
 License: LGPL-2
 RoxygenNote: 6.0.1

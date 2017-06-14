@@ -4,7 +4,7 @@
 \alias{ph2Eearly}
 \title{Expected sample size and SD for decision to continue to Stage 2}
 \usage{
-ph2Eearly(p, n1, r1)
+ph2Eearly(p, n, r)
 }
 \arguments{
 \item{p}{vector containing the probability of successful outcomes
@@ -23,5 +23,5 @@ to decide whether to either continue to Stage 2 or else terminate early
 }
 \examples{
 ph2Eearly( p = .8, n = 5, r = 3)
-ph2early(p = c(.8, .2), n = c(5, 31), r = 3)
+ph2Eearly(p = c(.8, .2), n = c(5, 31), r = 3)
 }

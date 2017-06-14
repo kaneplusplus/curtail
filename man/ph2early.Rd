@@ -15,7 +15,7 @@ and Stage 2 (n2) or a scalar containing n1}
 
 \item{r}{vector containing the minimum number of Stage 1 successes 
 to continue to Stage 2 (r1) and the minimum number of Stage 2 
-successes to reject the null hypothesis (r2) or a scalar containing r2}
+successes to reject the null hypothesis (r2) or a scalar containing r1}
 }
 \description{
 Calculates the probability of stopping the trial after Stage 1
