@@ -1047,7 +1047,7 @@ ph2mmax = function(p, n, r) {
 #' successes to reject the null hypothesis (r2)
 #' @examples
 #' ph2reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' ph2reject(p = c( .8, .2), n = c(12, 24), r = c(0, 11))
+#' ph2reject(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 ph2reject = function(p, n, r) {
   # check validity of parameter values
   
@@ -1118,7 +1118,8 @@ ph2reject = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' # Put exmple code here.
+#' ph2rejcs(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' ph2rejcs(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 #' @export
 ph2rejcs = function(p, n, r) {
   # check validity of parameter values

@@ -16,7 +16,7 @@ test_that("ph2early function works", {
 
 
 test_that("ph2Eearly function works", {
-  resp <- ph2Eearly (p = 0.8, n = 6, r = 4)
+  resp <- ph2Eearly(p = 0.8, n = 6, r = 4)
   expect_equal(resp[1], 4.76)
   expect_equal(round(resp[2], 7), 0.7797435)
  expect_is(resp, 'vector')
@@ -57,3 +57,40 @@ test_that("ph2designs function works", {
   
   expect_is(resp, 'data.frame')
 })
+
+test_that("ph2mmax function works", {
+  resp <- ph2mmax(p = c(.8, .2), n = c(3,33), r = ph2crit(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
+  expect_equal(round(resp, 5), 0.07063)
+  expect_is(resp, 'numeric')
+})
+
+test_that("ph2reject function works", {
+  resp <- ph2reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 5), 0.08578)
+  expect_is(resp, 'numeric')
+})
+
+test_that("ph2rejcs function works", {
+  resp <- ph2rejcs(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 5), 0.09044)
+  expect_is(resp, 'numeric')
+})
+
+test_that("ph2snb function works", {
+  resp <- ph2snb(p = .8, s = 3, t = 5)
+  expect_equal(round(resp[1], 5), 0.00000)
+  expect_equal(round(resp[2], 5), 0.00000)
+  expect_equal(round(resp[3], 5), 0.51200)
+  expect_equal(round(resp[4], 5), 0.30720)
+  expect_equal(round(resp[5], 5), 0.12320)
+  expect_equal(round(resp[6], 5), 0.04224)
+  expect_equal(round(resp[7], 5), 0.01536)
+  expect_is(resp, 'vector')
+})
+
+test_that("ph2rejcs function works", {
+  resp <- ph2valid(p = c( .2, .3), n = c(10, 10), r = c(5, 5))
+  expect_equal(resp, FALSE)
+  expect_is(resp, 'logical')
+})
+
