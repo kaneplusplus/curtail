@@ -640,48 +640,81 @@ edkz = function(n1, r1, p1, n2, r2, p2) {
 #' @param pearly desired probability of early stopping (default = .1).
 #' @param alpha desired significance level (default = .1).
 #' @examples
-#' ph2crit( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
+#' criticalValues( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
 #' @export
-ph2crit = function(n, p, pearly = .1, alpha = .1) {
+criticalValues = function(n, p, pearly = .1, alpha = .1) {
+  if(length(p) != length(n))
+    stop('Parameters p and n must be the same length (both length 1 for the one-stage design, or both length 2 for the two-stage design)')
   
-  if (!ph2valid(p, n, r = c(0, 0)) ||
-      pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
-  {
-    warning("Invalid parameter values (PhII)")
-    return (NaN)
+  # if(length(p) == 2) p1 <- p[1] # p can be vector or scalar
+  # 
+  # else p1 <- p
+  # 
+  # if(length(n) == 2) n1 <- n[1] # n can be vector or scalar
+  # 
+  # else n1 <- n
+  
+  if(length(p)==1 && length(n)==1){
+    
+    if (!ph2valid(p, n, r = 0) ||
+        pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
+    {
+      warning("Invalid parameter values")
+      return (NaN)
+    }
+    for (j in 0 : n[1]){
+      
+      # r1 based on pearly
+      if (probEarlyStop(p, n, r = j) > pearly)
+        
+        return(max(j - 1, 0))
+    }
+    
+    return(n)  
   }
+  ## two-stage design
+  else{
+    
+    if (!ph2valid(p, n, r = c(0, 0)) ||
+        pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
+    {
+      warning("Invalid parameter values, pearly and alpha must be in [0, 1]")
+      return (NaN)
+    }
+    # Binomial critical value, r2
+    r2 <- 1 + qbinom(1 - alpha, sum(n), p[2])     
   
-  # Binomial critical value, r2
-  r2 <- 1 + qbinom(1 - alpha, sum(n), p[2])     
-  
-  for (j in 0 : n[1]){
+   for (j in 0 : n[1]){
     
     # r1 based on pearly
-    if (ph2early(p, n, r = c(j, 0)) > pearly)
+    if (probEarlyStop(p, n, r = c(j, 0)) > pearly)
       
-      return(c(max(j - 1, 0), r2))
+    return(c(max(j - 1, 0), r2))
   }
   
-  return (c(n[1], r2))         # Hmmm. Didn't add up to 1
+  return (c(n[1], r2))        
+  }
 }
 
-#' Probability of stopping early 
+#' Probability of stopping early in the two-stage design
 #'
 #' Calculates the probability of stopping the trial after Stage 1
 #'
 #' @param p vector containing the probability of successful outcomes
-#'          in Stage 1 (p1) and Stage 2 (p2) or a scalar containing p1
+#'          in Stage 1 (p1) and Stage 2 (p2) 
 #' @param n vector containing sample sizes planned for Stage 1 (n1) 
-#'          and Stage 2 (n2) or a scalar containing n1
+#'          and Stage 2 (n2) 
 #' @param r vector containing the minimum number of Stage 1 successes 
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
-#' successes to reject the null hypothesis (r2) or a scalar containing r1
+#' successes to reject the null hypothesis (r2) 
 #' @examples
-#' ph2early(p = .8, n = 25, r = 18)
-#' ph2early(p = c(.8, .2), n = c(25, 9), r = 18)
+#' probEarlyStop(p = c(.8, .2), n = c(25, 9), r = c(17, 11))
 #' @export
-ph2early = function( p, n, r) {
-  if( any(p>1) || any(p<0)) stop('p must be in [0, 1]')
+probEarlyStop= function(p, n, r) {
+  if( ! ph2valid(p, n, r)){
+    warning("Invalid parameter values")
+    return(NaN)
+  }
 
   if(length(p) == 2) p1 <- p[1] # p can be vector or scalar
   
@@ -704,28 +737,34 @@ ph2early = function( p, n, r) {
   
   j <- min(r1, n1) : n1    # range of X1
   
-  ph2early <- 1 - sum(dbinom(j, n1, p1))
+  probEarlyStop<- 1 - sum(dbinom(j, n1, p1))
   
-  return(ph2early)
+  return(probEarlyStop)
 }
 
-#' Expected sample size and SD for decision to continue to Stage 2
+#' Expected sample size and SD for the one-stage design, or for Stage 1 of the two-stage design 
 #'
-#' Mean and standard deviation of the minimum number of Stage 1 patients necessary to be able
-#' to decide whether to either continue to Stage 2 or else terminate early
+#' Mean and standard deviation of the minimum number of patients to make a decision about rejectging the null for the
+#' one-stage design, or in the two-stage design, the minimum number of Stage 1 patients necessary to be able
+#' to decide whether to either continue to Stage 2 or else terminate early. 
+#' For the one-stage design, scalar parameters of length 1 should be used and for the two-stage design, 
+#' vector parameters of length two should be used.
 #'
-#' @param p vector containing the probability of successful outcomes
-#'          in Stage 1 (p1) and Stage 2 (p2) or a scalar containing p1
-#' @param n vector containing sample sizes planned for Stage 1 (n1) 
-#'           and Stage 2 (n2) or a scalar containing n1
-#' @param r vector containing the minimum number of Stage 1 successes 
-#' to continue to Stage 2 (r1) and the minimum number of Stage 2 
-#' successes to reject the null hypothesis (r2) or a scalar containing r1
+#' @param p scalar for the one-stage design containing the probability of successful outcome (p), 
+#'          or a vector for the two-stage design containing the probability of successful outcomes in 
+#'          in Stage 1 (p1) and Stage 2 (p2)
+#' @param n scalar for the one-stage design containing the planned maximum sample size (n = s+t-1), 
+#'          or a vector for the two-stage design containing maximum sample sizes planned for Stage 1 (n1) and Stage 2 (n2)
+#' @param r scalar for the one-stage design containing the minimum number of successes to reject the null hypothesis (s),
+#'          or a vector for the two-stage design containing the minimum number of Stage 1 successes 
+#'          to continue to Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2) 
 #' @examples
-#' ph2Eearly( p = .8, n = 5, r = 3)
-#' ph2Eearly(p = c(.8, .2), n = c(5, 31), r = 3)
+#' expectedStage1SampleSize( p = .6, n = 18, r = 3)
+#' expectedStage1SampleSize(p = c(.8, .2), n = c(5, 31), r = c(3, 11))
 #' @export
-ph2Eearly = function(p, n, r) {
+expectedStage1SampleSize= function(p, n, r) {
+  if(length(p) != length(n) | length(n) != length(r) | length(p) != length(r))
+    stop('Parameters p, n, and r must all be the same length (all length 1 for the one-stage design, or all length 2 for the two-stage design)')
   if(length(p) > 1){ p1 <- p[1] # p can be vector or scalar
   
   }else p1 <- p
@@ -746,11 +785,13 @@ ph2Eearly = function(p, n, r) {
   
   v <- sum((1 : n1) ^ 2 * ph2snb(p1, r1, tt)) - e ^ 2   # variance
   
-  return(c(e, sqrt(v)))  # Expected value and SD
+  eAndSD<-list("expectation"=e, "standardDeviation"=sqrt(v))
+
+  return(eAndSD)  # Expected value and SD
   
 }
 
-#' Expected curtailed sample size
+#' Expected curtailed sample size for the two-stage design
 #'
 #' The expected number of patients who are enrolled and followed to their
 #' endpoint before critical endpoints in Stage 1 and Stage 2 are achieved
@@ -763,18 +804,18 @@ ph2Eearly = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' ph2Ess(p = c(.8, .2), n=c(6, 30), r=c(4, 11))
-#' ph2Ess(p = c(.8, .2), n = c(18, 18), r = c(12, 11))
+#' expectedTotalSampleSize(p = c(.8, .2), n=c(6, 30), r=c(4, 11))
+#' expectedTotalSampleSize(p = c(.8, .2), n = c(18, 18), r = c(12, 11))
 #' @export
-ph2Ess = function(p, n, r) {
-  
+expectedTotalSampleSize= function(p, n, r) {
+  if(length(p)!=2 || length(n)!=2 || length(r)!=2) stop("Parameters must be vectors of length 2")
   # check parameter values
   if( ! ph2valid(p, n, r)){
-    warning("Invalid parameter values (PhII)")
+    warning("Invalid parameter values")
     return(NaN)
   }
   
-  pearly <- ph2early( p, n, r)  # Probability of stopping early
+  pearly <- probEarlyStop( p, n, r)  # Probability of stopping early
   
   #Pr(Y1=y1|continue to stage 2)
   # truncated negative binomial distribution
@@ -782,7 +823,7 @@ ph2Ess = function(p, n, r) {
   # r1 <= y1 <= n1
   prY1Continue <- function(y1, r1, n1, p1){
     if(y1<r1 || y1>n1){    
-      warning("Invalid parameter values (y1)")
+      warning("Invalid parameter values")
       return(NaN)
     }
     num <- factorial(y1-1)/factorial(y1-r1)
@@ -799,7 +840,7 @@ ph2Ess = function(p, n, r) {
   # n1-r1+1 <= y1 <= n1
   prY1Stop <- function(y1, r1, n1, p1){
     if(y1 < n1-r1+1 || y1 > n1 ){ 
-      warning("Invalid parameter values (y1)")
+      warning("Invalid parameter values")
       return(NaN)
     }
     num <- factorial(y1-1)/factorial(y1-1-n1+r1)
@@ -851,7 +892,7 @@ ph2Ess = function(p, n, r) {
 }
 
 
-#' Find the minimax design
+#' Find the minimax design for a two-stage trial
 #'
 #'Calculates the minimax probability for each combination of n1 and n2 for a given total n
 #'
@@ -861,9 +902,9 @@ ph2Ess = function(p, n, r) {
 #' @param pearly desired probability of early stopping (default = .1).
 #' @param alpha desired significance level (default = .1).
 #' @examples 
-#' minimax(c(.8, .2), 36)
-#' minimax(c(.7, .3), 40, pearly = .08, alpha=.1)
-minimax = function(p, ntot, pearly = .1, alpha = .1){
+#' allMinimaxDesigns(c(.8, .2), 36)
+#' allMinimaxDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
+allMinimaxDesigns = function(p, ntot, pearly = .1, alpha = .1){
   
   mmax <- NULL
   nOne <- NULL
@@ -871,9 +912,9 @@ minimax = function(p, ntot, pearly = .1, alpha = .1){
   # for each combination of n1 and n2, calculate probability of using maximum sample size
   for (i in 1:(ntot-1)){
     nn <- c(i, ntot - i)
-    r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
+    r <- criticalValues(n=nn, p=p, pearly = pearly, alpha = alpha)
     if(r[1]>0){
-      prob <- ph2mmax(p=p, n = nn, r)
+      prob <- minimaxDesign(p=p, n = nn, r)
       mmax <- c(mmax, prob)
       nOne <- c(nOne, nn[1])
       nTwo <- c(nTwo, nn[2])
@@ -886,7 +927,7 @@ minimax = function(p, ntot, pearly = .1, alpha = .1){
   return(mmax[order(mmax[,3]),])
 }
 
-#' Find the optimal design
+#' Find the optimal design for a two-stage trial
 #'
 #'Calculates the expected sample size under curtailed sampling for each combination of 
 #'n1 and n2 for a given total n
@@ -897,10 +938,10 @@ minimax = function(p, ntot, pearly = .1, alpha = .1){
 #' @param pearly desired probability of early stopping (default = .1).
 #' @param alpha desired significance level (default = .1).
 #' @examples 
-#' optimal(c(.8, .2), 36)
-#' optimal(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' allOptimalDesigns(c(.8, .2), 36)
+#' allOptimalDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
-optimal = function(p, ntot, pearly = .1, alpha = .1){
+allOptimalDesigns = function(p, ntot, pearly = .1, alpha = .1){
   
   ess <- NULL
   nOne <- NULL
@@ -908,9 +949,9 @@ optimal = function(p, ntot, pearly = .1, alpha = .1){
   for (i in 1:(ntot))
   {
     nn <- c(i, ntot - i)
-    r <- ph2crit(n=nn, p=p, pearly = pearly, alpha = alpha)
+    r <- criticalValues(n=nn, p=p, pearly = pearly, alpha = alpha)
     if(r[1]>0){
-      ss <- ph2Ess(p=p, n=nn, r)
+      ss <- expectedTotalSampleSize(p=p, n=nn, r)
       ess <- c(ess, ss)
       nOne <-c(nOne, nn[1])
       nTwo <-c(nTwo, nn[2])
@@ -921,7 +962,7 @@ optimal = function(p, ntot, pearly = .1, alpha = .1){
   return(ess[order(ess[,3]),])
 }
 
-#' Finds the minimax and optimals designs
+#' Finds the minimax and optimals designs for a two-stage trial
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
@@ -929,23 +970,23 @@ optimal = function(p, ntot, pearly = .1, alpha = .1){
 #' @param pearly desired probability of early stopping (default = .1).
 #' @param alpha desired significance level (default = .1).
 #' @examples 
-#' ph2designs(c(.8, .2), 36)
-#' ph2designs(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' bestDesigns(c(.8, .2), 36)
+#' bestDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
-ph2designs = function(p, ntot, pearly = .1, alpha = .1){
-  opt <- optimal(p, ntot, pearly, alpha)
-  mini <- minimax(p, ntot, pearly, alpha)
+bestDesigns= function(p, ntot, pearly = .1, alpha = .1){
+  opt <- allOptimalDesigns(p, ntot, pearly, alpha)
+  mini <- allMinimaxDesigns(p, ntot, pearly, alpha)
   optimalDes <- opt[which.min(opt[,3]),]
   minimaxDes <- mini[which.min(mini[,3]),]
   nOpt <- as.vector(c(optimalDes[1,1], optimalDes[1,2]))
   nMini <- as.vector(c(minimaxDes[1,1], minimaxDes[1,2]))
-  rOpt <- ph2crit(c(optimalDes[1,1], optimalDes[1,2]), p, pearly, alpha)
-  rMini <- ph2crit(c(minimaxDes[1,1], minimaxDes[1,2]), p, pearly, alpha)
+  rOpt <- criticalValues(c(optimalDes[1,1], optimalDes[1,2]), p, pearly, alpha)
+  rMini <- criticalValues(c(minimaxDes[1,1], minimaxDes[1,2]), p, pearly, alpha)
   
-  optimalDesign <- cbind(p[1], nOpt[1], rOpt[1], p[2], nOpt[2], rOpt[2], alpha, ph2early(p, nOpt, rOpt), 
+  optimalDesign <- cbind(p[1], nOpt[1], rOpt[1], p[2], nOpt[2], rOpt[2], alpha, probEarlyStop(p, nOpt, rOpt), 
                          optimalDes[1,3], ph2mmax(p, nOpt, rOpt))
-  minimaxDesign <- cbind(p[1], nMini[1], rMini[1], p[2], nMini[2], rMini[2], alpha, ph2early(p, nMini, rMini), 
-                         ph2Ess(p, nMini, rMini), minimaxDes[1,3])
+  minimaxDesign <- cbind(p[1], nMini[1], rMini[1], p[2], nMini[2], rMini[2], alpha, probEarlyStop(p, nMini, rMini), 
+                         expectedTotalSampleSize(p, nMini, rMini), minimaxDes[1,3])
   designs <- data.frame(rbind(optimalDesign, minimaxDesign))
   rownames(designs) <- c("Optimal", "Minimax")
   colnames(designs) <- c("p1", "n1", "r1", "p2", "n2", "r2", "Alpha", "PET", "ECSS", "P(MaxSS)")
@@ -976,9 +1017,9 @@ plot.ph2_design = function(x, ...) {
   p <- c(x[1, "p1"], x[1, "p2"])
   ntot <- x[1, "n1"]+x[1, "n2"]
   
-  opt <- optimal(p, ntot, pearly, alpha)
+  opt <- allOptimalDesigns(p, ntot, pearly, alpha)
   opt <- opt[order(opt[,1]),]
-  mini <- minimax(p, ntot, pearly, alpha)
+  mini <- allMinimaxDesigns(p, ntot, pearly, alpha)
   mini <- mini[order(mini[,1]),]
   
   
@@ -988,7 +1029,7 @@ plot.ph2_design = function(x, ...) {
   
 }
     
-#' Evaluate the probability that the maximum sample size is needed
+#' Evaluate the probability that the maximum sample size is needed for the two-stage design
 #'
 #' Evaluate the probability that the maximum sample size n1+n2 is
 #' required to complete the trial
@@ -1001,16 +1042,19 @@ plot.ph2_design = function(x, ...) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' ph2mmax( p = c(.8, .2), n = c(3,33), r = ph2crit(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
+#' ph2mmax( p = c(.8, .2), n = c(3,33), r = criticalValues(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
 #' @export
-ph2mmax = function(p, n, r) {
-  if (!ph2valid(p, n, r)) return(NaN) # Check validity of parameters
+minimaxDesign= function(p, n, r) {
+  if (!ph2valid(p, n, r)){
+    warning("Invalid parameter values")
+    return(NaN) # Check validity of parameters
+  } 
   if (r[1]==0){
     return(choose(n[1]+n[2]-1, r[2]-1)*p[2]^(r[2]-1)*(1-p[2])^(n[1]+n[2]-r[2]))
   }
   else{
-    pearly <- ph2early(p, n, r) # Probability of stopping early
-    ph2mmax <- 0
+    pearly <- probEarlyStop(p, n, r) # Probability of stopping early
+    minimaxDesign<- 0
     
     ck <- rep(0, n[1])     # Distribution of Y1  |  Don't stop early
     k <- 1 : n[1]
@@ -1028,9 +1072,9 @@ ph2mmax = function(p, n, r) {
         xp2 <- dbinom(r[2] - i - 1, sum(n) - j - 1, p[2])
         conv <- conv + x12 * xp2
       }
-      ph2mmax <- ph2mmax + conv * y1j
+      minimaxDesign<- minimaxDesign+ conv * y1j
     }
-    ph2mmax * (1 - pearly)
+    minimaxDesign* (1 - pearly)
   }
 }
 
@@ -1046,24 +1090,20 @@ ph2mmax = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' ph2reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' ph2reject(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
-ph2reject = function(p, n, r) {
+#' probRejectTraditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' probRejectTraditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+probRejectTraditional = function(p, n, r) {
   # check validity of parameter values
   
   if ( ! ph2valid(p, n, r)){
   
-    warning("Invalid parameter values (PhII)")
+    warning("Invalid parameter values")
     
     return (NaN)
     
   }
   
-  
-  
   reject <- 0
-  
-  
   
   # Loop on X1 = number of Stage 1 successes
   
@@ -1118,14 +1158,14 @@ ph2reject = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' ph2rejcs(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' ph2rejcs(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' probReject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' probReject(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 #' @export
-ph2rejcs = function(p, n, r) {
+probReject = function(p, n, r) {
   # check validity of parameter values
   if ( ! ph2valid(p, n, r)){
   
-    warning("Invalid parameter values (PhII)")
+    warning("Invalid parameter values")
     return (NaN)
   }
   
@@ -1171,7 +1211,7 @@ ph2snb = function(p, s, t) {
   if( length(p) != 1 || p < 0 || p > 1 || s < 1 || t < 1 ||
       !is.wholenumber(s) || !is.wholenumber(t)){
     
-    warning("Invalid parameter values (PhII)")
+    warning("Invalid parameter values")
     
     return(NaN)
     
@@ -1237,7 +1277,7 @@ ph2tnb = function(p, n, r) {
     
   {
     
-    warning("Invalid parameter values (PhII)")
+    warning("Invalid parameter values")
     
     return(NaN)
     
@@ -1271,8 +1311,24 @@ ph2tnb = function(p, n, r) {
 #' @examples
 #' ph2valid(p = c(.2, .1), n = c(10, 10), r = c(5, 5))
 #' ph2valid(p = c( .2, .3), n = c(10, 10), r = c(5, 5))
-#' @export
 ph2valid = function(p,n,r) {
+  if(length(p)==1 && length(n)==1 && length(r)==1){
+    if( p > 1 | p < 0) return(FALSE)
+    
+    if(n < 0) return(FALSE)
+    
+    if(!is.wholenumber(n)) return(FALSE)
+    
+    if( r < 0) return(FALSE)
+    
+    if( r > n) return(FALSE)
+    
+    if(!is.wholenumber(r)) return(FALSE) 
+    
+    return(TRUE)               # Valid parameter values for one-stage
+  }
+  
+  else{
   #  Must have:  0 <= p2 <= p1 <= 1
   if( length(p) != 2 ) return(FALSE)
   
@@ -1308,7 +1364,7 @@ ph2valid = function(p,n,r) {
   if(!is.wholenumber(r[1]) || !is.wholenumber(r[2])) return(FALSE) 
   
   return(TRUE)               # Valid parameter values
-  
+  }
 }
 
 
