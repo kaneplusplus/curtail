@@ -9,6 +9,12 @@ test_that("criticalValues function works", {
   expect_is(resp, 'vector')
 })
 
+test_that("criticalValues function works", {
+  resp <- criticalValues(n=6, p=.8, pearly = .1, alpha = .1)
+  expect_equal(resp, 4)
+  expect_is(resp, 'numeric')
+})
+
 
 test_that("probEarlyStop function works", {
   resp <- probEarlyStop(p=0.8, n = 6, r = 4)
@@ -18,10 +24,17 @@ test_that("probEarlyStop function works", {
 
 
 test_that("expectedStage1SampleSize function works", {
-  resp <- expectedStage1SampleSize(p = 0.8, n = 6, r = 4)
+  resp <- expectedStage1SampleSize(p = c(0.8, .2), n = c(6, 30), r = c(4, 11))
   expect_equal(resp$expectation, 4.76)
   expect_equal(round(resp$standardDeviation, 7), 0.7797435)
  expect_is(resp, 'list')
+})
+
+test_that("expectedStage1SampleSize function works", {
+  resp <- expectedStage1SampleSize(p = 0.8, n = 6, r = 4)
+  expect_equal(resp$expectation, 4.76)
+  expect_equal(round(resp$standardDeviation, 7), 0.7797435)
+  expect_is(resp, 'list')
 })
 
 
