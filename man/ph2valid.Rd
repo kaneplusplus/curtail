@@ -22,6 +22,6 @@ successes to reject the null hypothesis (r2). Must have 0 <= r1 <= r2,
 Check validity of parameter values p, n, and r.
 }
 \examples{
-ph2valid(p = c(.2, .1), n = c(10, 10), r = c(5, 5))
-ph2valid(p = c( .2, .3), n = c(10, 10), r = c(5, 5))
+# ph2valid(p = c(.2, .1), n = c(10, 10), r = c(5, 5))
+# ph2valid(p = c( .2, .3), n = c(10, 10), r = c(5, 5))
 }

@@ -42,16 +42,16 @@ dsnb_stacked = function(x, p, s, t) {
 #  ret
 #}
 
-dsnb_private = function(x, p, s, t) {
-  k=NULL
-  a = foreach(k=1:(s+t-1), .combine=c) %do% N(k, p, s)
-  b = foreach(k=1:(s+t-1), .combine=c) %do% R(k, p, t)
-  d = a + b
-  inds = which(x %in% 1:length(d))
-  ret = rep(0, length(x))
-  ret[inds] = d[x[inds]]
-  ret
-}
+#dsnb_private = function(x, p, s, t) {
+#  k=NULL
+#  a = foreach(k=1:(s+t-1), .combine=c) %do% N(k, p, s)
+#  b = foreach(k=1:(s+t-1), .combine=c) %do% R(k, p, t)
+#  d = a + b
+#  inds = which(x %in% 1:length(d))
+#  ret = rep(0, length(x))
+#  ret[inds] = d[x[inds]]
+#  ret
+#}
 
 ## Remember, shape1 and shape2 are data plus priors.
 #dsnbc_private = function(x, s, t, shape1, shape2) {
@@ -99,6 +99,7 @@ dsnb_private = function(x, p, s, t) {
 #' used when getting the conditional distribution where the domain does 
 #' not start at 1.
 #' @import ggplot2
+#' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
 #' @export
 stacked_plot = function(x, s, t) {
@@ -108,7 +109,7 @@ stacked_plot = function(x, s, t) {
     x = x$x
   }
   d = data.frame(list(x=x, s=s, t=t))
-  d = melt(data=d, id.vars="x") 
+  d = gather(d, Outcome, value, -x)
   names(d)[names(d) == "variable"] = "Outcome"
   ggplot(data=d, aes(x=factor(x), y=value, fill=Outcome)) +
     geom_bar(position="stack", stat="identity") + xlab("k") +
@@ -156,18 +157,17 @@ dsnb_plot = function(p, s, t, x, offset) {
 #' used when getting the conditional distribution where the domain does 
 #' not start at 1.
 #' @import ggplot2
+#' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
 #' @export
-dsnb_stack_plot = function(p, s, t, x, offset) {
-  value = Outcome = k = NULL
+dsnb_stack_plot <- function(p, s, t, x, offset) {
   if (missing(x))
-    x = min(s,t):(t+s-1)
-  d = as.data.frame(
+    x <- min(s,t):(t+s-1)
+  d <- as.data.frame(
     dsnb_stacked(x, p=p, s=s, t=t))
   if (!missing(offset))
-    d$x = d$x+offset
-  d = melt(data=d, id.vars="x") 
-  names(d)[names(d) == "variable"] = "Outcome"
+    d$x <- d$x+offset
+  d <- gather(d, Outcome, value, -x) 
   ggplot(data=d, aes(x=factor(x), y=value, fill=Outcome)) +
     geom_bar(position="stack", stat="identity") + xlab("k") +
     ylab("f(k,p,s,t)")
@@ -185,9 +185,9 @@ dsnb_stack_plot = function(p, s, t, x, offset) {
 #' @param t the right barrier for the snb process.
 #' @export
 cdsnb_stacked = function(x, shape, s, t) {
-  ret=foreach(k=x, .combine=rbind) %do% {
-    rets=0
-    rett=0
+  ret <- foreach(k=x, .combine=rbind) %do% {
+    rets <- 0
+    rett <- 0
     normalizer = beta(shape[1], shape[2])
     if (s <= k && k <= s+t-1)
       rets = rets + choose(k-1, s-1) * beta(shape[1]+s, k-s+shape[2])/normalizer
@@ -195,73 +195,73 @@ cdsnb_stacked = function(x, shape, s, t) {
       rett = rett + choose(k-1, t-1) * beta(shape[1]+k-t, t+shape[2])/normalizer
     c(k, rets, rett)
   }
-  rownames(ret) = NULL
-  colnames(ret) = c("k", "s", "t")
+  rownames(ret) <- NULL
+  colnames(ret) <- c("k", "s", "t")
   as.data.frame(ret)
 }
 
-#' The Conditional Stopped Negative Binomial Density Plot
-#' 
-#' A plot of the stacked snb density function. The plot shows the distribution
-#' of the stopping time when the binomial process has not reached one of 
-#' its endpoints. The success probabilty is fitted using the fit_flips function
-#' with specefied prior.
-#' @param d a sequence of 1's and 0's corresponding to the binomial process.
-#' @param s the top barrier for the snb process.
-#' @param t the right barrier for the snb process.
-#' @param prior the shape parameters of the prior on the success probability.
-#' @importFrom reshape2 melt
-#' @export
-cdsnb_stack_plot = function(d, shape, s, t) {
-  value = Outcome = NULL
-  x = cdsnb(d, shape, s, t)
-  x = melt(data=x, id.vars="x") 
-  names(x)[names(x) == "variable"] = "Outcome"
-  qplot(x=factor(x), y=value, data=x, fill=Outcome, geom="bar", 
-        position="stack", stat="identity", ylab="f(k,p,s,t)", xlab="k")
-}
+# The Conditional Stopped Negative Binomial Density Plot
+# 
+# A plot of the stacked snb density function. The plot shows the distribution
+# of the stopping time when the binomial process has not reached one of 
+# its endpoints. The success probabilty is fitted using the fit_flips function
+# with specefied prior.
+# @param d a sequence of 1's and 0's corresponding to the binomial process.
+# @param s the top barrier for the snb process.
+# @param t the right barrier for the snb process.
+# @param prior the shape parameters of the prior on the success probability.
+# @importFrom reshape2 melt
+# @export
+#cdsnb_stack_plot <- function(d, shape, s, t) {
+#  value <- Outcome <- NULL
+#  x <- cdsnb(d, shape, s, t)
+#  x <- melt(data=x, id.vars="x") 
+#  names(x)[names(x) == "variable"] <- "Outcome"
+#  qplot(x=factor(x), y=value, data=x, fill=Outcome, geom="bar", 
+#        position="stack", stat="identity", ylab="f(k,p,s,t)", xlab="k")
+#}
 
-#' Stacked Plot of the Compound Stopped Negative Binomial Density 
-#'
-#' The stacked plot of the probability mass function for the snb showing
-#' the contributions from N (the top barrier) and R (the right barrier).
-#' @param d the data, a vector of 0 and 1 values.
-#' @param s the top barrier for the snb process.
-#' @param t the right barrier for the snb process.
-#' @param shape1 the value of the first shape parameter on the prior
-#' @param shape2 the value of the second shape parameter on the prior
-#' @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
-#' @return a plot of the probability mass function.
-#' @export
-dsnbc_stack_plot = function(d, s, t, shape1=0.5, shape2=0.5,
-                            x=min(s,t):(t+s-1)) {
-  value = Outcome = NULL
-  d = dsnbc_stack(d, s, t, shape1, shape2, x)
-  d = melt(data=d, id.vars="x") 
-  names(d)[names(d) == "variable"] = "Outcome"
-  qplot(x=factor(x), y=value, data=d, fill=Outcome, geom="bar", 
-        position="stack", stat="identity", ylab="f(k|x,s,t,alpha,beta)", xlab="k")
-}
+# Stacked Plot of the Compound Stopped Negative Binomial Density 
+#
+# The stacked plot of the probability mass function for the snb showing
+# the contributions from N (the top barrier) and R (the right barrier).
+# @param d the data, a vector of 0 and 1 values.
+# @param s the top barrier for the snb process.
+# @param t the right barrier for the snb process.
+# @param shape1 the value of the first shape parameter on the prior
+# @param shape2 the value of the second shape parameter on the prior
+# @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
+# @return a plot of the probability mass function.
+# @export
+# dsnbc_stack_plot = function(d, s, t, shape1=0.5, shape2=0.5,
+#                             x=min(s,t):(t+s-1)) {
+#   value = Outcome = NULL
+#   d = dsnbc_stack(d, s, t, shape1, shape2, x)
+#   d = melt(data=d, id.vars="x") 
+#   names(d)[names(d) == "variable"] = "Outcome"
+#   qplot(x=factor(x), y=value, data=d, fill=Outcome, geom="bar", 
+#         position="stack", stat="identity", ylab="f(k|x,s,t,alpha,beta)", xlab="k")
+# }
 
-#' The "Stacked" Compound Negative Binomial Density Function
-#' 
-#' This function returns the "stacked" density function showing the 
-#' contribution from each of the end points to the total mass.
-#' @param d the data, a vector of 0 and 1 values.
-#' @param s the top barrier for the snb process.
-#' @param t the right barrier for the snb process.
-#' @param shape1 the value of the first shape parameter on the prior
-#' @param shape2 the value of the second shape parameter on the prior
-#' @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
-#' @return the "stacked" density.
-#' @export
-dsnbc_stack = function(d, s, t, shape1=0.5, shape2=0.5,
-                       x=min(s,t):(t+s-1)) {
-  num_heads = sum(d)
-  num_flips = length(d)
-  as.data.frame(
-    dsnbc_private_stacked(x, shape1+num_heads, shape2+num_flips-num_heads,s,t))
-}
+# The "Stacked" Compound Negative Binomial Density Function
+# 
+# This function returns the "stacked" density function showing the 
+# contribution from each of the end points to the total mass.
+# @param d the data, a vector of 0 and 1 values.
+# @param s the top barrier for the snb process.
+# @param t the right barrier for the snb process.
+# @param shape1 the value of the first shape parameter on the prior
+# @param shape2 the value of the second shape parameter on the prior
+# @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
+# @return the "stacked" density.
+# @export
+# dsnbc_stack = function(d, s, t, shape1=0.5, shape2=0.5,
+#                        x=min(s,t):(t+s-1)) {
+#   num_heads = sum(d)
+#   num_flips = length(d)
+#   as.data.frame(
+#     dsnbc_private_stacked(x, shape1+num_heads, shape2+num_flips-num_heads,s,t))
+# }
 
 
 #' The Stopped Negative Binomial Distribution
@@ -339,14 +339,14 @@ rsnb = function(n, prob, s, t) {
 #  flips
 #}
 
-#flips_to_zplot_df = function(flips) {
-#  d = data.frame(k=0:length(flips))
-#  d$head = c(0, cumsum(flips))
-#  d$tail= c(0, cumsum(!(flips)))
-#  d$headEnd = c(d$head[-1], NA)
-#  d$tailEnd = c(d$tail[-1], NA)
-#  d
-#}
+flips_to_zplot_df = function(flips) {
+  d <- data.frame(k=0:length(flips))
+  d$head <- c(0, cumsum(flips))
+  d$tail <- c(0, cumsum(!(flips)))
+  d$headEnd <- c(d$head[-1], NA)
+  d$tailEnd <- c(d$tail[-1], NA)
+  d
+}
 
 #' The Z-Plot for the Binomial Process
 #'
@@ -464,36 +464,36 @@ flips_to_kplot_df = function(flips) {
 #' @export
 kplot = function(flips, s, t, bw=FALSE) {
   if (!is.list(flips)) {
-    d = flips_to_kplot_df(flips)
+    d <- flips_to_kplot_df(flips)
     if (bw) {
-      p = qplot(k, path, data = d, geom = "line") +
+      p <- qplot(k, path, data = d, geom = "line") +
         scale_x_continuous(breaks = 0:(t + s), limits = c(0, t + s)) +
         scale_y_continuous(breaks = 0:s, limits=c(0, s+0.15)) +
         geom_segment(x=s, y=s, xend=(t+s-1), yend=s, linetype=2) +
         geom_segment(x=t, y=0, xend=(s+t-1), yend=s-1, linetype=2)
     } else {
-      p = qplot(k, path, data = d, geom = "line") +
+      p <- qplot(k, path, data = d, geom = "line") +
         scale_x_continuous(breaks = 0:(t + s), limits = c(0, t + s)) +
         scale_y_continuous(breaks = 0:s, limits=c(0, s+0.15)) +
         geom_segment(x=s,y=s,xend=(t+s-1),yend=s, color="green", linetype=1) +
         geom_segment(x=t, y=0, xend=(s+t-1), yend=s-1, col="red")
     }
   } else {
-    flip_set = lapply(flips, flips_to_kplot_df)
+    flip_set <- lapply(flips, flips_to_kplot_df)
     for (i in 1:length(flip_set)) {
-      flip_set[[i]]$num = as.factor(i)
-      flip_set[[i]]$k = jitter(flip_set[[i]]$k)
-      flip_set[[i]]$k[flip_set[[i]]$k < 0] = 0
+      flip_set[[i]]$num <- as.factor(i)
+      flip_set[[i]]$k <- jitter(flip_set[[i]]$k)
+      flip_set[[i]]$k[flip_set[[i]]$k < 0] <- 0
     }
-    d = Reduce(rbind, flip_set)[, -(4:5)]
+    d <- Reduce(rbind, flip_set)[, -(4:5)]
     if (bw) {
-      p = qplot(k, path, data = d, geom = "path", group = num) +
+      p <- qplot(k, path, data = d, geom = "path", group=num) +
         scale_x_continuous(breaks=0:(t+s), limits = c(0, t+s)) +
         geom_segment(x = s, y = s, xend = (t + s - 1), yend = s,
                      linetype=2) +
         geom_segment(x=t, y=0, xend=(s+t-1), yend=s-1, linetype=2)
     } else {
-      p = qplot(k, path, data = d, geom = "path", group = num) +
+      p <- qplot(k, path, data = d, geom = "path", group=num) +
         scale_x_continuous(breaks=0:(t+s), limits = c(0, t+s)) +
         geom_segment(x = s, y = s, xend = (t + s - 1), yend = s,
                      color = "green") +
@@ -594,32 +594,32 @@ vcsnb = function(shape, s, t) {
   sum(as.vector(ds[,2:3])) - ecsnb(shape, s, t)^2 
 }
 
-#' Expected size for the DKZ 2-stage trial
-#' 
-#' Find the expected size of the DKZ trial with specified parameters.
-#' @param n1 maximum number of enrollees in the first stage.
-#' @param r1 number of successes to move to stage-2.
-#' @param p1 success probability in stage-1.
-#' @param n2 maximum number of enrollees in stage-2.
-#' @param r2 number of successes in stage-2 for success endpoint.
-#' @param p2 success probability in stage-2.
-#' @export
-edkz = function(n1, r1, p1, n2, r2, p2) {
-  EY1 = esnb(p1, r1, n1-r1+1)
-  X12 = cbind(0:r1, dbinom(0:r1, r1, p2/p1))
-  stage1_success = cbind((n1-r1):n1, S((n1-r1):n1, p1, r1))
-  EY2 = 0
-  for (i in 1:nrow(stage1_success)) {
-    for (j in 1:nrow(X12)) {
-      EY2 = EY2 + stage1_success[i,2] * X12[j,2] * 
-        esnb(p2, r2-X12[j,1], n2+n1-stage1_success[i,1]-r2-r1+X12[j,1]+1)
-    }
-  }
-  #  for (i in 1:nrow(X12)) {
-  #    EY2 = EY2 + X12[i,2] * esnb(p2, r2-X12[i,1], n2-r2-r1+X12[i,1]+1)
-  #  }  
-  EY1 + EY2
-}
+# Expected size for the DKZ 2-stage trial
+# 
+# Find the expected size of the DKZ trial with specified parameters.
+# @param n1 maximum number of enrollees in the first stage.
+# @param r1 number of successes to move to stage-2.
+# @param p1 success probability in stage-1.
+# @param n2 maximum number of enrollees in stage-2.
+# @param r2 number of successes in stage-2 for success endpoint.
+# @param p2 success probability in stage-2.
+# @export
+# edkz = function(n1, r1, p1, n2, r2, p2) {
+#   EY1 = esnb(p1, r1, n1-r1+1)
+#   X12 = cbind(0:r1, dbinom(0:r1, r1, p2/p1))
+#   stage1_success = cbind((n1-r1):n1, S((n1-r1):n1, p1, r1))
+#   EY2 = 0
+#   for (i in 1:nrow(stage1_success)) {
+#     for (j in 1:nrow(X12)) {
+#       EY2 = EY2 + stage1_success[i,2] * X12[j,2] * 
+#         esnb(p2, r2-X12[j,1], n2+n1-stage1_success[i,1]-r2-r1+X12[j,1]+1)
+#     }
+#   }
+#   #  for (i in 1:nrow(X12)) {
+#   #    EY2 = EY2 + X12[i,2] * esnb(p2, r2-X12[i,1], n2-r2-r1+X12[i,1]+1)
+#   #  }  
+##    EY1 + EY2
+# }
 
 
 #' Find critical values for decision making during the one-stage or two-stage trial 
@@ -648,6 +648,7 @@ edkz = function(n1, r1, p1, n2, r2, p2) {
 #' @param pearly desired probability of early stopping (default = .1).  
 #' Not necessary for determining critical values for the one-stage design.
 #' @param alpha desired significance level (default = .1).
+#' @importFrom stats qbinom
 #' @examples
 #' criticalValues(n = 36, p=.2, alpha=.1)
 #' criticalValues( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
@@ -803,6 +804,7 @@ expectedStage1SampleSize= function(p, n, r) {
 #' @examples
 #' expectedTotalSampleSize(p = c(.8, .2), n=c(6, 30), r=c(4, 11))
 #' expectedTotalSampleSize(p = c(.8, .2), n = c(18, 18), r = c(12, 11))
+#' @importFrom stats dbinom
 #' @export
 expectedTotalSampleSize= function(p, n, r) {
   if(length(p)!=2 || length(n)!=2 || length(r)!=2) stop("Parameters must be vectors of length 2")
@@ -889,6 +891,7 @@ expectedTotalSampleSize= function(p, n, r) {
 #' @examples 
 #' allMinimaxDesigns(c(.8, .2), 36)
 #' allMinimaxDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' @export
 allMinimaxDesigns = function(p, ntot, pearly = .1, alpha = .1){
   if (any(p>1) || any(p < 0) || ntot<0 || pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
   {
@@ -951,11 +954,10 @@ allOptimalDesigns = function(p, ntot, pearly = .1, alpha = .1){
 #' bestDesigns(c(.8, .2), 36)
 #' bestDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
-bestDesigns= function(p, ntot, pearly = .1, alpha = .1){
-  if (any(!is.numeric(p) || any(p>1) || any(p < 0) || !is.numeric(ntot) || ntot<0 || 
-          !is.numeric(pearly) || pearly < 0 || pearly > 1 || !is.numeric(alpha) || 
-          alpha < 0 || alpha > 1)
-  {
+bestDesigns= function(p, ntot, pearly = .1, alpha = .1) {
+  if (any(!is.numeric(p) || any(p>1) || any(p < 0) || !is.numeric(ntot) || 
+      ntot<0 || !is.numeric(pearly) || pearly < 0 || pearly > 1 || 
+      !is.numeric(alpha) || alpha < 0 || alpha > 1)) {
     warning("Invalid parameter values")
     return (NaN)
   }
@@ -1028,9 +1030,10 @@ plot.ph2_design = function(x, ...) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' ph2mmax( p = c(.8, .2), n = c(3,33), r = criticalValues(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
+#' minimaxDesign(p=c(.8, .2), n=c(3,33), r=criticalValues(n=c(3,33), 
+#'   p=c(.8, .2), pearly=.1, alpha=.1))
 #' @export
-minimaxDesign= function(p, n, r) {
+minimaxDesign <- function(p, n, r) {
   if (!ph2valid(p, n, r)){
     warning("Invalid parameter values")
     return(NaN) # Check validity of parameters
@@ -1077,8 +1080,8 @@ minimaxDesign= function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' probRejectTraditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' probRejectTraditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' #probRejectTraditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' #probRejectTraditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 probRejectTraditional = function(p, n, r) {
   # check validity of parameter values
   
@@ -1193,7 +1196,7 @@ probReject = function(p, n, r) {
 #' @param s number of successes.
 #' @param t number of failures.
 #' @examples
-#' ph2snb(p = .8, s = 3, t = 5)
+#' # ph2snb(p = .8, s = 3, t = 5)
 ph2snb = function(p, s, t) {
   
   if( length(p) != 1 || p < 0 || p > 1 || s < 1 || t < 1 ||
@@ -1242,8 +1245,8 @@ ph2snb = function(p, s, t) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2) or a scalar containing r1
 #' @examples
-#' ph2tnb(p = .8, n = 6, r = 4) 
-#` ph2tnb(p = .2, n = 6, r = 3) 
+#' # ph2tnb(p = .8, n = 6, r = 4) 
+#' # ph2tnb(p = .2, n = 6, r = 3) 
 ph2tnb = function(p, n, r) {
   if(length(p) > 1){ p1 <- p[1] # p can be vector or scalar
   
@@ -1297,8 +1300,8 @@ ph2tnb = function(p, n, r) {
 #' successes to reject the null hypothesis (r2). Must have 0 <= r1 <= r2,
 #' 0 <= r1 <= n1, and 0 <= r2 <= n1 + n2.
 #' @examples
-#' ph2valid(p = c(.2, .1), n = c(10, 10), r = c(5, 5))
-#' ph2valid(p = c( .2, .3), n = c(10, 10), r = c(5, 5))
+#' # ph2valid(p = c(.2, .1), n = c(10, 10), r = c(5, 5))
+#' # ph2valid(p = c( .2, .3), n = c(10, 10), r = c(5, 5))
 ph2valid = function(p,n,r) {
   if(length(p)==1 && length(n)==1 && length(r)==1){
     if( p > 1 | p < 0) return(FALSE)
@@ -1360,10 +1363,8 @@ ph2valid = function(p,n,r) {
 #' Test for integer
 #' 
 #' @param x the number to test.
-#' @param tot the tolerance for x being a whole number (default \code{.Machine$double.eps ^ 0.5})
-#' @examples
-#' is.wholenumber(4)
-#' is.wholenumber(3.5)
+#' @param tot the tolerance for x being a whole number (default 
+#' \code{.Machine$double.eps ^ 0.5})
 is.wholenumber = function(x, tol = .Machine$double.eps ^ 0.5){
     abs(x - round(x)) < tol
 }

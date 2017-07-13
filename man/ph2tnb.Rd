@@ -24,5 +24,6 @@ Can also be the number of events to reach r failures with p = (1-p1) probability
 of failure.
 }
 \examples{
-ph2tnb(p = .8, n = 6, r = 4) 
+# ph2tnb(p = .8, n = 6, r = 4) 
+# ph2tnb(p = .2, n = 6, r = 3) 
 }
