@@ -20,73 +20,6 @@ dsnb_stacked = function(x, p, s, t) {
   ret
 }
 
-#R = function(k, p, t) {
-#  choose(k-1, k-t) * p^(k-t) * (1-p)^t
-#}
-
-#N = function(k, p, s) {
-#  choose(k-1, s-1) * p^s * (1-p)^(k-s)
-#}
-
-#Rc = function(k, s, t, shape1, shape2) {
-#  suppressWarnings({ret = choose(k-1, k-t) * beta(shape1 + k - t, t + shape2) / 
-#    beta(shape1, shape2)})
-#  ret[!is.finite(ret)] = 0
-#  ret
-#}
-
-#Nc = function(k, s, t, shape1, shape2) {
-#  suppressWarnings({ret = choose(k-1, s-1) * beta(shape1 + s, k - s + shape2) / 
-#    beta(shape1, shape2)})
-#  ret[!is.finite(ret)] = 0
-#  ret
-#}
-
-#dsnb_private = function(x, p, s, t) {
-#  k=NULL
-#  a = foreach(k=1:(s+t-1), .combine=c) %do% N(k, p, s)
-#  b = foreach(k=1:(s+t-1), .combine=c) %do% R(k, p, t)
-#  d = a + b
-#  inds = which(x %in% 1:length(d))
-#  ret = rep(0, length(x))
-#  ret[inds] = d[x[inds]]
-#  ret
-#}
-
-## Remember, shape1 and shape2 are data plus priors.
-#dsnbc_private = function(x, s, t, shape1, shape2) {
-#  k = NULL
-#  a = foreach(k=1:(s+t-1), .combine=c) %do% Nc(k, s, t, shape1, shape2)
-#  b = foreach(k=1:(s+t-1), .combine=c) %do% Rc(k, s, t, shape1, shape2)
-#  d = a + b
-#  inds = which(x %in% 1:length(d))
-#  ret = rep(0, length(x))
-#  ret[inds] = d[x[inds]]
-#  ret
-#}
-
-#dsnb_private_stacked = dsnb_stacked
-
-#dsnbc_private_stacked = function(x, shape1, shape2, s, t) {
-#  k=i=NULL
-#  a = foreach(k=1:(s+t-1), .combine=c) %do% Nc(k, s, t, shape1, shape2)
-#  b = foreach(k=1:(s+t-1), .combine=c) %do% Rc(k, s, t, shape1, shape2)
-#  d = a + b
-#  u = a/sum(d)
-#  r = b/sum(d)
-#  ret = foreach (i=x, .combine=rbind) %do% {
-#    v = c(i, 0, 0)
-#    if (i %in% 1:length(d)) {
-#      v[2] = a[i] #u[i] 
-#      v[3] = b[i] #r[i] 
-#    }
-#    v
-#  }
-#  colnames(ret) = c("x", "s", "t")
-#  rownames(ret) = NULL
-#  ret
-#}
-
 #' The Stacked Plot
 #'
 #' The stacked plot of the probability mass function for the snb showing
@@ -373,7 +306,7 @@ zplot = function(flips, s, t, show_arrows=TRUE, unif_jitter=0.2, xlab=NULL,
                  ylab=NULL) {
   p = tailEnd = headEnd = num = NULL
   if (!is.list(flips)) {
-    d =flips_to_zplot_df(flips)
+    d <- flips_to_zplot_df(flips)
     if (show_arrows) {
       p = ggplot(data=na.omit(d)) + 
         geom_segment(mapping=aes(x=tail, y=head, xend=tailEnd,
@@ -594,34 +527,6 @@ vcsnb = function(shape, s, t) {
   ds[,2:3] = ds[,1]^2 * ds[,2:3]
   sum(as.vector(ds[,2:3])) - ecsnb(shape, s, t)^2 
 }
-
-# Expected size for the DKZ 2-stage trial
-# 
-# Find the expected size of the DKZ trial with specified parameters.
-# @param n1 maximum number of enrollees in the first stage.
-# @param r1 number of successes to move to stage-2.
-# @param p1 success probability in stage-1.
-# @param n2 maximum number of enrollees in stage-2.
-# @param r2 number of successes in stage-2 for success endpoint.
-# @param p2 success probability in stage-2.
-# @export
-# edkz = function(n1, r1, p1, n2, r2, p2) {
-#   EY1 = esnb(p1, r1, n1-r1+1)
-#   X12 = cbind(0:r1, dbinom(0:r1, r1, p2/p1))
-#   stage1_success = cbind((n1-r1):n1, S((n1-r1):n1, p1, r1))
-#   EY2 = 0
-#   for (i in 1:nrow(stage1_success)) {
-#     for (j in 1:nrow(X12)) {
-#       EY2 = EY2 + stage1_success[i,2] * X12[j,2] * 
-#         esnb(p2, r2-X12[j,1], n2+n1-stage1_success[i,1]-r2-r1+X12[j,1]+1)
-#     }
-#   }
-#   #  for (i in 1:nrow(X12)) {
-#   #    EY2 = EY2 + X12[i,2] * esnb(p2, r2-X12[i,1], n2-r2-r1+X12[i,1]+1)
-#   #  }  
-##    EY1 + EY2
-# }
-
 
 #' Find critical values for decision making during the one-stage or two-stage trial 
 #' 
