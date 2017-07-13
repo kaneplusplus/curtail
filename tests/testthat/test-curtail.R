@@ -1,3 +1,5 @@
+library(testthat)
+
 context('curtail function calls')
 
 ##public functions
@@ -15,13 +17,11 @@ test_that("criticalValues function works for one-stage design", {
   expect_is(resp, 'numeric')
 })
 
-
 test_that("probEarlyStop function works", {
   resp <- probEarlyStop(p=0.8, n = 6, r = 4)
   expect_equal(round(resp, 5), 0.09888)
   expect_is(resp, 'numeric')
 })
-
 
 test_that("expectedStage1SampleSize function works for two-stage design", {
   resp <- expectedStage1SampleSize(p = c(0.8, .2), n = c(6, 30), r = c(4, 11))
