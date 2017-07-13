@@ -1314,8 +1314,8 @@ ph2valid = function(p,n,r) {
 
 #' Test for integer
 #' 
-#' @param x 
-#' @param tot 
+#' @param x the number to test.
+#' @param tot the tolerance for x being a whole number (default \code{.Machine$double.eps ^ 0.5})
 #' @examples
 #' is.wholenumber(4)
 #' is.wholenumber(3.5)

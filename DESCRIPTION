@@ -1,10 +1,9 @@
 Package: curtail
 Type: Package
 Title: One and Two Stage Curtailed Trial Design
-Version: 0.0.0
-Date: 2016-11-02
-Author: Michelle DeVeaux
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Version: 0.0.1
+Date: 2016-06-28
+Author: c(person(given="Michelle", family="DeVeaux", email="michelle.deveaux@yale.edu", role=c("aut", "cph", "cre")), person(given="Michael", family="Kane", email="michael.kane@yale.edu", role="ctb"))
 Description: More about what it does (maybe more than one line)
 Imports: ggplot2, foreach, reshape2
 License: LGPL-2
