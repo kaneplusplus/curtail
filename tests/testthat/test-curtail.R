@@ -2,16 +2,16 @@ context('curtail function calls')
 
 ##public functions
 
-test_that("criticalValues function works", {
+test_that("criticalValues function works for two-stage design", {
   resp <- criticalValues(n=c(6, 30), p=c(.8, .2), pearly = .1, alpha = .1)
   expect_equal(resp[1], 4)
   expect_equal(resp[2], 11)
-  expect_is(resp, 'vector')
+  expect_is(resp, 'numeric')
 })
 
-test_that("criticalValues function works", {
-  resp <- criticalValues(n=6, p=.8, pearly = .1, alpha = .1)
-  expect_equal(resp, 4)
+test_that("criticalValues function works for one-stage design", {
+  resp <- criticalValues(n=36, p=.2, alpha = .1)
+  expect_equal(resp,11)
   expect_is(resp, 'numeric')
 })
 
@@ -23,14 +23,14 @@ test_that("probEarlyStop function works", {
 })
 
 
-test_that("expectedStage1SampleSize function works", {
+test_that("expectedStage1SampleSize function works for two-stage design", {
   resp <- expectedStage1SampleSize(p = c(0.8, .2), n = c(6, 30), r = c(4, 11))
   expect_equal(resp$expectation, 4.76)
   expect_equal(round(resp$standardDeviation, 7), 0.7797435)
  expect_is(resp, 'list')
 })
 
-test_that("expectedStage1SampleSize function works", {
+test_that("expectedStage1SampleSize function works for one-stage design", {
   resp <- expectedStage1SampleSize(p = 0.8, n = 6, r = 4)
   expect_equal(resp$expectation, 4.76)
   expect_equal(round(resp$standardDeviation, 7), 0.7797435)
@@ -74,7 +74,7 @@ test_that("bestDesigns function works", {
 })
 
 test_that("minimaxDesign function works", {
-  resp <- minimaxDesign(p = c(.8, .2), n = c(3,33), r = ph2crit(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
+  resp <- minimaxDesign(p = c(.8, .2), n = c(3,33), r = criticalValues(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
   expect_equal(round(resp, 5), 0.07063)
   expect_is(resp, 'numeric')
 })
@@ -93,28 +93,17 @@ test_that("probReject function works", {
 
 test_that("allOptimalDesigns function works", {
   resp <- allOptimalDesigns(p = c( .8, .2), n = 10)
-  expect_equal(round(resp[1,], 6), c(2, 8, 7.214133))
-  expect_equal(round(resp[2,], 6), c(6, 4, 7.234434))
-  expect_equal(round(resp[3,], 6), c(5, 5, 7.272286))
-  expect_equal(round(resp[4,], 6), c(4, 6, 7.329535))
-  expect_equal(round(resp[5,], 6), c(3, 7, 7.383349))
-  expect_equal(round(resp[6,], 6), c(7, 3, 7.426047))
-  expect_equal(round(resp[7,], 6), c(8, 2, 7.587027))
-  expect_equal(round(resp[8,], 6), c(9, 1, 7.986812))
-  expect_equal(round(resp[9,], 6), c(10, 0, 8.150780))
+  expect_equal(resp$n1, c(2, 6, 5, 4, 3, 7, 8, 9))
+  expect_equal(resp$n2, c(8, 4, 5, 6, 7, 3, 2, 1))
+  expect_equal(round(resp$`Expected Sample Size`, 6), c(7.214133, 7.234434, 7.272286, 7.329535, 7.383349, 7.426047, 7.587027, 7.986812))
   expect_is(resp, 'data.frame')
 })
 
 test_that("allMinimaxDesigns function works", {
   resp <- allMinimaxDesigns(p = c( .8, .2), n = 10)
-  expect_equal(round(resp[1,], 8), c(6, 4, 0.06404506))
-  expect_equal(round(resp[2,], 8), c(2, 8, 0.06491341))
-  expect_equal(round(resp[3,], 8), c(5, 5, 0.06498202))
-  expect_equal(round(resp[4,], 8), c(9, 1, 0.06502810))
-  expect_equal(round(resp[5,], 8), c(8, 2, 0.06545818))
-  expect_equal(round(resp[6,], 8), c(4, 6, 0.06559949))
-  expect_equal(round(resp[7,], 8), c(7, 3, 0.06574490))
-  expect_equal(round(resp[8,], 8), c(3, 7, 0.06593741))
+  expect_equal(resp$n1, c(6, 2, 5, 9, 8, 4, 7, 3))
+  expect_equal(resp$n2, c(4, 8, 5, 1, 2, 6, 3, 7))
+  expect_equal(round(resp$`Probability of Maximum Sample Size`, 8), c(0.06404506, 0.06491341, 0.06498202, 0.06502810, 0.06545818, 0.06559949, 0.06574490, 0.06593741))
   expect_is(resp, 'data.frame')
 })
 
@@ -130,7 +119,7 @@ test_that("ph2snb function works", {
   expect_equal(round(resp[5], 5), 0.12320)
   expect_equal(round(resp[6], 5), 0.04224)
   expect_equal(round(resp[7], 5), 0.01536)
-  expect_is(resp, 'vector')
+  expect_is(resp, 'numeric')
 })
 
 test_that("ph2valid function works", {
@@ -147,7 +136,7 @@ test_that("ph2tnb function works", {
   expect_equal(round(resp[4], 7), 0.4545455)
   expect_equal(round(resp[5], 7), 0.3636364)
   expect_equal(round(resp[6], 7), 0.1818182)
-  expect_is(resp, 'vector')
+  expect_is(resp, 'numeric')
 })
 
 test_that("is.wholenumber function works", {

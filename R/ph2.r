@@ -622,14 +622,22 @@ edkz = function(n1, r1, p1, n2, r2, p2) {
 }
 
 
-#' Find critical values (r1, r2) 
+#' Find critical values for decision making during the one-stage or two-stage trial 
 #' 
+#' Finds the critical number of successes necessary to reject 
+#' the null hypothesis in the one- and two-stage designs, 
+#' as well as the number of Stage 1 successes neccesary to 
+#' continue to Stage 2 in the two-stage design.
+#' 
+#' For the one-stage design:  
+#' Finds s, the minimum number of successes to reject the null hypothesis 
+#' from the Binomial model with significance level alpha.
+#' 
+#' For the two-stage design:
 #' Finds r1, the minimum number of Stage 1 successes to continue to 
 #' Stage 2, and r2, the minimum number of Stage 2 successes to 
-#' reject the null hypothesis.
-#' 
-#' Find r1 so that the probability of early stopping
-#' is less than or equal to pearly. 
+#' reject the null hypothesis.  Find r1 so that the probability 
+#' of early stopping is less than or equal to pearly. 
 #' Find r2 from Binomial model with no early stopping
 #' and significance level alpha.
 #'
@@ -637,23 +645,18 @@ edkz = function(n1, r1, p1, n2, r2, p2) {
 #'          and Stage 2 (n2).
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2).
-#' @param pearly desired probability of early stopping (default = .1).
+#' @param pearly desired probability of early stopping (default = .1).  
+#' Not necessary for determining critical values for the one-stage design.
 #' @param alpha desired significance level (default = .1).
 #' @examples
+#' criticalValues(n = 36, p=.2, alpha=.1)
 #' criticalValues( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
 #' @export
 criticalValues = function(n, p, pearly = .1, alpha = .1) {
   if(length(p) != length(n))
     stop('Parameters p and n must be the same length (both length 1 for the one-stage design, or both length 2 for the two-stage design)')
   
-  # if(length(p) == 2) p1 <- p[1] # p can be vector or scalar
-  # 
-  # else p1 <- p
-  # 
-  # if(length(n) == 2) n1 <- n[1] # n can be vector or scalar
-  # 
-  # else n1 <- n
-  
+  # one-stage design
   if(length(p)==1 && length(n)==1){
     
     if (!ph2valid(p, n, r = 0) ||
@@ -662,16 +665,10 @@ criticalValues = function(n, p, pearly = .1, alpha = .1) {
       warning("Invalid parameter values")
       return (NaN)
     }
-    for (j in 0 : n[1]){
-      
-      # r1 based on pearly
-      if (probEarlyStop(p, n, r = j) > pearly)
-        
-        return(max(j - 1, 0))
-    }
-    
-    return(n)  
+      return(1 + qbinom(1 - alpha, n, p))  
   }
+
+  
   ## two-stage design
   else{
     
@@ -827,11 +824,10 @@ expectedTotalSampleSize= function(p, n, r) {
       return(NaN)
     }
     num <- factorial(y1-1)/factorial(y1-r1)
-    denom <- 0 
-    for(j in r1:n1){
-      a <- factorial(j-1)/factorial(j-r1) *(1-p1)^(j-y1)
-      denom <- denom + a
-    }
+    denom <- sum(sapply(r1:n1, function(j) factorial(j-1)/factorial(j-r1) *(1-p1)^(j-y1)))
+
+    if(is.na(num/denom)){ return(0)}
+    
     return(num/denom)
   }
   # Pr(Y1=y1|stop early)
@@ -844,50 +840,39 @@ expectedTotalSampleSize= function(p, n, r) {
       return(NaN)
     }
     num <- factorial(y1-1)/factorial(y1-1-n1+r1)
-    denom <- 0
-    for(j in (n1-r1+1):n1){
-      a <- factorial(j-1)/factorial(j-1-n1+r1) * p1^(j-y1)
-      denom <- denom+a
-    }
+
+    denom <- sum(sapply((n1-r1+1):n1, function(j) factorial(j-1)/factorial(j-1-n1+r1) * p1^(j-y1)))
     if(is.na(num/denom)){ return(0)}
     return(num/denom)
   }
   
   
   ### expected value of Y1 | continue to Stage 2
-  EY1Continue <- 0
-  for(i in r[1]:n[1]){
-    EY1Continue <- EY1Continue + i*prY1Continue(i, r[1], n[1], p[1])
-  }
-  
-  
+  EY1Continue <- sum(sapply(r[1]:n[1], function(i) i*prY1Continue(i, r[1], n[1], p[1])))
+
+
   ### expected value of Y1|stop early
-  EY1Stop <- 0
-  for(i in (n[1]-r[1]+1):n[1]){
-    EY1Stop <- EY1Stop + i*prY1Stop(i, r[1], n[1], p[1])
-  }
+  EY1Stop <- sum(sapply((n[1]-r[1]+1):n[1], function(i) i*prY1Stop(i, r[1], n[1], p[1])))
+
   ### expected value of y2|continue to Stage 2
-  a <- 0
-  b<- NULL
+  # i = possible values of y1
+  # j = possible values of x12
+  py1 <- sapply(r[1]:n[1], function(i) prY1Continue(i, r[1], n[1], p[1]))
+  px12 <- sapply(0:r[1], function(j) dbinom(j, r[1], p[2]/p[1]))
   
-  for(i in r[1]:n[1]){
-    py1 <- prY1Continue(i, r[1], n[1], p[1])
-    a <- 0
-    for(j in 0:r[1]){
-      px12 <- dbinom(j, r[1], p[2]/p[1])
-      s <- r[2]-j
-      t <- n[2]+n[1]-i-r[2]+j+1
-      if(s < 0) s <- 0
-      if(t < 0) t <- 0
-      ey2 <- esnb(p[2], s, t)
-      
-      a <- a+ px12*ey2
-    }
-    b <- c(b, (py1*a))
-  }
-  EY2Continue <- sum(b)
+  #for the snb distribution,
+  #s <- r[2]-j
+  #t <- n[2]+n[1]-i-r[2]+j+1
+  ey2 <-function(y1){
+    sapply(0:r[1], function(j) esnb(p[2], s = ifelse((r[2]-j)>0, (r[2]-j), 0), 
+                                    t = ifelse((n[2]+n[1]-y1-r[2]+j+1)>0, n[2]+n[1]-y1-r[2]+j+1, 0)))
+  } 
   
-  return((EY1Stop*pearly) + ((EY1Continue+EY2Continue)*(1-pearly)))
+  a <- sapply(r[1]:n[1], function(y1) sum(px12*ey2(y1)))
+  EY2Continue <- sum(py1*a)
+
+
+  return((EY1Stop*pearly) + ((EY1Continue+EY2Continue)*(1-pearly))) #Eq. 7
 
 }
 
@@ -905,23 +890,17 @@ expectedTotalSampleSize= function(p, n, r) {
 #' allMinimaxDesigns(c(.8, .2), 36)
 #' allMinimaxDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
 allMinimaxDesigns = function(p, ntot, pearly = .1, alpha = .1){
-  
-  mmax <- NULL
-  nOne <- NULL
-  nTwo <- NULL
-  # for each combination of n1 and n2, calculate probability of using maximum sample size
-  for (i in 1:(ntot-1)){
-    nn <- c(i, ntot - i)
-    r <- criticalValues(n=nn, p=p, pearly = pearly, alpha = alpha)
-    if(r[1]>0){
-      prob <- minimaxDesign(p=p, n = nn, r)
-      mmax <- c(mmax, prob)
-      nOne <- c(nOne, nn[1])
-      nTwo <- c(nTwo, nn[2])
-    }
-    
+  if (any(p>1) || any(p < 0) || ntot<0 || pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
+  {
+    warning("Invalid parameter values")
+    return (NaN)
   }
-  mmax <- data.frame(nOne, nTwo, mmax)
+  rcrit <- sapply(1:(ntot-1), function(n1) criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha))
+  n1 <- (1:(ntot-1))[which(rcrit[1,]>0)]
+  prob <- sapply(n1, function(n1) minimaxDesign(p=p, n=c(n1, ntot-n1), 
+                                r=criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha)))
+  
+  mmax <- data.frame(n1, (ntot-n1), prob)
   names(mmax) <- c("n1", "n2", "Probability of Maximum Sample Size")
   
   return(mmax[order(mmax[,3]),])
@@ -942,25 +921,24 @@ allMinimaxDesigns = function(p, ntot, pearly = .1, alpha = .1){
 #' allOptimalDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
 allOptimalDesigns = function(p, ntot, pearly = .1, alpha = .1){
-  
-  ess <- NULL
-  nOne <- NULL
-  nTwo <- NULL
-  for (i in 1:(ntot))
+  if (any(p>1) || any(p < 0) || ntot<0 || pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
   {
-    nn <- c(i, ntot - i)
-    r <- criticalValues(n=nn, p=p, pearly = pearly, alpha = alpha)
-    if(r[1]>0){
-      ss <- expectedTotalSampleSize(p=p, n=nn, r)
-      ess <- c(ess, ss)
-      nOne <-c(nOne, nn[1])
-      nTwo <-c(nTwo, nn[2])
-    }
+    warning("Invalid parameter values")
+    return (NaN)
   }
-  ess <- data.frame(nOne, nTwo, ess)
+
+  rcrit <- sapply(1:(ntot-1), function(n1) criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha))
+  n1 <- (1:(ntot-1))[which(rcrit[1,]>0)]
+  ss <- sapply(n1, function(n1) expectedTotalSampleSize(p=p, n=c(n1, ntot-n1), 
+                                r=criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha)))
+  
+  
+  
+  ess <- data.frame(n1, (ntot-n1), ss)
   names(ess) <- c("n1", "n2", "Expected Sample Size")
   return(ess[order(ess[,3]),])
 }
+
 
 #' Finds the minimax and optimals designs for a two-stage trial
 #'
@@ -974,6 +952,14 @@ allOptimalDesigns = function(p, ntot, pearly = .1, alpha = .1){
 #' bestDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
 bestDesigns= function(p, ntot, pearly = .1, alpha = .1){
+  if (any(!is.numeric(p) || any(p>1) || any(p < 0) || !is.numeric(ntot) || ntot<0 || 
+          !is.numeric(pearly) || pearly < 0 || pearly > 1 || !is.numeric(alpha) || 
+          alpha < 0 || alpha > 1)
+  {
+    warning("Invalid parameter values")
+    return (NaN)
+  }
+  
   opt <- allOptimalDesigns(p, ntot, pearly, alpha)
   mini <- allMinimaxDesigns(p, ntot, pearly, alpha)
   optimalDes <- opt[which.min(opt[,3]),]
@@ -984,7 +970,7 @@ bestDesigns= function(p, ntot, pearly = .1, alpha = .1){
   rMini <- criticalValues(c(minimaxDes[1,1], minimaxDes[1,2]), p, pearly, alpha)
   
   optimalDesign <- cbind(p[1], nOpt[1], rOpt[1], p[2], nOpt[2], rOpt[2], alpha, probEarlyStop(p, nOpt, rOpt), 
-                         optimalDes[1,3], ph2mmax(p, nOpt, rOpt))
+                         optimalDes[1,3], minimaxDesign(p, nOpt, rOpt))
   minimaxDesign <- cbind(p[1], nMini[1], rMini[1], p[2], nMini[2], rMini[2], alpha, probEarlyStop(p, nMini, rMini), 
                          expectedTotalSampleSize(p, nMini, rMini), minimaxDes[1,3])
   designs <- data.frame(rbind(optimalDesign, minimaxDesign))
@@ -1080,7 +1066,8 @@ minimaxDesign= function(p, n, r) {
 
 
 
-#' Probability of rejecting the null hypothesis under traditional sampling
+#' Probability of rejecting the null hypothesis in the two-stage design
+#' under traditional sampling
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
@@ -1148,7 +1135,8 @@ probRejectTraditional = function(p, n, r) {
   return(reject)
 }
 
-#' Probability of rejecting the null hypothesis under curtailed sampling
+#' Probability of rejecting the null hypothesis in the two-stage design
+#' under curtailed sampling
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
