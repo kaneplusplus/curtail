@@ -91,13 +91,9 @@ dsnb_stacked = function(x, p, s, t) {
 #'
 #' The stacked plot of the probability mass function for the snb showing
 #' the contributions from N (the top barrier) and R (the right barrier).
-#' @param p the probability of a success on each coin flip. 
+#' @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
 #' @param s the top barrier for the snb process.
 #' @param t the right barrier for the snb process.
-#' @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
-#' @param offset an offset on the domain of the distribution. This is 
-#' used when getting the conditional distribution where the domain does 
-#' not start at 1.
 #' @import ggplot2
 #' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
@@ -339,6 +335,9 @@ rsnb = function(n, prob, s, t) {
 #  flips
 #}
 
+#' Format a data.frame for plotting by the zplot function
+#' @param flips the seqence of ones and zeros denoting responses and 
+#' non-responses respecitively.
 flips_to_zplot_df = function(flips) {
   d <- data.frame(k=0:length(flips))
   d$head <- c(0, cumsum(flips))
@@ -364,6 +363,8 @@ flips_to_zplot_df = function(flips) {
 #' @param xlab the name of the x axis.
 #' @param ylab the name of the y axis.
 #' @importFrom grid arrow
+#' @importFrom stats na.omit runif
+#' @importFrom utils tail head
 #' @examples
 #' flips = c(0, 0, 1)
 #' zplot(flips, 2, 3)
@@ -1198,33 +1199,21 @@ probReject = function(p, n, r) {
 #' @examples
 #' # ph2snb(p = .8, s = 3, t = 5)
 ph2snb = function(p, s, t) {
-  
   if( length(p) != 1 || p < 0 || p > 1 || s < 1 || t < 1 ||
       !is.wholenumber(s) || !is.wholenumber(t)){
-    
     warning("Invalid parameter values")
-    
     return(NaN)
-    
   }
   
   tmnb <- rep(0, s + t - 1)    # zero out, over the range
-  
   for(j in 0 : (t - 1)){      # Last event is success:  eq # (6)
-    
     tmnb[j + s] <- choose(s + j - 1, s - 1) * p ^ s * (1 - p) ^ j
-    
   }
-  
   
   for(j in 0 : (s - 1)){       # Last event is failure:  eq # (7)
-    
     tmnb[j + t] <- tmnb[j + t] +
-      
       choose(t + j - 1, t - 1) * p ^ j * (1 - p) ^ t
-    
   }
-  
   return(tmnb / sum(tmnb))    # Normalize
 }
 
@@ -1363,7 +1352,7 @@ ph2valid = function(p,n,r) {
 #' Test for integer
 #' 
 #' @param x the number to test.
-#' @param tot the tolerance for x being a whole number (default 
+#' @param tol the tolerance for x being a whole number (default 
 #' \code{.Machine$double.eps ^ 0.5})
 is.wholenumber = function(x, tol = .Machine$double.eps ^ 0.5){
     abs(x - round(x)) < tol
