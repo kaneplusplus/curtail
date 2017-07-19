@@ -129,70 +129,6 @@ cdsnb_stacked = function(x, shape, s, t) {
   as.data.frame(ret)
 }
 
-# The Conditional Stopped Negative Binomial Density Plot
-# 
-# A plot of the stacked snb density function. The plot shows the distribution
-# of the stopping time when the binomial process has not reached one of 
-# its endpoints. The success probabilty is fitted using the fit_flips function
-# with specefied prior.
-# @param d a sequence of 1's and 0's corresponding to the binomial process.
-# @param s the top barrier for the snb process.
-# @param t the right barrier for the snb process.
-# @param prior the shape parameters of the prior on the success probability.
-# @importFrom reshape2 melt
-# @export
-#cdsnb_stack_plot <- function(d, shape, s, t) {
-#  value <- Outcome <- NULL
-#  x <- cdsnb(d, shape, s, t)
-#  x <- melt(data=x, id.vars="x") 
-#  names(x)[names(x) == "variable"] <- "Outcome"
-#  qplot(x=factor(x), y=value, data=x, fill=Outcome, geom="bar", 
-#        position="stack", stat="identity", ylab="f(k,p,s,t)", xlab="k")
-#}
-
-# Stacked Plot of the Compound Stopped Negative Binomial Density 
-#
-# The stacked plot of the probability mass function for the snb showing
-# the contributions from N (the top barrier) and R (the right barrier).
-# @param d the data, a vector of 0 and 1 values.
-# @param s the top barrier for the snb process.
-# @param t the right barrier for the snb process.
-# @param shape1 the value of the first shape parameter on the prior
-# @param shape2 the value of the second shape parameter on the prior
-# @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
-# @return a plot of the probability mass function.
-# @export
-# dsnbc_stack_plot = function(d, s, t, shape1=0.5, shape2=0.5,
-#                             x=min(s,t):(t+s-1)) {
-#   value = Outcome = NULL
-#   d = dsnbc_stack(d, s, t, shape1, shape2, x)
-#   d = melt(data=d, id.vars="x") 
-#   names(d)[names(d) == "variable"] = "Outcome"
-#   qplot(x=factor(x), y=value, data=d, fill=Outcome, geom="bar", 
-#         position="stack", stat="identity", ylab="f(k|x,s,t,alpha,beta)", xlab="k")
-# }
-
-# The "Stacked" Compound Negative Binomial Density Function
-# 
-# This function returns the "stacked" density function showing the 
-# contribution from each of the end points to the total mass.
-# @param d the data, a vector of 0 and 1 values.
-# @param s the top barrier for the snb process.
-# @param t the right barrier for the snb process.
-# @param shape1 the value of the first shape parameter on the prior
-# @param shape2 the value of the second shape parameter on the prior
-# @param x the range of the distribution (defaults to min(s,t):(t+s-1)).
-# @return the "stacked" density.
-# @export
-# dsnbc_stack = function(d, s, t, shape1=0.5, shape2=0.5,
-#                        x=min(s,t):(t+s-1)) {
-#   num_heads = sum(d)
-#   num_flips = length(d)
-#   as.data.frame(
-#     dsnbc_private_stacked(x, shape1+num_heads, shape2+num_flips-num_heads,s,t))
-# }
-
-
 #' The Stopped Negative Binomial Distribution
 #'
 #' Density, distribution function, quantile function and random generation
@@ -233,40 +169,6 @@ rsnb = function(n, prob, s, t) {
   sample(support, n, replace=TRUE, prob=ps)
 }
 
-##' Simulate the binomial process
-##'
-##' Generate coin flip trajectories that stop after either s heads or t tails.
-##' @param n the number of trajectories to simulate.
-##' @param prob the probability of a head.
-##' @param s the number of heads to stop at.
-##' @param t the number of tails to stop at.
-##' @param drop if TRUE then return the results as a matrix. Otherwise return as a list.
-## @export
-#snb_flips = function(n, prob, s, t, drop=TRUE) {
-#  if (length(prob) > 1)
-#    stop("rsnb prob-parameter must have length 1")
-#  flips = foreach(i=1:n) %do% {
-#    flip = rbinom(s+t-1, 1, prob=prob)
-#    path = c(cumsum(flip), sum(flip))
-#    m = which(path >= s)
-#    if (length(m) == 0) {
-#      m = s+t-1
-#    } else {
-#      m = min(m)
-#    }
-#    r = which(path < 0:(s+t-1)-(t-s+1))
-#    if (length(r) == 0) {
-#      r = s+t-1
-#    } else {
-#      r = min(r)
-#    }
-#    flip[1:min(m, r)]
-#  }
-#  if (n == 1 && drop) {
-#    flips = unlist(flips)
-#  }
-#  flips
-#}
 
 #' Format a data.frame for plotting by the zplot function
 #' @param flips the seqence of ones and zeros denoting responses and 
@@ -986,8 +888,9 @@ minimaxDesign <- function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' #probRejectTraditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' #probRejectTraditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' probRejectTraditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' probRejectTraditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' @export
 probRejectTraditional = function(p, n, r) {
   # check validity of parameter values
   

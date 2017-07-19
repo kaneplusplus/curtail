@@ -4,6 +4,49 @@ context('curtail function calls')
 
 ##public functions
 
+test_that("dsnb_stacked function works", {
+  s <- 5
+  t <- 7
+  resp <- dsnb_stacked(x = min(s,t):(s+t-1), p = .2, s = s, t = t)
+  expect_equal(resp[, "x"], 5:11)
+  expect_equal(round(resp[, "s"], 6), c(0.00032, 0.00128, 0.003072, 0.005734, 0.009175, 0.013212, 0.017616))
+  expect_equal(round(resp[, "t"], 6), c(0, 0, 0.209715, 0.293601, 0.234881, 0.140929, 0.070464))
+  expect_is(resp, "matrix")
+})
+test_that("cdsnb_stacked function works", {
+  s <- 5
+  t <- 7
+  resp <- cdsnb_stacked(x=min(s,t):(s+t-1), shape=c(1, 1), s=s, t=t)
+  expect_equal(resp[, "k"], 5:11)
+  expect_equal(round(resp[, "s"], 6), c(0.166667, 0.119048, 0.089286, 0.069444, 0.055556, 0.045455, 0.037879))
+  expect_equal(round(resp[, "t"], 6), c(0, 0, 0.125, 0.097222, 0.077778, 0.063636, 0.053030))
+  expect_is(resp, "data.frame")
+})
+
+test_that("esnb function works", {
+  resp <- esnb(p = .4, s = 7, t=11)
+  expect_equal(round(resp, 5), 14.50153)
+  expect_is(resp, "numeric")
+})
+
+test_that("vsnb function works", {
+  resp <- vsnb(p = .4, s = 7, t=11)
+  expect_equal(round(resp, 6), 4.544609)
+  expect_is(resp, "numeric")
+})
+
+test_that("ecsnb function works", {
+  resp <- ecsnb(shape=c(1, 1), s=7, t=11)
+  expect_equal(round(resp, 5), 11.54329)
+  expect_is(resp, "numeric")
+})
+
+test_that("vcsnb function works", {
+  resp <- vcsnb(shape=c(1, 1), s=7, t=11)
+  expect_equal(round(resp, 6), 9.209055)
+  expect_is(resp, "numeric")
+})
+
 test_that("criticalValues function works for two-stage design", {
   resp <- criticalValues(n=c(6, 30), p=c(.8, .2), pearly = .1, alpha = .1)
   expect_equal(resp[1], 4)
