@@ -47,50 +47,50 @@ test_that("vcsnb function works", {
   expect_is(resp, "numeric")
 })
 
-test_that("criticalValues function works for two-stage design", {
-  resp <- criticalValues(n=c(6, 30), p=c(.8, .2), pearly = .1, alpha = .1)
+test_that("critical_values function works for two-stage design", {
+  resp <- critical_values(n=c(6, 30), p=c(.8, .2), pearly = .1, alpha = .1)
   expect_equal(resp[1], 4)
   expect_equal(resp[2], 11)
   expect_is(resp, 'numeric')
 })
 
-test_that("criticalValues function works for one-stage design", {
-  resp <- criticalValues(n=36, p=.2, alpha = .1)
+test_that("critical_values function works for one-stage design", {
+  resp <- critical_values(n=36, p=.2, alpha = .1)
   expect_equal(resp,11)
   expect_is(resp, 'numeric')
 })
 
-test_that("probEarlyStop function works", {
-  resp <- probEarlyStop(p=0.8, n = 6, r = 4)
+test_that("prob_early_stop function works", {
+  resp <- prob_early_stop(p=0.8, n = 6, r = 4)
   expect_equal(round(resp, 5), 0.09888)
   expect_is(resp, 'numeric')
 })
 
-test_that("expectedStage1SampleSize function works for two-stage design", {
-  resp <- expectedStage1SampleSize(p = c(0.8, .2), n = c(6, 30), r = c(4, 11))
+test_that("expected_stage1_sample_size function works for two-stage design", {
+  resp <- expected_stage1_sample_size(p = c(0.8, .2), n = c(6, 30), r = c(4, 11))
   expect_equal(resp$expectation, 4.76)
   expect_equal(round(resp$standardDeviation, 7), 0.7797435)
  expect_is(resp, 'list')
 })
 
-test_that("expectedStage1SampleSize function works for one-stage design", {
-  resp <- expectedStage1SampleSize(p = 0.8, n = 6, r = 4)
+test_that("expected_stage1_sample_size function works for one-stage design", {
+  resp <- expected_stage1_sample_size(p = 0.8, n = 6, r = 4)
   expect_equal(resp$expectation, 4.76)
   expect_equal(round(resp$standardDeviation, 7), 0.7797435)
   expect_is(resp, 'list')
 })
 
 
-test_that("expectedTotalSampleSize function works", {
-  resp <- expectedTotalSampleSize(p = c(0.8, 0.2), n= c(6, 30), r = c(4, 11))
+test_that("expected_total_sample_size function works", {
+  resp <- expected_total_sample_size(p = c(0.8, 0.2), n= c(6, 30), r = c(4, 11))
   expect_equal(round(resp, 5), 29.32231)
   expect_is(resp, 'numeric')
 })
 
 ### optimal and minimax functions
 
-test_that("bestDesigns function works", {
-  resp <- bestDesigns(p = c(0.8, 0.2), ntot = 36, pearly = .1, alpha = .1)
+test_that("best_designs function works", {
+  resp <- best_designs(p = c(0.8, 0.2), ntot = 36, pearly = .1, alpha = .1)
   expect_equal(resp["Optimal", "p1"], 0.8)
   expect_equal(resp["Optimal", "n1"], 6)
   expect_equal(resp["Optimal", "r1"], 4)
@@ -116,34 +116,34 @@ test_that("bestDesigns function works", {
   expect_is(resp, 'data.frame')
 })
 
-test_that("minimaxDesign function works", {
-  resp <- minimaxDesign(p = c(.8, .2), n = c(3,33), r = criticalValues(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
+test_that("minimax_design function works", {
+  resp <- minimax_design(p = c(.8, .2), n = c(3,33), r = criticalValues(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
   expect_equal(round(resp, 5), 0.07063)
   expect_is(resp, 'numeric')
 })
 
-test_that("probRejectTraditional function works", {
-  resp <- probRejectTraditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+test_that("prob_reject_traditional function works", {
+  resp <- prob_reject_traditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
   expect_equal(round(resp, 5), 0.08578)
   expect_is(resp, 'numeric')
 })
 
-test_that("probReject function works", {
-  resp <- probReject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+test_that("prob_reject function works", {
+  resp <- prob_reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
   expect_equal(round(resp, 5), 0.09044)
   expect_is(resp, 'numeric')
 })
 
-test_that("allOptimalDesigns function works", {
-  resp <- allOptimalDesigns(p = c( .8, .2), n = 10)
+test_that("all_optimal_designs function works", {
+  resp <- all_optimal_designs(p = c( .8, .2), n = 10)
   expect_equal(resp$n1, c(2, 6, 5, 4, 3, 7, 8, 9))
   expect_equal(resp$n2, c(8, 4, 5, 6, 7, 3, 2, 1))
   expect_equal(round(resp$`Expected Sample Size`, 6), c(7.214133, 7.234434, 7.272286, 7.329535, 7.383349, 7.426047, 7.587027, 7.986812))
   expect_is(resp, 'data.frame')
 })
 
-test_that("allMinimaxDesigns function works", {
-  resp <- allMinimaxDesigns(p = c( .8, .2), n = 10)
+test_that("all_minimax_designs function works", {
+  resp <- all_minimax_designs(p = c( .8, .2), n = 10)
   expect_equal(resp$n1, c(6, 2, 5, 9, 8, 4, 7, 3))
   expect_equal(resp$n2, c(4, 8, 5, 1, 2, 6, 3, 7))
   expect_equal(round(resp$`Probability of Maximum Sample Size`, 8), c(0.06404506, 0.06491341, 0.06498202, 0.06502810, 0.06545818, 0.06559949, 0.06574490, 0.06593741))

@@ -458,10 +458,10 @@ vcsnb = function(shape, s, t) {
 #' @param alpha desired significance level (default = .1).
 #' @importFrom stats qbinom
 #' @examples
-#' criticalValues(n = 36, p=.2, alpha=.1)
-#' criticalValues( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
+#' critical_values(n = 36, p=.2, alpha=.1)
+#' critical_values( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
 #' @export
-criticalValues = function(n, p, pearly = .1, alpha = .1) {
+critical_values = function(n, p, pearly = .1, alpha = .1) {
   if(length(p) != length(n))
     stop('Parameters p and n must be the same length (both length 1 for the one-stage design, or both length 2 for the two-stage design)')
   
@@ -493,7 +493,7 @@ criticalValues = function(n, p, pearly = .1, alpha = .1) {
    for (j in 0 : n[1]){
     
     # r1 based on pearly
-    if (probEarlyStop(p, n, r = c(j, 0)) > pearly)
+    if (prob_early_stop(p, n, r = c(j, 0)) > pearly)
       
     return(c(max(j - 1, 0), r2))
   }
@@ -514,9 +514,9 @@ criticalValues = function(n, p, pearly = .1, alpha = .1) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2) 
 #' @examples
-#' probEarlyStop(p = c(.8, .2), n = c(25, 9), r = c(17, 11))
+#' prob_early_stop(p = c(.8, .2), n = c(25, 9), r = c(17, 11))
 #' @export
-probEarlyStop= function(p, n, r) {
+prob_early_stop= function(p, n, r) {
   if( ! ph2valid(p, n, r)){
     warning("Invalid parameter values")
     return(NaN)
@@ -565,10 +565,10 @@ probEarlyStop= function(p, n, r) {
 #'          or a vector for the two-stage design containing the minimum number of Stage 1 successes 
 #'          to continue to Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2) 
 #' @examples
-#' expectedStage1SampleSize( p = .6, n = 18, r = 3)
-#' expectedStage1SampleSize(p = c(.8, .2), n = c(5, 31), r = c(3, 11))
+#' expected_stage1_sample_size( p = .6, n = 18, r = 3)
+#' expected_stage1_sample_size(p = c(.8, .2), n = c(5, 31), r = c(3, 11))
 #' @export
-expectedStage1SampleSize= function(p, n, r) {
+expected_stage1_sample_size= function(p, n, r) {
   if(length(p) != length(n) | length(n) != length(r) | length(p) != length(r))
     stop('Parameters p, n, and r must all be the same length (all length 1 for the one-stage design, or all length 2 for the two-stage design)')
   if(length(p) > 1){ p1 <- p[1] # p can be vector or scalar
@@ -610,11 +610,11 @@ expectedStage1SampleSize= function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' expectedTotalSampleSize(p = c(.8, .2), n=c(6, 30), r=c(4, 11))
-#' expectedTotalSampleSize(p = c(.8, .2), n = c(18, 18), r = c(12, 11))
+#' expected_total_sample_size(p = c(.8, .2), n=c(6, 30), r=c(4, 11))
+#' expected_total_sample_size(p = c(.8, .2), n = c(18, 18), r = c(12, 11))
 #' @importFrom stats dbinom
 #' @export
-expectedTotalSampleSize= function(p, n, r) {
+expected_total_sample_size= function(p, n, r) {
   if(length(p)!=2 || length(n)!=2 || length(r)!=2) stop("Parameters must be vectors of length 2")
   # check parameter values
   if( ! ph2valid(p, n, r)){
@@ -622,7 +622,7 @@ expectedTotalSampleSize= function(p, n, r) {
     return(NaN)
   }
   
-  pearly <- probEarlyStop( p, n, r)  # Probability of stopping early
+  pearly <- prob_early_stop( p, n, r)  # Probability of stopping early
   
   #Pr(Y1=y1|continue to stage 2)
   # truncated negative binomial distribution
@@ -697,19 +697,19 @@ expectedTotalSampleSize= function(p, n, r) {
 #' @param pearly desired probability of early stopping (default = .1).
 #' @param alpha desired significance level (default = .1).
 #' @examples 
-#' allMinimaxDesigns(c(.8, .2), 36)
-#' allMinimaxDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' all_minimax_designs(c(.8, .2), 36)
+#' all_minimax_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
-allMinimaxDesigns = function(p, ntot, pearly = .1, alpha = .1){
+all_minimax_designs = function(p, ntot, pearly = .1, alpha = .1){
   if (any(p>1) || any(p < 0) || ntot<0 || pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
   {
     warning("Invalid parameter values")
     return (NaN)
   }
-  rcrit <- sapply(1:(ntot-1), function(n1) criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha))
+  rcrit <- sapply(1:(ntot-1), function(n1) critical_values(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha))
   n1 <- (1:(ntot-1))[which(rcrit[1,]>0)]
-  prob <- sapply(n1, function(n1) minimaxDesign(p=p, n=c(n1, ntot-n1), 
-                                r=criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha)))
+  prob <- sapply(n1, function(n1) minimax_design(p=p, n=c(n1, ntot-n1), 
+                                r=critical_values(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha)))
   
   mmax <- data.frame(n1, (ntot-n1), prob)
   names(mmax) <- c("n1", "n2", "Probability of Maximum Sample Size")
@@ -728,20 +728,20 @@ allMinimaxDesigns = function(p, ntot, pearly = .1, alpha = .1){
 #' @param pearly desired probability of early stopping (default = .1).
 #' @param alpha desired significance level (default = .1).
 #' @examples 
-#' allOptimalDesigns(c(.8, .2), 36)
-#' allOptimalDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' all_optimal_designs(c(.8, .2), 36)
+#' all_optimal_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
-allOptimalDesigns = function(p, ntot, pearly = .1, alpha = .1){
+all_optimal_designs = function(p, ntot, pearly = .1, alpha = .1){
   if (any(p>1) || any(p < 0) || ntot<0 || pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
   {
     warning("Invalid parameter values")
     return (NaN)
   }
 
-  rcrit <- sapply(1:(ntot-1), function(n1) criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha))
+  rcrit <- sapply(1:(ntot-1), function(n1) critical_values(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha))
   n1 <- (1:(ntot-1))[which(rcrit[1,]>0)]
-  ss <- sapply(n1, function(n1) expectedTotalSampleSize(p=p, n=c(n1, ntot-n1), 
-                                r=criticalValues(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha)))
+  ss <- sapply(n1, function(n1) expected_total_sample_size(p=p, n=c(n1, ntot-n1), 
+                                r=critical_values(n=c(n1, ntot-n1), p=p, pearly=pearly, alpha = alpha)))
   
   
   
@@ -759,10 +759,10 @@ allOptimalDesigns = function(p, ntot, pearly = .1, alpha = .1){
 #' @param pearly desired probability of early stopping (default = .1).
 #' @param alpha desired significance level (default = .1).
 #' @examples 
-#' bestDesigns(c(.8, .2), 36)
-#' bestDesigns(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' best_designs(c(.8, .2), 36)
+#' best_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
 #' @export
-bestDesigns= function(p, ntot, pearly = .1, alpha = .1) {
+best_designs= function(p, ntot, pearly = .1, alpha = .1) {
   if (any(!is.numeric(p) || any(p>1) || any(p < 0) || !is.numeric(ntot) || 
       ntot<0 || !is.numeric(pearly) || pearly < 0 || pearly > 1 || 
       !is.numeric(alpha) || alpha < 0 || alpha > 1)) {
@@ -770,19 +770,19 @@ bestDesigns= function(p, ntot, pearly = .1, alpha = .1) {
     return (NaN)
   }
   
-  opt <- allOptimalDesigns(p, ntot, pearly, alpha)
-  mini <- allMinimaxDesigns(p, ntot, pearly, alpha)
+  opt <- all_optimal_designs(p, ntot, pearly, alpha)
+  mini <- all_minimax_designs(p, ntot, pearly, alpha)
   optimalDes <- opt[which.min(opt[,3]),]
   minimaxDes <- mini[which.min(mini[,3]),]
   nOpt <- as.vector(c(optimalDes[1,1], optimalDes[1,2]))
   nMini <- as.vector(c(minimaxDes[1,1], minimaxDes[1,2]))
-  rOpt <- criticalValues(c(optimalDes[1,1], optimalDes[1,2]), p, pearly, alpha)
-  rMini <- criticalValues(c(minimaxDes[1,1], minimaxDes[1,2]), p, pearly, alpha)
+  rOpt <- critical_values(c(optimalDes[1,1], optimalDes[1,2]), p, pearly, alpha)
+  rMini <- critical_values(c(minimaxDes[1,1], minimaxDes[1,2]), p, pearly, alpha)
   
-  optimalDesign <- cbind(p[1], nOpt[1], rOpt[1], p[2], nOpt[2], rOpt[2], alpha, probEarlyStop(p, nOpt, rOpt), 
-                         optimalDes[1,3], minimaxDesign(p, nOpt, rOpt))
-  minimaxDesign <- cbind(p[1], nMini[1], rMini[1], p[2], nMini[2], rMini[2], alpha, probEarlyStop(p, nMini, rMini), 
-                         expectedTotalSampleSize(p, nMini, rMini), minimaxDes[1,3])
+  optimalDesign <- cbind(p[1], nOpt[1], rOpt[1], p[2], nOpt[2], rOpt[2], alpha, prob_early_stop(p, nOpt, rOpt), 
+                         optimalDes[1,3], minimax_design(p, nOpt, rOpt))
+  minimaxDesign <- cbind(p[1], nMini[1], rMini[1], p[2], nMini[2], rMini[2], alpha, prob_early_stop(p, nMini, rMini), 
+                         expected_total_sample_size(p, nMini, rMini), minimaxDes[1,3])
   designs <- data.frame(rbind(optimalDesign, minimaxDesign))
   rownames(designs) <- c("Optimal", "Minimax")
   colnames(designs) <- c("p1", "n1", "r1", "p2", "n2", "r2", "Alpha", "PET", "ECSS", "P(MaxSS)")
@@ -813,9 +813,9 @@ plot.ph2_design = function(x, ...) {
   p <- c(x[1, "p1"], x[1, "p2"])
   ntot <- x[1, "n1"]+x[1, "n2"]
   
-  opt <- allOptimalDesigns(p, ntot, pearly, alpha)
+  opt <- all_optimal_designs(p, ntot, pearly, alpha)
   opt <- opt[order(opt[,1]),]
-  mini <- allMinimaxDesigns(p, ntot, pearly, alpha)
+  mini <- all_minimax_designs(p, ntot, pearly, alpha)
   mini <- mini[order(mini[,1]),]
   
   
@@ -838,10 +838,10 @@ plot.ph2_design = function(x, ...) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' minimaxDesign(p=c(.8, .2), n=c(3,33), r=criticalValues(n=c(3,33), 
+#' minimax_design(p=c(.8, .2), n=c(3,33), r=critical_values(n=c(3,33), 
 #'   p=c(.8, .2), pearly=.1, alpha=.1))
 #' @export
-minimaxDesign <- function(p, n, r) {
+minimax_design <- function(p, n, r) {
   if (!ph2valid(p, n, r)){
     warning("Invalid parameter values")
     return(NaN) # Check validity of parameters
@@ -850,7 +850,7 @@ minimaxDesign <- function(p, n, r) {
     return(choose(n[1]+n[2]-1, r[2]-1)*p[2]^(r[2]-1)*(1-p[2])^(n[1]+n[2]-r[2]))
   }
   else{
-    pearly <- probEarlyStop(p, n, r) # Probability of stopping early
+    pearly <- prob_early_stop(p, n, r) # Probability of stopping early
     minimaxDesign<- 0
     
     ck <- rep(0, n[1])     # Distribution of Y1  |  Don't stop early
@@ -888,10 +888,10 @@ minimaxDesign <- function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' probRejectTraditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' probRejectTraditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' prob_reject_traditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' prob_reject_traditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 #' @export
-probRejectTraditional = function(p, n, r) {
+prob_reject_traditional = function(p, n, r) {
   # check validity of parameter values
   
   if ( ! ph2valid(p, n, r)){
@@ -958,10 +958,10 @@ probRejectTraditional = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' probReject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' probReject(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' prob_reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' prob_reject(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 #' @export
-probReject = function(p, n, r) {
+prob_reject = function(p, n, r) {
   # check validity of parameter values
   if ( ! ph2valid(p, n, r)){
   
