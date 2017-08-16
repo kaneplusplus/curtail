@@ -6,6 +6,14 @@ S = function(k, p, s) {
   ret
 }
 
+single_stage_significance = function(p0, s, t) {
+  dsnb_stacked(min(s, t):(s+t-1), p=p0, s=s, t=t)[,'s'] %>% sum
+}
+
+single_stage_power = function(p1, s, t) {
+  dsnb_stacked(min(s, t):(s+t-1), p=p1, s=s, t=t)[,'s'] %>% sum
+}
+
 #' Stack the distribution by responders and non-responders.
 #'
 #' Stacked distribution function for the stopped negative binomial distribution.
@@ -337,6 +345,74 @@ kplot = function(flips, s, t, bw=FALSE) {
     }
   }
   p
+}
+
+#' Plot power and significance 
+#'
+#' Plot power and significance across all trial designs with a maximum number of patients, n,
+#' with a varying number of responses, s, required to reach the success endpoint
+#'
+#' @param n maximum number of patients in the trial
+#' @param p0 probability of success under the null hypothesis
+#' @param p1 probability of success under the alternative hypothesis
+#' @importFrom foreach foreach %do%
+
+#' @examples
+#' power_significance_plot(17, 0.2, 0.4)
+#' @export
+
+power_significance_plot = function(n, p0, p1){
+
+  designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
+    ti = n + 1 - si
+    c(si, ti, single_stage_significance(p0, si, ti), single_stage_power(p1, si, ti),
+      esnb(p0, si, ti))
+  }
+  rownames(designs) = NULL
+  colnames(designs) = c("s", "t", "Significance", "Power", "ess")
+  designs = as.data.frame(designs)
+  
+  designs_long = gather(designs, `Design Feature`, value, Significance:Power)
+  
+  ggplot(designs_long, aes(x=s, y=value, color=`Design Feature`)) + 
+    geom_line() + ylab("Probability") + 
+    xlab("Number of Responses to Stop the Trial (s)") + theme_bw() +
+    scale_x_continuous(breaks=seq_len(n-1))
+  
+  
+}
+
+#' ROC curve for Power vs. 1-Significance
+#'
+#' ROC curve of all trial designs with a maximum number of patients, n,
+#' with a varying number of responses, s, required to reach the success endpoint
+#'
+#' @param n maximum number of patients in the trial
+#' @param p0 probability of success under the null hypothesis
+#' @param p1 probability of success under the alternative hypothesis
+#' @importFrom foreach foreach %do%
+#' @examples
+#' power_significance_ROC(17, 0.2, 0.4)
+#' @export
+power_significance_ROC = function(n, p0, p1){
+  
+  designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
+    ti = n + 1 - si
+    c(si, ti, single_stage_significance(p0, si, ti), single_stage_power(p1, si, ti),
+      esnb(p0, si, ti))
+  }
+  rownames(designs) = NULL
+  colnames(designs) = c("s", "t", "Significance", "Power", "ess")
+  designs = as.data.frame(designs)
+  
+  data_pos = designs[1:(n-1), c("Power", "Significance", "s")]
+  data_pos$Power = data_pos$Power + 0.02
+  data_pos$Significance = data_pos$Significance - 0.02
+  
+  ggplot(designs, aes(x=Power, y=1-Significance)) + 
+    geom_line() +   
+    geom_text(data=data_pos, aes(x=Power, y=1-Significance, label=s)) +
+    theme_bw()
 }
 
 
