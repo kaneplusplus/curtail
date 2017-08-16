@@ -7,11 +7,11 @@ S = function(k, p, s) {
 }
 
 single_stage_significance = function(p0, s, t) {
-  dsnb_stacked(min(s, t):(s+t-1), p=p0, s=s, t=t)[,'s'] %>% sum
+  sum(dsnb_stacked(min(s, t):(s+t-1), p=p0, s=s, t=t)[,'s'])
 }
 
 single_stage_power = function(p1, s, t) {
-  dsnb_stacked(min(s, t):(s+t-1), p=p1, s=s, t=t)[,'s'] %>% sum
+  sum(dsnb_stacked(min(s, t):(s+t-1), p=p1, s=s, t=t)[,'s'])
 }
 
 #' Stack the distribution by responders and non-responders.
