@@ -8,5 +8,6 @@ URL: https://github.com/kaneplusplus/curtail
 BugReports: https://github.com/kaneplusplus/curtail/issues
 Maintainer: Michelle DeVeaux <michelle.deveaux@yale.edu>
 Imports: ggplot2, foreach, tidyr
+Suggests: knitr, covr, testthat
 License: LGPL-2
 RoxygenNote: 6.0.1
