@@ -381,7 +381,6 @@ power_significance_plot = function(n, p0, p1){
   
   
 }
-
 #' ROC curve for Power vs. 1-Significance
 #'
 #' ROC curve of all trial designs with a maximum number of patients, n,
@@ -390,11 +389,13 @@ power_significance_plot = function(n, p0, p1){
 #' @param n maximum number of patients in the trial
 #' @param p0 probability of success under the null hypothesis
 #' @param p1 probability of success under the alternative hypothesis
+#' @param all_labels controls how many labels of s will be included in the plot.  if set to TRUE,  all labels of s will appear 
+#' on the plot. otherwise, if FALSE (default), the labels for the extreme values of s will be removed to improve the readability
 #' @importFrom foreach foreach %do%
 #' @examples
 #' power_significance_ROC(17, 0.2, 0.4)
 #' @export
-power_significance_ROC = function(n, p0, p1){
+power_significance_ROC = function(n, p0, p1, all_labels=FALSE){
   
   designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
     ti = n + 1 - si
@@ -408,13 +409,13 @@ power_significance_ROC = function(n, p0, p1){
   data_pos = designs[1:(n-1), c("Power", "Significance", "s")]
   data_pos$Power = data_pos$Power + 0.02
   data_pos$Significance = data_pos$Significance - 0.02
-  
+  # stop labeling when power < .05 or significance>.95 when all_labels=FALSE
+  if(all_labels==FALSE)  data_pos[which(data_pos$Power<0.05 | data_pos$Significance>.95), "s"] <- ""
   ggplot(designs, aes(x=Power, y=1-Significance)) + 
     geom_line() +   
     geom_text(data=data_pos, aes(x=Power, y=1-Significance, label=s)) +
     theme_bw()
 }
-
 
 #' @export
 psnb = function(q, prob, s, t) {
