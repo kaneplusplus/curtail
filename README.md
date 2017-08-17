@@ -5,9 +5,9 @@ curtail: An R package for Clinical Trials using Curtailed Designs
 **Contributors:** Michael J. Kane<br/>
 **License:** [LGPL-2](https://opensource.org/licenses/LGPL-2.1)
 
-[![Build Status](https://travis-ci.org/kaneplusplus/preference.svg?branch=master)](https://travis-ci.org/kaneplusplus/curtail)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/ippgxxrkwi545nkq?svg=true)](https://ci.appveyor.com/project/kaneplusplus/curtail)
-[![Coverage Status](https://coveralls.io/repos/github/kaneplusplus/preference/badge.svg?branch=master)](https://coveralls.io/github/kaneplusplus/curtail?branch=master)
+[![Build Status](https://travis-ci.org/kaneplusplus/curtail.svg?branch=master)](https://travis-ci.org/kaneplusplus/curtail)
+[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/a5v9tx3l4g84w1p1/branch/master?svg=true)](https://ci.appveyor.com/project/kaneplusplus/curtail/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/kaneplusplus/curtail/badge.svg?branch=master)](https://coveralls.io/github/kaneplusplus/curtail?branch=master)
 
 
 ## Install the package
