@@ -117,7 +117,7 @@ test_that("best_designs function works", {
 })
 
 test_that("minimax_design function works", {
-  resp <- minimax_design(p = c(.8, .2), n = c(3,33), r = criticalValues(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
+  resp <- minimax_design(p = c(.8, .2), n = c(3,33), r = critical_values(n=c(3,33), p=c(.8, .2), pearly = .1, alpha =.1))
   expect_equal(round(resp, 5), 0.07063)
   expect_is(resp, 'numeric')
 })
