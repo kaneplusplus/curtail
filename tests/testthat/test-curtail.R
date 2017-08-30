@@ -4,6 +4,19 @@ context('curtail function calls')
 
 ##public functions
 
+test_that("single_stage_significance function works", {
+  resp <- single_stage_significance(.2, 5, 7) 
+  expect_equal(round(resp, 8), 0.05040957)
+  expect_is(resp, "numeric")
+})
+
+test_that("single_stage_power function works", {
+  resp <- single_stage_significance(.6, 5, 7) 
+  expect_equal(round(resp, 7), 0.9006474)
+  expect_is(resp, "numeric")
+})
+
+
 test_that("dsnb_stacked function works", {
   s <- 5
   t <- 7
@@ -122,15 +135,16 @@ test_that("minimax_design function works", {
   expect_is(resp, 'numeric')
 })
 
-test_that("prob_reject_traditional function works", {
-  resp <- prob_reject_traditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-  expect_equal(round(resp, 5), 0.08578)
+
+test_that("two_stage_significance function works", {
+  resp <- two_stage_significance(p0 = c( .8, .2), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 5), 0.09044)
   expect_is(resp, 'numeric')
 })
 
-test_that("prob_reject function works", {
-  resp <- prob_reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-  expect_equal(round(resp, 5), 0.09044)
+test_that("two_stage_power function works", {
+  resp <- two_stage_power(p = c( .85, .4), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 6), 0.880804)
   expect_is(resp, 'numeric')
 })
 
@@ -186,4 +200,16 @@ test_that("is.wholenumber function works", {
   resp <- is.wholenumber(2.365)
   expect_equal(resp, FALSE)
   expect_is(resp, 'logical')
+})
+
+test_that("prob_reject_traditional function works", {
+  resp <- prob_reject_traditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 5), 0.08578)
+  expect_is(resp, 'numeric')
+})
+
+test_that("prob_reject function works", {
+  resp <- prob_reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 5), 0.09044)
+  expect_is(resp, 'numeric')
 })
