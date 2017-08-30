@@ -6,10 +6,28 @@ S = function(k, p, s) {
   ret
 }
 
+#' Calculate significance for the single stage trial
+#' 
+#' Calculates the probability of rejecting the null hypothesis assuming the null
+#' probability of success
+#'
+#' @param p0 probability of success under the null hypthesis
+#' @param s number of successes to stop the trial
+#' @param t number of failures to stop the trial
+#' @export
 single_stage_significance = function(p0, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=p0, s=s, t=t)[,'s'])
 }
 
+#' Calculate power for the single stage trial
+#' 
+#' Calculates the probability of rejecting the null hypothesis assuming an alternative
+#' probability of success
+#'
+#' @param p1 probability of success under the alternative hypothesis
+#' @param s number of successes to stop the trial
+#' @param t number of failures to stop the trial
+#' @export
 single_stage_power = function(p1, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=p1, s=s, t=t)[,'s'])
 }
@@ -967,7 +985,6 @@ minimax_design <- function(p, n, r) {
 #' @examples
 #' prob_reject_traditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
 #' prob_reject_traditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
-#' @export
 prob_reject_traditional = function(p, n, r) {
   # check validity of parameter values
   
@@ -1024,6 +1041,49 @@ prob_reject_traditional = function(p, n, r) {
   return(reject)
 }
 
+
+#' Significance of the two-stage design under curtailed sampling
+#' 
+#' Calculates the probability of rejecting the null hypothesis in the two-stage design
+#' under curtailed sampling, assuming null probabililties of success 
+#' for Stage 1 and Stage 2
+#'
+#' @param p0 vector containing the probability of successful outcomes
+#'          in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis
+#' @param n vector containing sample sizes planned for Stage 1 (n1) 
+#'           and Stage 2 (n2) 
+#' @param r vector containing the minimum number of Stage 1 successes 
+#' to continue to Stage 2 (r1) and the minimum number of Stage 2 
+#' successes to reject the null hypothesis (r2)
+#' @examples
+#' two_stage_significance(p0 = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' two_stage_significance(p0 = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' @export
+two_stage_significance = function(p0, n, r) {
+  return(prob_reject(p = p0, n = n, r = r))
+}
+
+#' Power of the two-stage design under curtailed sampling
+#' 
+#' Calculates the probability of rejecting the null hypothesis in the two-stage design
+#' under curtailed sampling, assuming alternative probabililties of success 
+#' for Stage 1 and Stage 2
+#'
+#' @param p vector containing the probability of successful outcomes
+#'          in Stage 1 (p1) and Stage 2 (p2) under the alternative hypothesis
+#' @param n vector containing sample sizes planned for Stage 1 (n1) 
+#'           and Stage 2 (n2) 
+#' @param r vector containing the minimum number of Stage 1 successes 
+#' to continue to Stage 2 (r1) and the minimum number of Stage 2 
+#' successes to reject the null hypothesis (r2)
+#' @examples
+#' two_stage_power(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' two_stage_power(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' @export
+two_stage_power = function(p, n, r) {
+  return(prob_reject(p = p, n = n, r = r))
+}
+
 #' Probability of rejecting the null hypothesis in the two-stage design
 #' under curtailed sampling
 #'
@@ -1037,7 +1097,6 @@ prob_reject_traditional = function(p, n, r) {
 #' @examples
 #' prob_reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
 #' prob_reject(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
-#' @export
 prob_reject = function(p, n, r) {
   # check validity of parameter values
   if ( ! ph2valid(p, n, r)){
