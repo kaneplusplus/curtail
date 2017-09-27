@@ -11,7 +11,7 @@ test_that("single_stage_significance function works", {
 })
 
 test_that("single_stage_power function works", {
-  resp <- single_stage_significance(.6, 5, 7) 
+  resp <- single_stage_power(.6, 5, 7) 
   expect_equal(round(resp, 7), 0.9006474)
   expect_is(resp, "numeric")
 })
