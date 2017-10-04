@@ -18,6 +18,5 @@ cdsnb_stacked(x, shape, s, t)
 \description{
 The conditional stacked snb density function. This function gets
 the distribution of the stopping time when the binomial process has not 
-reached one of its endpoints. The success probability is fitted using 
-fit_flips with specified prior.
+reached one of its endpoints.
 }

@@ -17,3 +17,6 @@ single_stage_significance(p0, s, t)
 Calculates the probability of rejecting the null hypothesis assuming the null
 probability of success
 }
+\examples{
+single_stage_significance(0.2, 7, 11)
+}

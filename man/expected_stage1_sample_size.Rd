@@ -2,7 +2,8 @@
 % Please edit documentation in R/ph2.r
 \name{expected_stage1_sample_size}
 \alias{expected_stage1_sample_size}
-\title{Expected sample size and SD for the one-stage design, or for Stage 1 of the two-stage design}
+\title{Expected sample size and SD for the one-stage design, or for Stage 1 of the 
+two-stage design}
 \usage{
 expected_stage1_sample_size(p, n, r)
 }
@@ -19,11 +20,12 @@ or a vector for the two-stage design containing the minimum number of Stage 1 su
 to continue to Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2)}
 }
 \description{
-Mean and standard deviation of the minimum number of patients to make a decision about rejectging the null for the
-one-stage design, or in the two-stage design, the minimum number of Stage 1 patients necessary to be able
-to decide whether to either continue to Stage 2 or else terminate early. 
-For the one-stage design, scalar parameters of length 1 should be used and for the two-stage design, 
-vector parameters of length two should be used.
+Mean and standard deviation of the minimum number of patients to make a decision 
+about rejecting the null for the one-stage design, or in the two-stage design, 
+the minimum number of Stage 1 patients necessary to be able to decide whether to 
+either continue to Stage 2 or else terminate early. For the one-stage design, 
+scalar parameters of length 1 should be used and for the two-stage design, vector 
+parameters of length two should be used.
 }
 \examples{
 expected_stage1_sample_size( p = .6, n = 18, r = 3)

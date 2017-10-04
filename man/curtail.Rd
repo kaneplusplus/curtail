@@ -4,4 +4,10 @@
 \name{curtail}
 \alias{curtail}
 \alias{curtail-package}
-\title{One- and Two-Stage Curtailed Designs Using the Stopped Negative Binomial Distribution}
+\title{Design of One- and Two-Stage Clinical Trials with Curtailed Sampling}
+\references{
+Rucker G (1989). "A two-stage trial design for testing treatment,
+self-selection and treatment preference effects." \emph{Stat Med}, 
+\strong{8}(4):477-485. 
+(\href{https://www.ncbi.nlm.nih.gov/pubmed/2727471}{PubMed})
+}

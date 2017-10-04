@@ -2,13 +2,13 @@
 % Please edit documentation in R/ph2.r
 \name{zplot}
 \alias{zplot}
-\title{The Z-Plot for the Binomial Process}
+\title{The Z-Plot for the Stopped Negative Binomial Process}
 \usage{
 zplot(flips, s, t, show_arrows = TRUE, unif_jitter = 0.2, xlab = NULL,
   ylab = NULL)
 }
 \arguments{
-\item{flips}{the sequence of coing flips (1's and 0's) to visualize.
+\item{flips}{the sequence of coin flips (1's and 0's) to visualize.
 Note that this can be a list in which case multiple processes will be 
 shown.}
 
@@ -26,7 +26,7 @@ shown.}
 \item{ylab}{the name of the y axis.}
 }
 \description{
-Visualize the stopped Bernoulli process with horizontal axis counting 
+Visualize the Stopped Negative Binomial process with horizontal axis counting 
 successes and vertical axis counting failure.
 }
 \examples{

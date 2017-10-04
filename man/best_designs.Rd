@@ -2,7 +2,7 @@
 % Please edit documentation in R/ph2.r
 \name{best_designs}
 \alias{best_designs}
-\title{Finds the minimax and optimals designs for a two-stage trial}
+\title{Finds the minimax and optimal designs for a two-stage trial}
 \usage{
 best_designs(p, ntot, pearly = 0.1, alpha = 0.1)
 }
@@ -17,7 +17,7 @@ in Stage 1 (p1) and Stage 2 (p2)}
 \item{alpha}{desired significance level (default = .1).}
 }
 \description{
-Finds the minimax and optimals designs for a two-stage trial
+Finds the minimax and optimal designs for a two-stage trial
 }
 \examples{
 best_designs(c(.8, .2), 36)

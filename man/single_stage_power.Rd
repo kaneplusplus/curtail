@@ -17,3 +17,6 @@ single_stage_power(p1, s, t)
 Calculates the probability of rejecting the null hypothesis assuming an alternative
 probability of success
 }
+\examples{
+single_stage_power(0.5, 7, 11)
+}
