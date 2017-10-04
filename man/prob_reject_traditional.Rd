@@ -22,7 +22,3 @@ successes to reject the null hypothesis (r2)}
 Probability of rejecting the null hypothesis in the two-stage design
 under traditional sampling
 }
-\examples{
-prob_reject_traditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-prob_reject_traditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
-}
