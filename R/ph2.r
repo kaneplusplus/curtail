@@ -14,6 +14,8 @@ S = function(k, p, s) {
 #' @param p0 probability of success under the null hypthesis
 #' @param s number of successes to stop the trial
 #' @param t number of failures to stop the trial
+#' @examples
+#' single_stage_significance(0.2, 7, 11)
 #' @export
 single_stage_significance = function(p0, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=p0, s=s, t=t)[,'s'])
@@ -27,6 +29,8 @@ single_stage_significance = function(p0, s, t) {
 #' @param p1 probability of success under the alternative hypothesis
 #' @param s number of successes to stop the trial
 #' @param t number of failures to stop the trial
+#' @examples
+#' single_stage_power(0.5, 7, 11)
 #' @export
 single_stage_power = function(p1, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=p1, s=s, t=t)[,'s'])
@@ -132,12 +136,12 @@ dsnb_stack_plot <- function(p, s, t, x, offset) {
 #'
 #' The conditional stacked snb density function. This function gets
 #' the distribution of the stopping time when the binomial process has not 
-#' reached one of its endpoints. The success probability is fitted using 
-#' fit_flips with specified prior.
+#' reached one of its endpoints. 
 #' @param x quantile
 #' @param shape the shape parameters of the beta prior.
 #' @param s the top barrier for the snb process.
 #' @param t the right barrier for the snb process.
+#' @importFrom foreach foreach %do%
 #' @export
 cdsnb_stacked = function(x, shape, s, t) {
   ret <- foreach(k=x, .combine=rbind) %do% {
@@ -280,6 +284,7 @@ ecsnb = function(shape, s, t) {
 #' @param shape the shape parameters of the beta prior.
 #' @param s number of successes.
 #' @param t number of failures.
+#' @importFrom foreach foreach %do%
 #' @export
 vcsnb = function(shape, s, t) {
   ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
@@ -299,12 +304,12 @@ flips_to_zplot_df = function(flips) {
   d
 }
 
-#' The Z-Plot for the Binomial Process
+#' The Z-Plot for the Stopped Negative Binomial Process
 #'
-#' Visualize the stopped Bernoulli process with horizontal axis counting 
+#' Visualize the Stopped Negative Binomial process with horizontal axis counting 
 #' successes and vertical axis counting failure.
 #'
-#' @param flips the sequence of coing flips (1's and 0's) to visualize.
+#' @param flips the sequence of coin flips (1's and 0's) to visualize.
 #' Note that this can be a list in which case multiple processes will be 
 #' shown.
 #' @param s the top barrier for the Bernoulli process.
@@ -646,13 +651,15 @@ prob_early_stop= function(p, n, r) {
   return(probEarlyStop)
 }
 
-#' Expected sample size and SD for the one-stage design, or for Stage 1 of the two-stage design 
+#' Expected sample size and SD for the one-stage design, or for Stage 1 of the 
+#' two-stage design 
 #'
-#' Mean and standard deviation of the minimum number of patients to make a decision about rejectging the null for the
-#' one-stage design, or in the two-stage design, the minimum number of Stage 1 patients necessary to be able
-#' to decide whether to either continue to Stage 2 or else terminate early. 
-#' For the one-stage design, scalar parameters of length 1 should be used and for the two-stage design, 
-#' vector parameters of length two should be used.
+#' Mean and standard deviation of the minimum number of patients to make a decision 
+#' about rejecting the null for the one-stage design, or in the two-stage design, 
+#' the minimum number of Stage 1 patients necessary to be able to decide whether to 
+#' either continue to Stage 2 or else terminate early. For the one-stage design, 
+#' scalar parameters of length 1 should be used and for the two-stage design, vector 
+#' parameters of length two should be used.
 #'
 #' @param p scalar for the one-stage design containing the probability of successful outcome (p), 
 #'          or a vector for the two-stage design containing the probability of successful outcomes in 
@@ -849,7 +856,7 @@ all_optimal_designs = function(p, ntot, pearly = .1, alpha = .1){
 }
 
 
-#' Finds the minimax and optimals designs for a two-stage trial
+#' Finds the minimax and optimal designs for a two-stage trial
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
@@ -985,9 +992,6 @@ minimax_design <- function(p, n, r) {
 #' @param r vector containing the minimum number of Stage 1 successes 
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
-#' @examples
-#' prob_reject_traditional(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' prob_reject_traditional(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 prob_reject_traditional = function(p, n, r) {
   # check validity of parameter values
   
@@ -1098,8 +1102,6 @@ two_stage_power = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' prob_reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' prob_reject(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 prob_reject = function(p, n, r) {
   # check validity of parameter values
   if ( ! ph2valid(p, n, r)){
