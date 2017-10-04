@@ -184,7 +184,6 @@ dsnb = function(x, prob, s, t) {
   if (t < 1) stop("dsnb t-parameter must be at least 1")
   if (any(prob > 1) || any(prob < 0))
     stop("dsnb prob-parameter must be between zero and one inclusive")
-  browser()
   apply(dsnb_stacked(x, prob, s, t)[, 2:3, drop=FALSE], 1, sum)
 }
 

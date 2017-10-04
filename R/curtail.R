@@ -68,4 +68,5 @@
 #' \item{best_designs: }{}
 #' \item{plot.ph2_design: }{}
 #' \item{minimax_design: }{}
+#' }
 NULL
