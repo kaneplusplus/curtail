@@ -196,6 +196,96 @@ rsnb = function(n, prob, s, t) {
   sample(support, n, replace=TRUE, prob=ps)
 }
 
+#' @export
+psnb = function(q, prob, s, t) {
+  if (length(prob) > 1)
+    stop("psnb prob-parameter may only have length 1")
+  support = min(s, t):(t+s-1)
+  cdf = c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
+  qs = floor(q)
+  qs[qs < support[1]] = support[1]-1
+  qs[qs > support[length(support)]] = support[length(support)]
+  cdf[qs]
+}
+
+#' @export
+qsnb = function(p, prob, s, t) {
+  pr = NULL
+  if (length(prob) > 1)
+    stop("psnb prob-parameter may only have length 1")
+  support = min(s, t):t
+  cdf = c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
+  ret = foreach(pr=p, .combine=c) %do% {
+    r = NA
+    if (!is.na(pr)) {
+      r = which(pr < cdf)[1]
+      if (is.na(r))
+        r = support[length(support)]
+    }
+    if (pr > 1 || pr < 0)
+      r = NaN
+    r
+  }
+  ret[ret < support[1]-1] = support[1] - 1
+  ret
+}
+
+
+#' Expected Value of the SNB Distribution
+#' 
+#' Find the expected size of an SNB distribution with specified parameters.
+#' @param p success probability
+#' @param s number of successes 
+#' @param t number of failures
+#' @export
+esnb = function(p, s, t) {
+  ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
+  ds[,2:3] = ds[,1] * ds[,2:3]
+  sum(as.vector(ds[,2:3]))
+}
+
+
+
+#' Variance of the SNB Distribution
+#' 
+#' Find the variance of the SNB distribution with specified parameters.
+#' @param p success probability
+#' @param s number of successes 
+#' @param t number of failures
+#' @export
+vsnb = function(p, s, t) {
+  ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
+  ds[,2:3] = ds[,1]^2 * ds[,2:3]
+  sum(as.vector(ds[,2:3])) - esnb(p, s, t)^2
+}
+
+#' Expected Value of the Conditional SNB Distribution
+#' 
+#' Find the expected size of the conditional SNB distribution with specified 
+#' parameters.
+#' @param shape the shape parameters of the beta prior.
+#' @param s number of successes 
+#' @param t number of failures
+#' @export
+ecsnb = function(shape, s, t) {
+  ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
+  ds[,2:3] = ds[,1] * ds[,2:3]
+  sum(as.vector(ds[,2:3]))
+}
+
+#' Variance of the Conditional SNB Distribution
+#' 
+#' Find the variance of the conditional SNB distribution with specified 
+#' parameters.
+#' @param shape the shape parameters of the beta prior.
+#' @param s number of successes.
+#' @param t number of failures.
+#' @export
+vcsnb = function(shape, s, t) {
+  ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
+  ds[,2:3] = ds[,1]^2 * ds[,2:3]
+  sum(as.vector(ds[,2:3])) - ecsnb(shape, s, t)^2 
+}
 
 #' Format a data.frame for plotting by the zplot function
 #' @param flips the seqence of ones and zeros denoting responses and 
@@ -375,7 +465,7 @@ kplot = function(flips, s, t, bw=FALSE) {
 #' @param p0 probability of success under the null hypothesis
 #' @param p1 probability of success under the alternative hypothesis
 #' @importFrom foreach foreach %do%
-
+#' @importFrom tidyr gather
 #' @examples
 #' power_significance_plot(17, 0.2, 0.4)
 #' @export
@@ -436,95 +526,7 @@ power_significance_ROC = function(n, p0, p1, all_labels=FALSE){
     theme_bw()
 }
 
-#' @export
-psnb = function(q, prob, s, t) {
-  if (length(prob) > 1)
-    stop("psnb prob-parameter may only have length 1")
-  support = min(s, t):(t+s-1)
-  cdf = c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
-  qs = floor(q)
-  qs[qs < support[1]] = support[1]-1
-  qs[qs > support[length(support)]] = support[length(support)]
-  cdf[qs]
-}
 
-#' @export
-qsnb = function(p, prob, s, t) {
-  pr = NULL
-  if (length(prob) > 1)
-    stop("psnb prob-parameter may only have length 1")
-  support = min(s, t):t
-  cdf = c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
-  ret = foreach(pr=p, .combine=c) %do% {
-    r = NA
-    if (!is.na(pr)) {
-      r = which(pr < cdf)[1]
-      if (is.na(r))
-        r = support[length(support)]
-    }
-    if (pr > 1 || pr < 0)
-      r = NaN
-    r
-  }
-  ret[ret < support[1]-1] = support[1] - 1
-  ret
-}
-
-#' Expected Value of the SNB Distribution
-#' 
-#' Find the expected size of an SNB distribution with specified parameters.
-#' @param p success probability
-#' @param s number of successes 
-#' @param t number of failures
-#' @export
-esnb = function(p, s, t) {
-  ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
-  ds[,2:3] = ds[,1] * ds[,2:3]
-  sum(as.vector(ds[,2:3]))
-}
-
-
-
-#' Variance of the SNB Distribution
-#' 
-#' Find the variance of the SNB distribution with specified parameters.
-#' @param p success probability
-#' @param s number of successes 
-#' @param t number of failures
-#' @export
-vsnb = function(p, s, t) {
-  ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
-  ds[,2:3] = ds[,1]^2 * ds[,2:3]
-  sum(as.vector(ds[,2:3])) - esnb(p, s, t)^2
-}
-
-#' Expected Value of the Conditional SNB Distribution
-#' 
-#' Find the expected size of the conditional SNB distribution with specified 
-#' parameters.
-#' @param shape the shape parameters of the beta prior.
-#' @param s number of successes 
-#' @param t number of failures
-#' @export
-ecsnb = function(shape, s, t) {
-  ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
-  ds[,2:3] = ds[,1] * ds[,2:3]
-  sum(as.vector(ds[,2:3]))
-}
-
-#' Variance of the Conditional SNB Distribution
-#' 
-#' Find the variance of the conditional SNB distribution with specified 
-#' parameters.
-#' @param shape the shape parameters of the beta prior.
-#' @param s number of successes.
-#' @param t number of failures.
-#' @export
-vcsnb = function(shape, s, t) {
-  ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
-  ds[,2:3] = ds[,1]^2 * ds[,2:3]
-  sum(as.vector(ds[,2:3])) - ecsnb(shape, s, t)^2 
-}
 
 #' Find critical values for decision making during the one-stage or two-stage trial 
 #' 
