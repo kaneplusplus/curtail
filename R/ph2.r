@@ -11,14 +11,14 @@ S = function(k, p, s) {
 #' Calculates the probability of rejecting the null hypothesis assuming the null
 #' probability of success
 #'
-#' @param p0 probability of success under the null hypthesis
+#' @param pNull probability of success under the null hypthesis
 #' @param s number of successes to stop the trial
 #' @param t number of failures to stop the trial
 #' @examples
 #' single_stage_significance(0.2, 7, 11)
 #' @export
-single_stage_significance = function(p0, s, t) {
-  sum(dsnb_stacked(min(s, t):(s+t-1), p=p0, s=s, t=t)[,'s'])
+single_stage_significance = function(pNull, s, t) {
+  sum(dsnb_stacked(min(s, t):(s+t-1), p=pNull, s=s, t=t)[,'s'])
 }
 
 #' Calculate power for the single stage trial
@@ -26,15 +26,42 @@ single_stage_significance = function(p0, s, t) {
 #' Calculates the probability of rejecting the null hypothesis assuming an alternative
 #' probability of success
 #'
-#' @param p1 probability of success under the alternative hypothesis
+#' @param pAlt probability of success under the alternative hypothesis
 #' @param s number of successes to stop the trial
 #' @param t number of failures to stop the trial
 #' @examples
 #' single_stage_power(0.5, 7, 11)
 #' @export
-single_stage_power = function(p1, s, t) {
-  sum(dsnb_stacked(min(s, t):(s+t-1), p=p1, s=s, t=t)[,'s'])
+single_stage_power = function(pAlt, s, t) {
+  sum(dsnb_stacked(min(s, t):(s+t-1), p=pAlt, s=s, t=t)[,'s'])
 }
+
+
+#' Expected sample size and SD for the one-stage design
+#'
+#' Mean and standard deviation of the minimum number of patients to make a decision 
+#' about rejecting the null for the one-stage design.
+#'
+#' @param p scalar for the one-stage design containing the probability of successful outcome (p)
+#' @param s number of successes to stop the trial
+#' @param t number of failures to stop the trial
+#' @examples
+#' single_stage_expected_sample_size(p = 0.2, s = 7, t = 11)
+#' @export
+single_stage_expected_sample_size= function(p, s, t) {
+  if(length(p) != length(s) | length(s) != length(t) | length(p) != length(t))
+    stop('Parameters p, s, and t must all be the same length (all length 1 for the one-stage design, or all length 2 for the two-stage design)')
+
+  e <- sum((1 : (s+t-1)) * ph2snb(p, s, t))  # Expected value
+  
+  v <- sum((1 : (s+t-1)) ^ 2 * ph2snb(p, s, t)) - e ^ 2   # variance
+  
+  eAndSD<-list("expectation"=e, "standardDeviation"=sqrt(v))
+  
+  return(eAndSD)  # Expected value and SD
+  
+}
+
 
 #' Stack the distribution by responders and non-responders.
 #'
@@ -43,12 +70,16 @@ single_stage_power = function(p1, s, t) {
 #' @param p success probability
 #' @param s number of successes
 #' @param t number of failures
+#' @examples
+#' dsnb_stacked(14, 0.2, 7, 11) 
 #' @export
 dsnb_stacked = function(x, p, s, t) {
   ret = cbind(x, S(x, p, s), S(x, 1-p, t))
   colnames(ret) = c("x", "s", "t")
   ret
 }
+
+
 
 #' The Stacked Plot
 #'
@@ -60,6 +91,8 @@ dsnb_stacked = function(x, p, s, t) {
 #' @import ggplot2
 #' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
+#' @examples 
+#' stacked_plot(8, 7, 11)
 #' @export
 stacked_plot = function(x, s, t) {
   if (missing(s) && missing(t) && all(names(x) %in% c("x", "s", "t"))) {
@@ -77,8 +110,7 @@ stacked_plot = function(x, s, t) {
 
 #' The Stopped Negative Binomial P.M.F. Plot
 #'
-#' The plot of the probability mass function for the SNB showing
-#' the contributions from N (the top barrier) and R (the right barrier).
+#' The plot of the probability mass function for the SNB.
 #' @param p the probability of a success on each coin flip. 
 #' @param s the top barrier for the snb process.
 #' @param t the right barrier for the snb process.
@@ -318,6 +350,7 @@ flips_to_zplot_df = function(flips) {
 #' (default is 0.2).
 #' @param xlab the name of the x axis.
 #' @param ylab the name of the y axis.
+#' @import ggplot2
 #' @importFrom grid arrow
 #' @importFrom stats na.omit runif
 #' @importFrom utils tail head
@@ -466,20 +499,21 @@ kplot = function(flips, s, t, bw=FALSE) {
 #' with a varying number of responses, s, required to reach the success endpoint
 #'
 #' @param n maximum number of patients in the trial
-#' @param p0 probability of success under the null hypothesis
-#' @param p1 probability of success under the alternative hypothesis
+#' @param pNull probability of success under the null hypothesis
+#' @param pAlt probability of success under the alternative hypothesis
+#' @import ggplot2
 #' @importFrom foreach foreach %do%
 #' @importFrom tidyr gather
 #' @examples
 #' power_significance_plot(17, 0.2, 0.4)
 #' @export
 
-power_significance_plot = function(n, p0, p1){
+power_significance_plot = function(n, pNull, pAlt){
 
   designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
     ti = n + 1 - si
-    c(si, ti, single_stage_significance(p0, si, ti), single_stage_power(p1, si, ti),
-      esnb(p0, si, ti))
+    c(si, ti, single_stage_significance(pNull, si, ti), single_stage_power(pAlt, si, ti),
+      esnb(pNull, si, ti))
   }
   rownames(designs) = NULL
   colnames(designs) = c("s", "t", "Significance", "Power", "ess")
@@ -500,20 +534,21 @@ power_significance_plot = function(n, p0, p1){
 #' with a varying number of responses, s, required to reach the success endpoint
 #'
 #' @param n maximum number of patients in the trial
-#' @param p0 probability of success under the null hypothesis
-#' @param p1 probability of success under the alternative hypothesis
+#' @param pNull probability of success under the null hypothesis
+#' @param pAlt probability of success under the alternative hypothesis
 #' @param all_labels controls how many labels of s will be included in the plot.  if set to TRUE,  all labels of s will appear 
 #' on the plot. otherwise, if FALSE (default), the labels for the extreme values of s will be removed to improve the readability
+#' @import ggplot2
 #' @importFrom foreach foreach %do%
 #' @examples
 #' power_significance_ROC(17, 0.2, 0.4)
 #' @export
-power_significance_ROC = function(n, p0, p1, all_labels=FALSE){
+power_significance_ROC = function(n, pNull, pAlt, all_labels=FALSE){
   
   designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
     ti = n + 1 - si
-    c(si, ti, single_stage_significance(p0, si, ti), single_stage_power(p1, si, ti),
-      esnb(p0, si, ti))
+    c(si, ti, single_stage_significance(pNull, si, ti), single_stage_power(pAlt, si, ti),
+      esnb(pNull, si, ti))
   }
   rownames(designs) = NULL
   colnames(designs) = c("s", "t", "Significance", "Power", "ess")
@@ -554,7 +589,7 @@ power_significance_ROC = function(n, p0, p1, all_labels=FALSE){
 #' @param n vector containing sample sizes planned for Stage 1 (n1) 
 #'          and Stage 2 (n2).
 #' @param p vector containing the probability of successful outcomes
-#'          in Stage 1 (p1) and Stage 2 (p2).
+#'          in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis.
 #' @param pearly desired probability of early stopping (default = .1).  
 #' Not necessary for determining critical values for the one-stage design.
 #' @param alpha desired significance level (default = .1).
@@ -650,26 +685,17 @@ prob_early_stop= function(p, n, r) {
   return(probEarlyStop)
 }
 
-#' Expected sample size and SD for the one-stage design, or for Stage 1 of the 
-#' two-stage design 
+#' Expected sample size and SD for Stage 1 of the two-stage design 
 #'
-#' Mean and standard deviation of the minimum number of patients to make a decision 
-#' about rejecting the null for the one-stage design, or in the two-stage design, 
-#' the minimum number of Stage 1 patients necessary to be able to decide whether to 
-#' either continue to Stage 2 or else terminate early. For the one-stage design, 
-#' scalar parameters of length 1 should be used and for the two-stage design, vector 
-#' parameters of length two should be used.
+#' Mean and standard deviation of the minimum number of patients to make a decision to either 
+#' continue to Stage 2 or else terminate early. 
 #'
-#' @param p scalar for the one-stage design containing the probability of successful outcome (p), 
-#'          or a vector for the two-stage design containing the probability of successful outcomes in 
+#' @param p a vector containing the probability of successful outcomes in 
 #'          in Stage 1 (p1) and Stage 2 (p2)
-#' @param n scalar for the one-stage design containing the planned maximum sample size (n = s+t-1), 
-#'          or a vector for the two-stage design containing maximum sample sizes planned for Stage 1 (n1) and Stage 2 (n2)
-#' @param r scalar for the one-stage design containing the minimum number of successes to reject the null hypothesis (s),
-#'          or a vector for the two-stage design containing the minimum number of Stage 1 successes 
-#'          to continue to Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2) 
+#' @param n a vector containing maximum sample sizes planned for Stage 1 (n1) and Stage 2 (n2)
+#' @param r a vector containing the minimum number of Stage 1 successes to continue to 
+#' Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2) 
 #' @examples
-#' expected_stage1_sample_size( p = .6, n = 18, r = 3)
 #' expected_stage1_sample_size(p = c(.8, .2), n = c(5, 31), r = c(3, 11))
 #' @export
 expected_stage1_sample_size= function(p, n, r) {
@@ -793,7 +819,7 @@ expected_total_sample_size= function(p, n, r) {
 
 #' Find the minimax design for a two-stage trial
 #'
-#'Calculates the minimax probability for each combination of n1 and n2 for a given total n
+#'Computes the minimax probability for each combination of n1 and n2 for a given total n
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
@@ -823,7 +849,7 @@ all_minimax_designs = function(p, ntot, pearly = .1, alpha = .1){
 
 #' Find the optimal design for a two-stage trial
 #'
-#'Calculates the expected sample size under curtailed sampling for each combination of 
+#'Computes the expected sample size under curtailed sampling for each combination of 
 #'n1 and n2 for a given total n
 #'
 #' @param p vector containing the probability of successful outcomes
@@ -931,7 +957,7 @@ plot.ph2_design = function(x, ...) {
     
 #' Evaluate the probability that the maximum sample size is needed for the two-stage design
 #'
-#' Evaluate the probability that the maximum sample size n1+n2 is
+#' Evaluate the minimax probability that the maximum sample size n1+n2 is
 #' required to complete the trial
 #'
 #' @param p vector containing the probability of successful outcomes
@@ -1054,7 +1080,7 @@ prob_reject_traditional = function(p, n, r) {
 #' under curtailed sampling, assuming null probabililties of success 
 #' for Stage 1 and Stage 2
 #'
-#' @param p0 vector containing the probability of successful outcomes
+#' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis
 #' @param n vector containing sample sizes planned for Stage 1 (n1) 
 #'           and Stage 2 (n2) 
@@ -1062,11 +1088,11 @@ prob_reject_traditional = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' two_stage_significance(p0 = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' two_stage_significance(p0 = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' two_stage_significance(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+#' two_stage_significance(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 #' @export
-two_stage_significance = function(p0, n, r) {
-  return(prob_reject(p = p0, n = n, r = r))
+two_stage_significance = function(p, n, r) {
+  return(prob_reject(p = p, n = n, r = r))
 }
 
 #' Power of the two-stage design under curtailed sampling
@@ -1100,7 +1126,6 @@ two_stage_power = function(p, n, r) {
 #' @param r vector containing the minimum number of Stage 1 successes 
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
-#' @examples
 prob_reject = function(p, n, r) {
   # check validity of parameter values
   if ( ! ph2valid(p, n, r)){

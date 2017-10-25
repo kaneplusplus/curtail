@@ -16,6 +16,12 @@ test_that("single_stage_power function works", {
   expect_is(resp, "numeric")
 })
 
+test_that("single_stage_expected_sample_size function works", {
+  resp <- single_stage_expected_sample_size(.2, 7, 11)
+  expect_equal(round(resp$expectation, 5), 13.61483)
+  expect_equal(round(resp$standardDeviation, 6), 1.627825)
+  expect_is(resp, 'list')
+})
 
 test_that("dsnb_stacked function works", {
   s <- 5
@@ -79,20 +85,12 @@ test_that("prob_early_stop function works", {
   expect_is(resp, 'numeric')
 })
 
-test_that("expected_stage1_sample_size function works for two-stage design", {
+test_that("expected_stage1_sample_size function works", {
   resp <- expected_stage1_sample_size(p = c(0.8, .2), n = c(6, 30), r = c(4, 11))
   expect_equal(resp$expectation, 4.76)
   expect_equal(round(resp$standardDeviation, 7), 0.7797435)
  expect_is(resp, 'list')
 })
-
-test_that("expected_stage1_sample_size function works for one-stage design", {
-  resp <- expected_stage1_sample_size(p = 0.8, n = 6, r = 4)
-  expect_equal(resp$expectation, 4.76)
-  expect_equal(round(resp$standardDeviation, 7), 0.7797435)
-  expect_is(resp, 'list')
-})
-
 
 test_that("expected_total_sample_size function works", {
   resp <- expected_total_sample_size(p = c(0.8, 0.2), n= c(6, 30), r = c(4, 11))

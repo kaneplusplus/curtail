@@ -23,6 +23,5 @@ not start at 1.}
 a plot of the probability mass function.
 }
 \description{
-The plot of the probability mass function for the SNB showing
-the contributions from N (the top barrier) and R (the right barrier).
+The plot of the probability mass function for the SNB.
 }

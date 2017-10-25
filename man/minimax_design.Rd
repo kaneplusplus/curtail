@@ -18,7 +18,7 @@ to continue to Stage 2 (r1) and the minimum number of Stage 2
 successes to reject the null hypothesis (r2)}
 }
 \description{
-Evaluate the probability that the maximum sample size n1+n2 is
+Evaluate the minimax probability that the maximum sample size n1+n2 is
 required to complete the trial
 }
 \examples{

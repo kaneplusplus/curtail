@@ -17,7 +17,7 @@ in Stage 1 (p1) and Stage 2 (p2)}
 \item{alpha}{desired significance level (default = .1).}
 }
 \description{
-Calculates the expected sample size under curtailed sampling for each combination of 
+Computes the expected sample size under curtailed sampling for each combination of 
 n1 and n2 for a given total n
 }
 \examples{

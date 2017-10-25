@@ -2,32 +2,23 @@
 % Please edit documentation in R/ph2.r
 \name{expected_stage1_sample_size}
 \alias{expected_stage1_sample_size}
-\title{Expected sample size and SD for the one-stage design, or for Stage 1 of the 
-two-stage design}
+\title{Expected sample size and SD for Stage 1 of the two-stage design}
 \usage{
 expected_stage1_sample_size(p, n, r)
 }
 \arguments{
-\item{p}{scalar for the one-stage design containing the probability of successful outcome (p), 
-or a vector for the two-stage design containing the probability of successful outcomes in 
+\item{p}{a vector containing the probability of successful outcomes in 
 in Stage 1 (p1) and Stage 2 (p2)}
 
-\item{n}{scalar for the one-stage design containing the planned maximum sample size (n = s+t-1), 
-or a vector for the two-stage design containing maximum sample sizes planned for Stage 1 (n1) and Stage 2 (n2)}
+\item{n}{a vector containing maximum sample sizes planned for Stage 1 (n1) and Stage 2 (n2)}
 
-\item{r}{scalar for the one-stage design containing the minimum number of successes to reject the null hypothesis (s),
-or a vector for the two-stage design containing the minimum number of Stage 1 successes 
-to continue to Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2)}
+\item{r}{a vector containing the minimum number of Stage 1 successes to continue to 
+Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2)}
 }
 \description{
-Mean and standard deviation of the minimum number of patients to make a decision 
-about rejecting the null for the one-stage design, or in the two-stage design, 
-the minimum number of Stage 1 patients necessary to be able to decide whether to 
-either continue to Stage 2 or else terminate early. For the one-stage design, 
-scalar parameters of length 1 should be used and for the two-stage design, vector 
-parameters of length two should be used.
+Mean and standard deviation of the minimum number of patients to make a decision to either 
+continue to Stage 2 or else terminate early.
 }
 \examples{
-expected_stage1_sample_size( p = .6, n = 18, r = 3)
 expected_stage1_sample_size(p = c(.8, .2), n = c(5, 31), r = c(3, 11))
 }

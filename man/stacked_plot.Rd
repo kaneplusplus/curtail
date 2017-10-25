@@ -20,3 +20,6 @@ a plot of the probability mass function.
 The stacked plot of the probability mass function for the snb showing
 the contributions from N (the top barrier) and R (the right barrier).
 }
+\examples{
+stacked_plot(8, 7, 11)
+}

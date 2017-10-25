@@ -45,7 +45,7 @@
 #' hypothesis assuming the null probability of success}
 #' \item{single_stage_power: }{computes the probability of rejecting the null 
 #' hypothesis assuming an alternative probability of success}
-#' \item{expected_stage1_sample_size: }{computes the mean and standard deviation of 
+#' \item{single_stage_expected_sample_size: }{computes the mean and standard deviation of 
 #' the sample size for the one-stage design}
 #' \item{zplot: }{visualize the Stopped Negative Binomial process with horizontal 
 #' axis counting patient successes and vertical axis counting patient failures}
@@ -67,13 +67,12 @@
 #' distribution}
 #' \item{esnb: }{expected value of the Stopped Negative Binomial distribution}
 #' \item{vsnb: }{variance of the Stopped Negative Binomial distribution}
-#' \item{ecsnb: }{expected value of the Stopped Negative Binomial distribution}
-#' \item{vcsnb: }{variance of the Stopped Negative Binomial distribution}
-#' \item{dsnb_stacked: }{}
+#' \item{dsnb_stacked: }{computes the density stacked by responders and non-
+#' responders}
 #' \item{stacked_plot: }{}
 #' \item{dsnb_plot: }{}
-#' \item{dsnb_stack_plot: }{}
-#' \item{cdsnb_stacked: }{}
+#' \item{dsnb_stack_plot: }{The stacked plot of the probability mass function for the SNB 
+#' showing the contributions from N (the top barrier) and R (the right barrier) by color.}
 #' }
 #' 
 #' Two-Stage Design Function Calls

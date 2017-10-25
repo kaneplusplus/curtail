@@ -18,3 +18,6 @@ dsnb_stacked(x, p, s, t)
 \description{
 Stacked distribution function for the stopped negative binomial distribution.
 }
+\examples{
+dsnb_stacked(14, 0.2, 7, 11) 
+}

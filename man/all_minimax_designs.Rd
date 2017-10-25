@@ -17,7 +17,7 @@ in Stage 1 (p1) and Stage 2 (p2)}
 \item{alpha}{desired significance level (default = .1).}
 }
 \description{
-Calculates the minimax probability for each combination of n1 and n2 for a given total n
+Computes the minimax probability for each combination of n1 and n2 for a given total n
 }
 \examples{
 all_minimax_designs(c(.8, .2), 36)
