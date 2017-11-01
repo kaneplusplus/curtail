@@ -925,14 +925,14 @@ best_designs= function(p, ntot, pearly = .1, alpha = .1) {
 plot.ph2_design = function(x, ...) {
   # Get the arguments from dots
   dot_args = list(...)
-  
+  print(dot_args$pearly)
   # Fill in the value for pearly.
   if ("pearly" %in% names(dot_args)) {
     pearly = dot_args$pearly
   } else {
     pearly = .1
   }
-  
+  print(dot_args$pearly)
   # Fill in the value for alpha.
   if ("alpha" %in% names(dot_args)) {
     alpha = dot_args$alpha
@@ -1109,8 +1109,8 @@ two_stage_significance = function(p, n, r) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' two_stage_power(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-#' two_stage_power(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+#' two_stage_power(p = c( .8, .4), n = c(12, 24), r = c(8, 11))
+#' two_stage_power(p = c( .8, .4), n = c(6, 30), r = c(4, 11))
 #' @export
 two_stage_power = function(p, n, r) {
   return(prob_reject(p = p, n = n, r = r))
@@ -1129,7 +1129,7 @@ two_stage_power = function(p, n, r) {
 prob_reject = function(p, n, r) {
   # check validity of parameter values
   if ( ! ph2valid(p, n, r)){
-  
+    
     warning("Invalid parameter values")
     return (NaN)
   }
@@ -1138,27 +1138,27 @@ prob_reject = function(p, n, r) {
   
   # Loop on Y1 = curtailed sample size in Stage 1
   
-  
   for (y1 in r[1] : n[1])     #  First summation 
   {
-    t1 <- ph2tnb(p[1], n[1], r[1])[y1]
+    t1 <- (1-prob_early_stop(p, n, r))*ph2tnb(p, n, r)[y1]
     
     # Loop on X12 = Stage 1 successes who become Stage 2 successes
-    lowx12 <- max(0, r[2] - n[2])  # lower limit for X12            
+    lowx12 <- max(0, r[2] - (sum(n)-y1))  # lower limit for X12            
     for (x12 in lowx12 : r[1])       # X12 conditional on X1
     {
-      t2 <- dbinom(x12, y1, p[2] / p[1])  #  Prob of X12 given Y1
+      t2 <- dbinom(x12, r[1], p[2]/p[1])  #  Prob of X12 given Y1
       
       # Loop on X2 = Stage 2 successes - Third summation
       lowx2 <- max(0, r[2] - x12) # lower limit for X2
       for (x2 in lowx2 : (sum(n) - y1))
       {
-        reject <- reject + t1 * t2 * dbinom(x2, n[2], p[2])    
+        reject <- reject + t1 * t2 * dbinom(x2, sum(n)-y1, p[2])    
       }
     }
   }
   return(reject)
 }
+
 
 
 #' Stopped negative binomial distribution mass function
