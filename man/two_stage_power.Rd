@@ -23,6 +23,6 @@ under curtailed sampling, assuming alternative probabililties of success
 for Stage 1 and Stage 2
 }
 \examples{
-two_stage_power(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-two_stage_power(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
+two_stage_power(p = c( .8, .4), n = c(12, 24), r = c(8, 11))
+two_stage_power(p = c( .8, .4), n = c(6, 30), r = c(4, 11))
 }

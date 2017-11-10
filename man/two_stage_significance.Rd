@@ -4,10 +4,10 @@
 \alias{two_stage_significance}
 \title{Significance of the two-stage design under curtailed sampling}
 \usage{
-two_stage_significance(p0, n, r)
+two_stage_significance(p, n, r)
 }
 \arguments{
-\item{p0}{vector containing the probability of successful outcomes
+\item{p}{vector containing the probability of successful outcomes
 in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis}
 
 \item{n}{vector containing sample sizes planned for Stage 1 (n1) 
@@ -23,6 +23,6 @@ under curtailed sampling, assuming null probabililties of success
 for Stage 1 and Stage 2
 }
 \examples{
-two_stage_significance(p0 = c( .8, .2), n = c(12, 24), r = c(8, 11))
-two_stage_significance(p0 = c( .8, .2), n = c(6, 30), r = c(4, 11))
+two_stage_significance(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+two_stage_significance(p = c( .8, .2), n = c(6, 30), r = c(4, 11))
 }

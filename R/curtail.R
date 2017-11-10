@@ -69,23 +69,32 @@
 #' \item{vsnb: }{variance of the Stopped Negative Binomial distribution}
 #' \item{dsnb_stacked: }{computes the density stacked by responders and non-
 #' responders}
-#' \item{stacked_plot: }{}
-#' \item{dsnb_plot: }{}
+#' \item{stacked_plot: }{stacked plot of the probability mass function for the snb showing
+#' the contributions from N (the top barrier) and R (the right barrier)}
+#' \item{dsnb_plot: }{plot of the probability mass function for the Stopped Negative Binomial}
 #' \item{dsnb_stack_plot: }{The stacked plot of the probability mass function for the SNB 
 #' showing the contributions from N (the top barrier) and R (the right barrier) by color.}
 #' }
 #' 
 #' Two-Stage Design Function Calls
 #' \itemize{
-#' \item{critical_values: }{}
-#' \item{prob_early_stop: }{}
-#' \item{expected_stage1_sample_size: }{}
-#' \item{expected_total_sample_size: }{}
-#' \item{all_minimax_designs: }{}
-#' \item{all_optimal_designs: }{}
-#' \item{best_designs: }{}
-#' \item{plot.ph2_design: }{}
-#' \item{minimax_design: }{}
+#' \item{critical_values: }{finds the critical values the number of Stage 1 successes to continue to
+#' Stage 2 and the minimum number of Stage 2 successes to the reject the null hypothesis}
+#' \item{prob_early_stop: }{computes the probability of stopping the trial after Stage 1}
+#' \item{expected_stage1_sample_size: }{computes the expected sample size and standard deviation for Stage 1 
+#' of the two-stage design under curtailed sampling}
+#' \item{expected_total_sample_size: }{computes the expected number of patients who are 
+#' enrolled and followed to their endpoint before critical endpoints in Stage 1 and Stage 2 
+#' are achieved}
+#' \item{all_minimax_designs: }{computes the minimax probability for each possible design for a 
+#' a given total n}
+#' \item{all_optimal_designs: }{computes the expected curtailed sample size for each possible design for a 
+#' a given total n}
+#' \item{best_designs: }{finds the minimax and optimal designs for a given total n}
+#' \item{plot.ph2_design: }{plots the optimal and minimax criteria for each possible
+#' design over different values of n1}
+#' \item{minimax_design: }{computes the minimax probability for a given design with 
+#' specified n1 and n2}
 #' }
 #' 
 #' Acknowledgements: This work was partially supported through a 

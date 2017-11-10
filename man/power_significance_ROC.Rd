@@ -4,14 +4,14 @@
 \alias{power_significance_ROC}
 \title{ROC curve for Power vs. 1-Significance}
 \usage{
-power_significance_ROC(n, p0, p1, all_labels = FALSE)
+power_significance_ROC(n, pNull, pAlt, all_labels = FALSE)
 }
 \arguments{
 \item{n}{maximum number of patients in the trial}
 
-\item{p0}{probability of success under the null hypothesis}
+\item{pNull}{probability of success under the null hypothesis}
 
-\item{p1}{probability of success under the alternative hypothesis}
+\item{pAlt}{probability of success under the alternative hypothesis}
 
 \item{all_labels}{controls how many labels of s will be included in the plot.  if set to TRUE,  all labels of s will appear 
 on the plot. otherwise, if FALSE (default), the labels for the extreme values of s will be removed to improve the readability}

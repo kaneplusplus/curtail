@@ -17,3 +17,6 @@ vcsnb(shape, s, t)
 Find the variance of the conditional SNB distribution with specified 
 parameters.
 }
+\examples{
+vcsnb(c(0.5, 0.5), s=7, t=11)
+}

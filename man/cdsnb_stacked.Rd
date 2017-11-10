@@ -20,3 +20,6 @@ The conditional stacked snb density function. This function gets
 the distribution of the stopping time when the binomial process has not 
 reached one of its endpoints.
 }
+\examples{
+cdsnb_stacked(8:11, c(0.5, 0.5), s=7, t=11)
+}

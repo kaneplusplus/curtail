@@ -16,3 +16,6 @@ esnb(p, s, t)
 \description{
 Find the expected size of an SNB distribution with specified parameters.
 }
+\examples{
+esnb(p=0.2, s=7, t=11)
+}

@@ -16,3 +16,6 @@ vsnb(p, s, t)
 \description{
 Find the variance of the SNB distribution with specified parameters.
 }
+\examples{
+vsnb(p=0.2, s=7, t=11)
+}

@@ -23,5 +23,8 @@ not start at 1.}
 a plot of the probability mass function.
 }
 \description{
-The plot of the probability mass function for the SNB.
+The plot of the probability mass function for the Stopped Negative Binomial.
+}
+\examples{
+dsnb_plot(p=.2, s=7, t=11)
 }

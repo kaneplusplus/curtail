@@ -17,9 +17,11 @@ in Stage 1 (p1) and Stage 2 (p2)}
 \item{alpha}{desired significance level (default = .1).}
 }
 \description{
-Finds the minimax and optimal designs for a two-stage trial
+Returns the minimax and optimal designs and their associated statistical 
+properties.
 }
 \examples{
 best_designs(c(.8, .2), 36)
 best_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
+best_designs(c(.7, .3), 40, pearly = .08, alpha=.1)$designs
 }

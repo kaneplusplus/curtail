@@ -23,7 +23,10 @@ not start at 1.}
 a plot of the probability mass function.
 }
 \description{
-The stacked plot of the probability mass function for the SNB showing
-the contributions from N (the top barrier) and R (the right barrier) by
+The stacked plot of the probability mass function for the Stopped Negative Binomial 
+showing the contributions from N (the top barrier) and R (the right barrier) by
 color.
+}
+\examples{
+dsnb_stack_plot(p=.2, s=7, t=11)
 }

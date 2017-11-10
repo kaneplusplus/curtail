@@ -17,7 +17,10 @@ in Stage 1 (p1) and Stage 2 (p2)}
 \item{alpha}{desired significance level (default = .1).}
 }
 \description{
-Computes the minimax probability for each combination of n1 and n2 for a given total n
+Computes the minimax probability (probability of requiring all n1+n2 patients to reach
+a statistical endpoint) for each combination of n1 and n2 for a given total n.
+The minimax design is the design in the first row of output with the smallest 
+minimax probability.
 }
 \examples{
 all_minimax_designs(c(.8, .2), 36)

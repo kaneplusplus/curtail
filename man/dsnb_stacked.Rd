@@ -2,7 +2,7 @@
 % Please edit documentation in R/ph2.r
 \name{dsnb_stacked}
 \alias{dsnb_stacked}
-\title{Stack the distribution by responders and non-responders.}
+\title{Stack the Stopped Negative Binomial distribution by responders and non-responders.}
 \usage{
 dsnb_stacked(x, p, s, t)
 }
@@ -16,7 +16,7 @@ dsnb_stacked(x, p, s, t)
 \item{t}{number of failures}
 }
 \description{
-Stacked distribution function for the stopped negative binomial distribution.
+Stacked distribution function for the Stopped Negative Binomial distribution.
 }
 \examples{
 dsnb_stacked(14, 0.2, 7, 11) 

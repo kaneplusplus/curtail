@@ -101,7 +101,7 @@ test_that("expected_total_sample_size function works", {
 ### optimal and minimax functions
 
 test_that("best_designs function works", {
-  resp <- best_designs(p = c(0.8, 0.2), ntot = 36, pearly = .1, alpha = .1)
+  resp <- best_designs(p = c(0.8, 0.2), ntot = 36, pearly = .1, alpha = .1)$designs
   expect_equal(resp["Optimal", "p1"], 0.8)
   expect_equal(resp["Optimal", "n1"], 6)
   expect_equal(resp["Optimal", "r1"], 4)
@@ -135,14 +135,14 @@ test_that("minimax_design function works", {
 
 
 test_that("two_stage_significance function works", {
-  resp <- two_stage_significance(p0 = c( .8, .2), n = c(12, 24), r = c(8, 11))
-  expect_equal(round(resp, 5), 0.09044)
+  resp <- two_stage_significance(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 5), 0.08578)
   expect_is(resp, 'numeric')
 })
 
 test_that("two_stage_power function works", {
-  resp <- two_stage_power(p = c( .85, .4), n = c(12, 24), r = c(8, 11))
-  expect_equal(round(resp, 6), 0.880804)
+  resp <- two_stage_power(p = c( .8, .4), n = c(12, 24), r = c(8, 11))
+  expect_equal(round(resp, 6), 0.850723)
   expect_is(resp, 'numeric')
 })
 
@@ -208,6 +208,6 @@ test_that("prob_reject_traditional function works", {
 
 test_that("prob_reject function works", {
   resp <- prob_reject(p = c( .8, .2), n = c(12, 24), r = c(8, 11))
-  expect_equal(round(resp, 5), 0.09044)
+  expect_equal(round(resp, 5), 0.08578)
   expect_is(resp, 'numeric')
 })

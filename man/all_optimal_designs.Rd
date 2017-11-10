@@ -18,7 +18,8 @@ in Stage 1 (p1) and Stage 2 (p2)}
 }
 \description{
 Computes the expected sample size under curtailed sampling for each combination of 
-n1 and n2 for a given total n
+n1 and n2 for a given total n.  The optimal design is the design in the first row 
+of output with the smallest expected sample size under curtailed sampling.
 }
 \examples{
 all_optimal_designs(c(.8, .2), 36)

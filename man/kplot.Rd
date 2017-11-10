@@ -2,7 +2,7 @@
 % Please edit documentation in R/ph2.r
 \name{kplot}
 \alias{kplot}
-\title{The K-Plot for the Binomial Process}
+\title{The K-Plot for the Stopped Negative Binomial Process}
 \usage{
 kplot(flips, s, t, bw = FALSE)
 }
@@ -16,7 +16,7 @@ kplot(flips, s, t, bw = FALSE)
 \item{bw}{should the plot be in black and white?}
 }
 \description{
-Visualize the stopped Bernoulli process with a horizontal step axis and a 
+Visualize the Stopped Negative Binomial process with a horizontal step axis and a 
 vertical axis counting the number of successes.
 }
 \examples{

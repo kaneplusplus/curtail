@@ -4,10 +4,10 @@
 \alias{single_stage_power}
 \title{Calculate power for the single stage trial}
 \usage{
-single_stage_power(p1, s, t)
+single_stage_power(pAlt, s, t)
 }
 \arguments{
-\item{p1}{probability of success under the alternative hypothesis}
+\item{pAlt}{probability of success under the alternative hypothesis}
 
 \item{s}{number of successes to stop the trial}
 

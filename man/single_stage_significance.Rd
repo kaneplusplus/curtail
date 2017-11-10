@@ -4,10 +4,10 @@
 \alias{single_stage_significance}
 \title{Calculate significance for the single stage trial}
 \usage{
-single_stage_significance(p0, s, t)
+single_stage_significance(pNull, s, t)
 }
 \arguments{
-\item{p0}{probability of success under the null hypthesis}
+\item{pNull}{probability of success under the null hypthesis}
 
 \item{s}{number of successes to stop the trial}
 

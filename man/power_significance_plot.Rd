@@ -2,16 +2,16 @@
 % Please edit documentation in R/ph2.r
 \name{power_significance_plot}
 \alias{power_significance_plot}
-\title{Plot power and significance}
+\title{Plot Power and Significance for One-Stage Design}
 \usage{
-power_significance_plot(n, p0, p1)
+power_significance_plot(n, pNull, pAlt)
 }
 \arguments{
 \item{n}{maximum number of patients in the trial}
 
-\item{p0}{probability of success under the null hypothesis}
+\item{pNull}{probability of success under the null hypothesis}
 
-\item{p1}{probability of success under the alternative hypothesis}
+\item{pAlt}{probability of success under the alternative hypothesis}
 }
 \description{
 Plot power and significance across all trial designs with a maximum number of patients, n,

@@ -7,9 +7,7 @@
 single_stage_expected_sample_size(p, s, t)
 }
 \arguments{
-\item{p}{scalar for the one-stage design containing the probability of successful outcome (p), 
-or a vector for the two-stage design containing the probability of successful outcomes in 
-in Stage 1 (p1) and Stage 2 (p2)}
+\item{p}{scalar for the one-stage design containing the probability of successful outcome (p)}
 
 \item{s}{number of successes to stop the trial}
 

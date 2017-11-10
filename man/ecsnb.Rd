@@ -17,3 +17,6 @@ ecsnb(shape, s, t)
 Find the expected size of the conditional SNB distribution with specified 
 parameters.
 }
+\examples{
+ecsnb(c(0.5, 0.5), s=7, t=11)
+}

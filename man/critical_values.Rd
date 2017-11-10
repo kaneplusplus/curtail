@@ -11,7 +11,7 @@ critical_values(n, p, pearly = 0.1, alpha = 0.1)
 and Stage 2 (n2).}
 
 \item{p}{vector containing the probability of successful outcomes
-in Stage 1 (p1) and Stage 2 (p2).}
+in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis.}
 
 \item{pearly}{desired probability of early stopping (default = .1).
 Not necessary for determining critical values for the one-stage design.}
@@ -26,8 +26,8 @@ continue to Stage 2 in the two-stage design.
 }
 \details{
 For the one-stage design:  
-Finds s, the minimum number of successes to reject the null hypothesis 
-from the Binomial model with significance level alpha.
+Finds the value of s, the minimum number of successes to reject the 
+null hypothesis, from the Binomial model with significance level alpha.
 
 For the two-stage design:
 Finds r1, the minimum number of Stage 1 successes to continue to 

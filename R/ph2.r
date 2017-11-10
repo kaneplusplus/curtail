@@ -1,11 +1,3 @@
-S = function(k, p, s) {
-  if (p < 0 || p > 1) stop("p must be between zero and one.")
-  if (s < 0) stop("s must be non-negative")
-  ret = choose(k-1, s-1) * p^s * (1-p)^(k-s)
-  ret[k < s] = 0
-  ret
-}
-
 #' Calculate significance for the single stage trial
 #' 
 #' Calculates the probability of rejecting the null hypothesis assuming the null
@@ -63,9 +55,9 @@ single_stage_expected_sample_size= function(p, s, t) {
 }
 
 
-#' Stack the distribution by responders and non-responders.
+#' Stack the Stopped Negative Binomial distribution by responders and non-responders.
 #'
-#' Stacked distribution function for the stopped negative binomial distribution.
+#' Stacked distribution function for the Stopped Negative Binomial distribution.
 #' @param x quantile
 #' @param p success probability
 #' @param s number of successes
@@ -81,7 +73,7 @@ dsnb_stacked = function(x, p, s, t) {
 
 
 
-#' The Stacked Plot
+#' The Stacked Plot of the Stopped Negative Binomial Distribution
 #'
 #' The stacked plot of the probability mass function for the snb showing
 #' the contributions from N (the top barrier) and R (the right barrier).
@@ -92,7 +84,7 @@ dsnb_stacked = function(x, p, s, t) {
 #' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
 #' @examples 
-#' stacked_plot(8, 7, 11)
+#' stacked_plot(x = 7:17,s= 7, t= 11)
 #' @export
 stacked_plot = function(x, s, t) {
   if (missing(s) && missing(t) && all(names(x) %in% c("x", "s", "t"))) {
@@ -110,7 +102,7 @@ stacked_plot = function(x, s, t) {
 
 #' The Stopped Negative Binomial P.M.F. Plot
 #'
-#' The plot of the probability mass function for the SNB.
+#' The plot of the probability mass function for the Stopped Negative Binomial.
 #' @param p the probability of a success on each coin flip. 
 #' @param s the top barrier for the snb process.
 #' @param t the right barrier for the snb process.
@@ -120,6 +112,8 @@ stacked_plot = function(x, s, t) {
 #' not start at 1.
 #' @import ggplot2
 #' @return a plot of the probability mass function.
+#' @examples 
+#' dsnb_plot(p=.2, s=7, t=11)
 #' @export
 dsnb_plot = function(p, s, t, x, offset) {
   value = Outcome = k = NULL
@@ -137,8 +131,8 @@ dsnb_plot = function(p, s, t, x, offset) {
 
 #' The Stopped Negative Binomial P.M.F. Stack-Plot
 #'
-#' The stacked plot of the probability mass function for the SNB showing
-#' the contributions from N (the top barrier) and R (the right barrier) by
+#' The stacked plot of the probability mass function for the Stopped Negative Binomial 
+#' showing the contributions from N (the top barrier) and R (the right barrier) by
 #' color.
 #' @param p the probability of a success on each coin flip. 
 #' @param s the top barrier for the snb process.
@@ -150,6 +144,8 @@ dsnb_plot = function(p, s, t, x, offset) {
 #' @import ggplot2
 #' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
+#' @examples 
+#' dsnb_stack_plot(p=.2, s=7, t=11)
 #' @export
 dsnb_stack_plot <- function(p, s, t, x, offset) {
   if (missing(x))
@@ -174,6 +170,8 @@ dsnb_stack_plot <- function(p, s, t, x, offset) {
 #' @param s the top barrier for the snb process.
 #' @param t the right barrier for the snb process.
 #' @importFrom foreach foreach %do%
+#' @examples 
+#' cdsnb_stacked(8:11, c(0.5, 0.5), s=7, t=11)
 #' @export
 cdsnb_stacked = function(x, shape, s, t) {
   ret <- foreach(k=x, .combine=rbind) %do% {
@@ -272,6 +270,8 @@ qsnb = function(p, prob, s, t) {
 #' @param p success probability
 #' @param s number of successes 
 #' @param t number of failures
+#' @examples 
+#' esnb(p=0.2, s=7, t=11)
 #' @export
 esnb = function(p, s, t) {
   ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
@@ -287,6 +287,8 @@ esnb = function(p, s, t) {
 #' @param p success probability
 #' @param s number of successes 
 #' @param t number of failures
+#' @examples
+#' vsnb(p=0.2, s=7, t=11)
 #' @export
 vsnb = function(p, s, t) {
   ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
@@ -301,6 +303,8 @@ vsnb = function(p, s, t) {
 #' @param shape the shape parameters of the beta prior.
 #' @param s number of successes 
 #' @param t number of failures
+#' @examples 
+#' ecsnb(c(0.5, 0.5), s=7, t=11)
 #' @export
 ecsnb = function(shape, s, t) {
   ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
@@ -316,6 +320,8 @@ ecsnb = function(shape, s, t) {
 #' @param s number of successes.
 #' @param t number of failures.
 #' @importFrom foreach foreach %do%
+#' @examples 
+#' vcsnb(c(0.5, 0.5), s=7, t=11)
 #' @export
 vcsnb = function(shape, s, t) {
   ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
@@ -439,9 +445,9 @@ flips_to_kplot_df = function(flips) {
   d
 }
 
-#' The K-Plot for the Binomial Process
+#' The K-Plot for the Stopped Negative Binomial Process
 #'
-#' Visualize the stopped Bernoulli process with a horizontal step axis and a 
+#' Visualize the Stopped Negative Binomial process with a horizontal step axis and a 
 #' vertical axis counting the number of successes.
 #'
 #' @param flips the sequence of coin flips (1's and 0's) to visualize.
@@ -493,7 +499,7 @@ kplot = function(flips, s, t, bw=FALSE) {
   p
 }
 
-#' Plot power and significance 
+#' Plot Power and Significance for One-Stage Design
 #'
 #' Plot power and significance across all trial designs with a maximum number of patients, n,
 #' with a varying number of responses, s, required to reach the success endpoint
@@ -575,8 +581,8 @@ power_significance_ROC = function(n, pNull, pAlt, all_labels=FALSE){
 #' continue to Stage 2 in the two-stage design.
 #' 
 #' For the one-stage design:  
-#' Finds s, the minimum number of successes to reject the null hypothesis 
-#' from the Binomial model with significance level alpha.
+#' Finds the value of s, the minimum number of successes to reject the 
+#' null hypothesis, from the Binomial model with significance level alpha.
 #' 
 #' For the two-stage design:
 #' Finds r1, the minimum number of Stage 1 successes to continue to 
@@ -819,7 +825,10 @@ expected_total_sample_size= function(p, n, r) {
 
 #' Find the minimax design for a two-stage trial
 #'
-#'Computes the minimax probability for each combination of n1 and n2 for a given total n
+#' Computes the minimax probability (probability of requiring all n1+n2 patients to reach
+#' a statistical endpoint) for each combination of n1 and n2 for a given total n.
+#' The minimax design is the design in the first row of output with the smallest 
+#' minimax probability.
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
@@ -849,8 +858,9 @@ all_minimax_designs = function(p, ntot, pearly = .1, alpha = .1){
 
 #' Find the optimal design for a two-stage trial
 #'
-#'Computes the expected sample size under curtailed sampling for each combination of 
-#'n1 and n2 for a given total n
+#' Computes the expected sample size under curtailed sampling for each combination of 
+#' n1 and n2 for a given total n.  The optimal design is the design in the first row 
+#' of output with the smallest expected sample size under curtailed sampling.
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
@@ -882,6 +892,9 @@ all_optimal_designs = function(p, ntot, pearly = .1, alpha = .1){
 
 
 #' Finds the minimax and optimal designs for a two-stage trial
+#' 
+#' Returns the minimax and optimal designs and their associated statistical 
+#' properties.
 #'
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) 
@@ -891,6 +904,8 @@ all_optimal_designs = function(p, ntot, pearly = .1, alpha = .1){
 #' @examples 
 #' best_designs(c(.8, .2), 36)
 #' best_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
+#' best_designs(c(.7, .3), 40, pearly = .08, alpha=.1)$designs
+
 #' @export
 best_designs= function(p, ntot, pearly = .1, alpha = .1) {
   if (any(!is.numeric(p) || any(p>1) || any(p < 0) || !is.numeric(ntot) || 
@@ -916,38 +931,23 @@ best_designs= function(p, ntot, pearly = .1, alpha = .1) {
   designs <- data.frame(rbind(optimalDesign, minimaxDesign))
   rownames(designs) <- c("Optimal", "Minimax")
   colnames(designs) <- c("p1", "n1", "r1", "p2", "n2", "r2", "Alpha", "PET", "ECSS", "P(MaxSS)")
-  class(designs) = c("ph2_design", "data.frame")
-  return(designs)
+  ret <- list(designs=designs, p=p, ntot=ntot, pearly=pearly, alpha=alpha)
+  class(ret) = c("ph2_design", class(ret))
+  return(ret)
 }
 
 #' @importFrom ggplot2 ggplot
 #' @export
 plot.ph2_design = function(x, ...) {
-  # Get the arguments from dots
-  dot_args = list(...)
-  print(dot_args$pearly)
-  # Fill in the value for pearly.
-  if ("pearly" %in% names(dot_args)) {
-    pearly = dot_args$pearly
-  } else {
-    pearly = .1
-  }
-  print(dot_args$pearly)
-  # Fill in the value for alpha.
-  if ("alpha" %in% names(dot_args)) {
-    alpha = dot_args$alpha
-  } else {
-    alpha = .1
-  }
-  
-  p <- c(x[1, "p1"], x[1, "p2"])
-  ntot <- x[1, "n1"]+x[1, "n2"]
-  
+
+  p <- x$p
+  ntot <- x$ntot
+  pearly <- x$pearly
+  alpha <- x$alpha
   opt <- all_optimal_designs(p, ntot, pearly, alpha)
   opt <- opt[order(opt[,1]),]
   mini <- all_minimax_designs(p, ntot, pearly, alpha)
   mini <- mini[order(mini[,1]),]
-  
   
   df <- data.frame(n1 = c(opt[,1], mini[,1]), values = c(opt[,3], mini[,3]), type=c(rep("Optimal Criteria", dim(opt)[1]), rep("Minimax Criteria", dim(mini)[1])))
   ggplot(data=df, aes(x=n1, y=values)) + geom_line() + facet_grid(type ~ ., scales="free")+ 
@@ -1007,71 +1007,6 @@ minimax_design <- function(p, n, r) {
 
 
 
-#' Probability of rejecting the null hypothesis in the two-stage design
-#' under traditional sampling
-#'
-#' @param p vector containing the probability of successful outcomes
-#'          in Stage 1 (p1) and Stage 2 (p2) 
-#' @param n vector containing sample sizes planned for Stage 1 (n1) 
-#'           and Stage 2 (n2) 
-#' @param r vector containing the minimum number of Stage 1 successes 
-#' to continue to Stage 2 (r1) and the minimum number of Stage 2 
-#' successes to reject the null hypothesis (r2)
-prob_reject_traditional = function(p, n, r) {
-  # check validity of parameter values
-  
-  if ( ! ph2valid(p, n, r)){
-  
-    warning("Invalid parameter values")
-    
-    return (NaN)
-    
-  }
-  
-  reject <- 0
-  
-  # Loop on X1 = number of Stage 1 successes
-  
-  lowx1 <- max(r[1], r[2] - n[2])    # lower limit for X1
-  
-  for (x1 in lowx1 : n[1])
-    
-  {
-    
-    t1 <- dbinom(x1, n[1], p[1]) # binomial probability of X1
-    
-    
-    
-    # Loop on X12 = Stage 1 successes who become Stage 2 successes
-    
-    lowx12 <- max(0, r[2] - n[2])  # lower limit for X12           
-    
-    for (x12 in lowx12 : x1)       # X12 conditional on X1
-      
-    {
-      
-      t2 <- dbinom(x12, x1, p[2] / p[1])  #  Prob of X12 given X1
-      
-      
-      
-      # Loop on X2 = Stage 2 successes
-      
-      lowx2 <- max(0, r[2] - x12) # lower limit for X2
-      
-      for (x2 in lowx2 : n[2])
-        
-      {
-        
-        reject <- reject + t1 * t2 * dbinom(x2, n[2], p[2])   
-        
-      }
-      
-    }
-    
-  }
-  
-  return(reject)
-}
 
 
 #' Significance of the two-stage design under curtailed sampling
@@ -1160,6 +1095,71 @@ prob_reject = function(p, n, r) {
 }
 
 
+#' Probability of rejecting the null hypothesis in the two-stage design
+#' under traditional sampling
+#'
+#' @param p vector containing the probability of successful outcomes
+#'          in Stage 1 (p1) and Stage 2 (p2) 
+#' @param n vector containing sample sizes planned for Stage 1 (n1) 
+#'           and Stage 2 (n2) 
+#' @param r vector containing the minimum number of Stage 1 successes 
+#' to continue to Stage 2 (r1) and the minimum number of Stage 2 
+#' successes to reject the null hypothesis (r2)
+prob_reject_traditional = function(p, n, r) {
+  # check validity of parameter values
+  
+  if ( ! ph2valid(p, n, r)){
+    
+    warning("Invalid parameter values")
+    
+    return (NaN)
+    
+  }
+  
+  reject <- 0
+  
+  # Loop on X1 = number of Stage 1 successes
+  
+  lowx1 <- max(r[1], r[2] - n[2])    # lower limit for X1
+  
+  for (x1 in lowx1 : n[1])
+    
+  {
+    
+    t1 <- dbinom(x1, n[1], p[1]) # binomial probability of X1
+    
+    
+    
+    # Loop on X12 = Stage 1 successes who become Stage 2 successes
+    
+    lowx12 <- max(0, r[2] - n[2])  # lower limit for X12           
+    
+    for (x12 in lowx12 : x1)       # X12 conditional on X1
+      
+    {
+      
+      t2 <- dbinom(x12, x1, p[2] / p[1])  #  Prob of X12 given X1
+      
+      
+      
+      # Loop on X2 = Stage 2 successes
+      
+      lowx2 <- max(0, r[2] - x12) # lower limit for X2
+      
+      for (x2 in lowx2 : n[2])
+        
+      {
+        
+        reject <- reject + t1 * t2 * dbinom(x2, n[2], p[2])   
+        
+      }
+      
+    }
+    
+  }
+  
+  return(reject)
+}
 
 #' Stopped negative binomial distribution mass function
 #'
@@ -1329,4 +1329,12 @@ ph2valid = function(p,n,r) {
 #' \code{.Machine$double.eps ^ 0.5})
 is.wholenumber = function(x, tol = .Machine$double.eps ^ 0.5){
     abs(x - round(x)) < tol
+}
+
+S = function(k, p, s) {
+  if (p < 0 || p > 1) stop("p must be between zero and one.")
+  if (s < 0) stop("s must be non-negative")
+  ret = choose(k-1, s-1) * p^s * (1-p)^(k-s)
+  ret[k < s] = 0
+  ret
 }
