@@ -1,40 +1,43 @@
 #' @title Design of One- and Two-Stage Clinical Trials with Curtailed Sampling
 #' @name curtail
 #' @docType package
-#' @description The \pkg{curtail} package is used for the planning of one- and two-
-#' stage clinical trials with curtailed sampling.  Under curtailed sampling, an early 
-#' decision in the trial is allowed as soon as any predefined statistical endpoint is 
-#' reached.  The package provides functions to help select a design, including 
-#' visualizations to compare criteria for different choices of parameters, and functions 
-#' to calculate power, significance, and expected sample size, among others.
+#' @description The \pkg{curtail} package is used for the planning of one- 
+#' and two- stage clinical trials with curtailed sampling. Under curtailed 
+#' sampling, an early decision in the trial is allowed as soon as any 
+#' predefined statistical endpoint is reached. The package provides functions 
+#' to help select a design, including visualizations to compare criteria for 
+#' different choices of parameters, and functions to calculate power, 
+#' significance, and expected sample size, among others.
 #' 
 #' In the one-stage design, patients are assumed to be enrolled into the trial 
-#' sequentially up to a maximum number of patients.  A critical value of observed 
-#' patient successes needed to deem the therapy superior is set prior to the start of
-#' the study.  The \code{power_significance_plot} and \code{power_significance_ROC} 
-#' functions provide visualizations to compare power and significance levels for 
-#' various choices of critical values.  Also, the \code{critical_values} function 
-#' will calculate the critical value to maintain a desired significance level.  
-#' Under curtailed sampling, the study ends as soon as enough the observed patient 
-#' successes meets the critical value or as soon as too many patient failures have 
-#' been observed.  The smallest number of patient enrollees needed to reach a 
-#' decision under curtailed sampling is described by the Stopped Negative Binomial 
-#' distribution.  This package also provides density and other related functions for 
-#' the Stopped Negative Binomial Distribution.  
+#' sequentially up to a maximum number of patients. A critical value of 
+#' observed patient successes needed to deem the therapy superior is set prior 
+#' to the start of the study. The \code{power_significance_plot} and 
+#' \code{power_significance_ROC} functions provide visualizations to compare 
+#' power and significance levels for various choices of critical values. Also, 
+#' the \code{critical_values} function will calculate the critical value to 
+#' maintain a desired significance level.  Under curtailed sampling, the study 
+#' ends as soon as enough the observed patient successes meets the critical 
+#' value or as soon as too many patient failures have been observed. The 
+#' smallest number of patient enrollees needed to reach a decision under 
+#' curtailed sampling is described by the Stopped Negative Binomial 
+#' distribution. This package also provides density and other related 
+#' functions for the Stopped Negative Binomial Distribution. 
 #' 
-#' The two-stage design presented in this package is a modification of Simon's two-
-#' stage design with separate, but nested, criteria for early stopping in Stage 1 
-#' and efficacy in Stage 2.  The two-stage design has two critical values which can 
-#' both be determined with the \code{critical_values} function to maintain a desired 
-#' significance level and probability of early stopping.  These critical values are set 
-#' prior to the start of the study to determine the number of patient successes in 
-#' the first stage needed to continue the trial to the second stage and the critical 
-#' number of efficacy successes throughout the trial needed to deem the therapy 
-#' superior.  Under curtailed sampling, early decisions can be made in Stage 1 and 
-#' Stage 2.  The \code{best_designs} function finds the optimal and minimax design 
-#' for a fixed total sample size.  Other functions are provided to calculate the 
-#' expected sample size, power, significance, and probability of early stopping in 
-#' the trial given a choice of design parameters.
+#' The two-stage design presented in this package is a modification of Simon's 
+#' two-stage design with separate, but nested, criteria for early stopping in 
+#' Stage 1 and efficacy in Stage 2. The two-stage design has two critical 
+#' values which can both be determined with the \code{critical_values} 
+#' function to maintain a desired significance level and probability of early 
+#' stopping. These critical values are set prior to the start of the study to 
+#' determine the number of patient successes in the first stage needed to 
+#' continue the trial to the second stage and the critical number of efficacy 
+#' successes throughout the trial needed to deem the therapy superior. Under 
+#' curtailed sampling, early decisions can be made in Stage 1 and Stage 2. 
+#' The \code{best_designs} function finds the optimal and minimax design 
+#' for a fixed total sample size. Other functions are provided to calculate the 
+#' expected sample size, power, significance, and probability of early 
+#' stopping in the trial given a choice of design parameters.
 #' 
 #' 
 #' One-Stage Design Function Calls

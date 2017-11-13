@@ -15,8 +15,8 @@ single_stage_significance = function(pNull, s, t) {
 
 #' Calculate power for the single stage trial
 #' 
-#' Calculates the probability of rejecting the null hypothesis assuming an alternative
-#' probability of success
+#' Calculates the probability of rejecting the null hypothesis assuming an 
+#' alternative probability of success
 #'
 #' @param pAlt probability of success under the alternative hypothesis
 #' @param s number of successes to stop the trial
@@ -31,10 +31,11 @@ single_stage_power = function(pAlt, s, t) {
 
 #' Expected sample size and SD for the one-stage design
 #'
-#' Mean and standard deviation of the minimum number of patients to make a decision 
-#' about rejecting the null for the one-stage design.
+#' Mean and standard deviation of the minimum number of patients to make a 
+#' decision about rejecting the null for the one-stage design.
 #'
-#' @param p scalar for the one-stage design containing the probability of successful outcome (p)
+#' @param p scalar for the one-stage design containing the probability of 
+#' successful outcome (p)
 #' @param s number of successes to stop the trial
 #' @param t number of failures to stop the trial
 #' @examples
@@ -87,6 +88,7 @@ dsnb_stacked = function(x, p, s, t) {
 #' stacked_plot(x = 7:17,s= 7, t= 11)
 #' @export
 stacked_plot = function(x, s, t) {
+  Outcome <- value <- NULL
   if (missing(s) && missing(t) && all(names(x) %in% c("x", "s", "t"))) {
     s = x$s
     t = x$t
@@ -116,6 +118,7 @@ stacked_plot = function(x, s, t) {
 #' dsnb_plot(p=.2, s=7, t=11)
 #' @export
 dsnb_plot = function(p, s, t, x, offset) {
+  y <- NULL
   value = Outcome = k = NULL
   if (missing(x))
     x = min(s,t):(t+s-1)
@@ -131,9 +134,9 @@ dsnb_plot = function(p, s, t, x, offset) {
 
 #' The Stopped Negative Binomial P.M.F. Stack-Plot
 #'
-#' The stacked plot of the probability mass function for the Stopped Negative Binomial 
-#' showing the contributions from N (the top barrier) and R (the right barrier) by
-#' color.
+#' The stacked plot of the probability mass function for the Stopped Negative 
+#' Binomial showing the contributions from N (the top barrier) and R (the 
+#' right barrier) by color.
 #' @param p the probability of a success on each coin flip. 
 #' @param s the top barrier for the snb process.
 #' @param t the right barrier for the snb process.
@@ -148,6 +151,7 @@ dsnb_plot = function(p, s, t, x, offset) {
 #' dsnb_stack_plot(p=.2, s=7, t=11)
 #' @export
 dsnb_stack_plot <- function(p, s, t, x, offset) {
+  Outcome <- value <- NULL
   if (missing(x))
     x <- min(s,t):(t+s-1)
   d <- as.data.frame(
@@ -174,6 +178,7 @@ dsnb_stack_plot <- function(p, s, t, x, offset) {
 #' cdsnb_stacked(8:11, c(0.5, 0.5), s=7, t=11)
 #' @export
 cdsnb_stacked = function(x, shape, s, t) {
+  k <- NULL
   ret <- foreach(k=x, .combine=rbind) %do% {
     rets <- 0
     rett <- 0
@@ -279,8 +284,6 @@ esnb = function(p, s, t) {
   sum(as.vector(ds[,2:3]))
 }
 
-
-
 #' Variance of the SNB Distribution
 #' 
 #' Find the variance of the SNB distribution with specified parameters.
@@ -364,9 +367,9 @@ flips_to_zplot_df = function(flips) {
 #' flips = c(0, 0, 1)
 #' zplot(flips, 2, 3)
 #' @export
-zplot = function(flips, s, t, show_arrows=TRUE, unif_jitter=0.2, xlab=NULL,
-                 ylab=NULL) {
-  p = tailEnd = headEnd = num = NULL
+zplot <- function(flips, s, t, show_arrows=TRUE, unif_jitter=0.2, xlab=NULL,
+                  ylab=NULL) {
+  p <- tailEnd <- headEnd <- num <- NULL
   if (!is.list(flips)) {
     d <- flips_to_zplot_df(flips)
     if (show_arrows) {
@@ -385,14 +388,14 @@ zplot = function(flips, s, t, show_arrows=TRUE, unif_jitter=0.2, xlab=NULL,
       flip_set[[i]]$num = as.factor(i)
       if (tail(flip_set[[i]]$headEnd, 1) == s) {
         # We hit the top barrier. Jitter on the x values
-        flip_set[[i]]$tail= flip_set[[i]]$tail + runif(nrow(flip_set[[i]]),
-                                                       -unif_jitter, unif_jitter) 
-        flip_set[[i]]$tailEnd = flip_set[[i]]$tailEnd + 
+        flip_set[[i]]$tail <- flip_set[[i]]$tail + 
+          runif(nrow(flip_set[[i]]), -unif_jitter, unif_jitter) 
+        flip_set[[i]]$tailEnd <- flip_set[[i]]$tailEnd + 
           runif(nrow(flip_set[[i]]), -unif_jitter, unif_jitter)
       } else {
-        flip_set[[i]]$head = flip_set[[i]]$head + runif(nrow(flip_set[[i]]), 
-                                                        -unif_jitter, unif_jitter)
-        flip_set[[i]]$headEnd = flip_set[[i]]$headEnd + 
+        flip_set[[i]]$head <- flip_set[[i]]$head + 
+          runif(nrow(flip_set[[i]]), -unif_jitter, unif_jitter)
+        flip_set[[i]]$headEnd <- flip_set[[i]]$headEnd + 
           runif(nrow(flip_set[[i]]), -unif_jitter, unif_jitter)
       }
       # Make sure that the paths "connect".
@@ -459,6 +462,7 @@ flips_to_kplot_df = function(flips) {
 #' kplot(flips, 2, 3)
 #' @export
 kplot = function(flips, s, t, bw=FALSE) {
+  k <- path <- num <- NULL
   if (!is.list(flips)) {
     d <- flips_to_kplot_df(flips)
     if (bw) {
@@ -513,13 +517,13 @@ kplot = function(flips, s, t, bw=FALSE) {
 #' @examples
 #' power_significance_plot(17, 0.2, 0.4)
 #' @export
-
 power_significance_plot = function(n, pNull, pAlt){
+  value <- Significance <- Power <- si <- s <- `Design Feature` <- NULL
 
   designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
     ti = n + 1 - si
-    c(si, ti, single_stage_significance(pNull, si, ti), single_stage_power(pAlt, si, ti),
-      esnb(pNull, si, ti))
+    c(si, ti, single_stage_significance(pNull, si, ti), 
+      single_stage_power(pAlt, si, ti), esnb(pNull, si, ti))
   }
   rownames(designs) = NULL
   colnames(designs) = c("s", "t", "Significance", "Power", "ess")
@@ -550,7 +554,7 @@ power_significance_plot = function(n, pNull, pAlt){
 #' power_significance_ROC(17, 0.2, 0.4)
 #' @export
 power_significance_ROC = function(n, pNull, pAlt, all_labels=FALSE){
-  
+  si <- Power <- Significance <- s <- NULL
   designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
     ti = n + 1 - si
     c(si, ti, single_stage_significance(pNull, si, ti), single_stage_power(pAlt, si, ti),
@@ -939,7 +943,7 @@ best_designs= function(p, ntot, pearly = .1, alpha = .1) {
 #' @importFrom ggplot2 ggplot
 #' @export
 plot.ph2_design = function(x, ...) {
-
+  n1 <- values <- NULL
   p <- x$p
   ntot <- x$ntot
   pearly <- x$pearly

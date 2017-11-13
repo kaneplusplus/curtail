@@ -7,15 +7,16 @@
 single_stage_expected_sample_size(p, s, t)
 }
 \arguments{
-\item{p}{scalar for the one-stage design containing the probability of successful outcome (p)}
+\item{p}{scalar for the one-stage design containing the probability of 
+successful outcome (p)}
 
 \item{s}{number of successes to stop the trial}
 
 \item{t}{number of failures to stop the trial}
 }
 \description{
-Mean and standard deviation of the minimum number of patients to make a decision 
-about rejecting the null for the one-stage design.
+Mean and standard deviation of the minimum number of patients to make a 
+decision about rejecting the null for the one-stage design.
 }
 \examples{
 single_stage_expected_sample_size(p = 0.2, s = 7, t = 11)

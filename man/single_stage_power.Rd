@@ -14,8 +14,8 @@ single_stage_power(pAlt, s, t)
 \item{t}{number of failures to stop the trial}
 }
 \description{
-Calculates the probability of rejecting the null hypothesis assuming an alternative
-probability of success
+Calculates the probability of rejecting the null hypothesis assuming an 
+alternative probability of success
 }
 \examples{
 single_stage_power(0.5, 7, 11)
