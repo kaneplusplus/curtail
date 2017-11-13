@@ -1,7 +1,7 @@
 #' Calculate significance for the single stage trial
 #' 
-#' Calculates the probability of rejecting the null hypothesis assuming the null
-#' probability of success
+#' Calculates the probability of rejecting the null hypothesis assuming the 
+#' null probability of success
 #'
 #' @param pNull probability of success under the null hypthesis
 #' @param s number of successes to stop the trial
@@ -9,7 +9,7 @@
 #' @examples
 #' single_stage_significance(0.2, 7, 11)
 #' @export
-single_stage_significance = function(pNull, s, t) {
+single_stage_significance <- function(pNull, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=pNull, s=s, t=t)[,'s'])
 }
 
@@ -24,7 +24,7 @@ single_stage_significance = function(pNull, s, t) {
 #' @examples
 #' single_stage_power(0.5, 7, 11)
 #' @export
-single_stage_power = function(pAlt, s, t) {
+single_stage_power <- function(pAlt, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=pAlt, s=s, t=t)[,'s'])
 }
 
@@ -41,9 +41,11 @@ single_stage_power = function(pAlt, s, t) {
 #' @examples
 #' single_stage_expected_sample_size(p = 0.2, s = 7, t = 11)
 #' @export
-single_stage_expected_sample_size= function(p, s, t) {
+single_stage_expected_sample_size <- function(p, s, t) {
   if(length(p) != length(s) | length(s) != length(t) | length(p) != length(t))
-    stop('Parameters p, s, and t must all be the same length (all length 1 for the one-stage design, or all length 2 for the two-stage design)')
+    stop(paste("Parameters p, s, and t must all be the same length",
+               "(all length 1 for the one-stage design, or all length 2 for",
+               "the two-stage design)"))
 
   e <- sum((1 : (s+t-1)) * ph2snb(p, s, t))  # Expected value
   
@@ -56,7 +58,8 @@ single_stage_expected_sample_size= function(p, s, t) {
 }
 
 
-#' Stack the Stopped Negative Binomial distribution by responders and non-responders.
+#' Stack the Stopped Negative Binomial distribution by responders and 
+#' non-responders.
 #'
 #' Stacked distribution function for the Stopped Negative Binomial distribution.
 #' @param x quantile
@@ -66,9 +69,9 @@ single_stage_expected_sample_size= function(p, s, t) {
 #' @examples
 #' dsnb_stacked(14, 0.2, 7, 11) 
 #' @export
-dsnb_stacked = function(x, p, s, t) {
-  ret = cbind(x, S(x, p, s), S(x, 1-p, t))
-  colnames(ret) = c("x", "s", "t")
+dsnb_stacked <- function(x, p, s, t) {
+  ret <- cbind(x, S(x, p, s), S(x, 1-p, t))
+  colnames(ret) <- c("x", "s", "t")
   ret
 }
 
@@ -85,18 +88,18 @@ dsnb_stacked = function(x, p, s, t) {
 #' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
 #' @examples 
-#' stacked_plot(x = 7:17,s= 7, t= 11)
+#' stacked_plot(x=7:17, s=7, t=11)
 #' @export
-stacked_plot = function(x, s, t) {
+stacked_plot <- function(x, s, t) {
   Outcome <- value <- NULL
   if (missing(s) && missing(t) && all(names(x) %in% c("x", "s", "t"))) {
-    s = x$s
-    t = x$t
-    x = x$x
+    s <- x$s
+    t <- x$t
+    x <- x$x
   }
-  d = data.frame(list(x=x, s=s, t=t))
-  d = gather(d, Outcome, value, -x)
-  names(d)[names(d) == "variable"] = "Outcome"
+  d <- data.frame(list(x=x, s=s, t=t))
+  d <- gather(d, Outcome, value, -x)
+  names(d)[names(d) == "variable"] <- "Outcome"
   ggplot(data=d, aes(x=factor(x), y=value, fill=Outcome)) +
     geom_bar(position="stack", stat="identity") + xlab("k") +
     ylab("f(k,p,s,t)")
@@ -115,18 +118,18 @@ stacked_plot = function(x, s, t) {
 #' @import ggplot2
 #' @return a plot of the probability mass function.
 #' @examples 
-#' dsnb_plot(p=.2, s=7, t=11)
+#' dsnb_plot(p=0.2, s=7, t=11)
 #' @export
-dsnb_plot = function(p, s, t, x, offset) {
+dsnb_plot <- function(p, s, t, x, offset) {
   y <- NULL
-  value = Outcome = k = NULL
+  value <- Outcome <- k <- NULL
   if (missing(x))
-    x = min(s,t):(t+s-1)
-  d = as.data.frame(
+    x <- min(s,t):(t+s-1)
+  d <- as.data.frame(
     dsnb_stacked(x, p=p, s=s, t=t))
   if (!missing(offset))
-    d$x = d$x+offset
-  d$y = apply(d[,2:3], 1, sum)
+    d$x <- d$x+offset
+  d$y <- apply(d[,2:3], 1, sum)
   ggplot(data=d, aes(x=factor(x), y=y)) + 
     geom_bar(position="stack", stat="identity") + xlab("k") +
     ylab("f(k,p,s,t)")
@@ -148,7 +151,7 @@ dsnb_plot = function(p, s, t, x, offset) {
 #' @importFrom tidyr gather
 #' @return a plot of the probability mass function.
 #' @examples 
-#' dsnb_stack_plot(p=.2, s=7, t=11)
+#' dsnb_stack_plot(p=0.2, s=7, t=11)
 #' @export
 dsnb_stack_plot <- function(p, s, t, x, offset) {
   Outcome <- value <- NULL
@@ -177,16 +180,20 @@ dsnb_stack_plot <- function(p, s, t, x, offset) {
 #' @examples 
 #' cdsnb_stacked(8:11, c(0.5, 0.5), s=7, t=11)
 #' @export
-cdsnb_stacked = function(x, shape, s, t) {
+cdsnb_stacked <- function(x, shape, s, t) {
   k <- NULL
   ret <- foreach(k=x, .combine=rbind) %do% {
     rets <- 0
     rett <- 0
-    normalizer = beta(shape[1], shape[2])
-    if (s <= k && k <= s+t-1)
-      rets = rets + choose(k-1, s-1) * beta(shape[1]+s, k-s+shape[2])/normalizer
-    if (t <= k && k <= s+t-1)
-      rett = rett + choose(k-1, t-1) * beta(shape[1]+k-t, t+shape[2])/normalizer
+    normalizer <- beta(shape[1], shape[2])
+    if (s <= k && k <= s+t-1) {
+      rets <- rets + choose(k-1, s-1) * 
+        beta(shape[1]+s, k-s+shape[2])/normalizer
+    }
+    if (t <= k && k <= s+t-1) {
+      rett <- rett + choose(k-1, t-1) * 
+        beta(shape[1]+k-t, t+shape[2])/normalizer
+    }
     c(k, rets, rett)
   }
   rownames(ret) <- NULL
@@ -218,7 +225,7 @@ cdsnb_stacked = function(x, shape, s, t) {
 #' deviates.
 #' @importFrom foreach foreach %do%
 #' @export
-dsnb = function(x, prob, s, t) {
+dsnb <- function(x, prob, s, t) {
   if (s < 1) stop("dsnb s-parameter must be at least 1")
   if (t < 1) stop("dsnb t-parameter must be at least 1")
   if (any(prob > 1) || any(prob < 0))
@@ -227,44 +234,44 @@ dsnb = function(x, prob, s, t) {
 }
 
 #' @export
-rsnb = function(n, prob, s, t) {
+rsnb <- function(n, prob, s, t) {
   # Get the distribution function.
-  support = min(s,t):(t+s-1)
-  ps = dsnb(support, prob, s, t)
+  support <- min(s,t):(t+s-1)
+  ps <- dsnb(support, prob, s, t)
   sample(support, n, replace=TRUE, prob=ps)
 }
 
 #' @export
-psnb = function(q, prob, s, t) {
+psnb <- function(q, prob, s, t) {
   if (length(prob) > 1)
     stop("psnb prob-parameter may only have length 1")
-  support = min(s, t):(t+s-1)
-  cdf = c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
-  qs = floor(q)
-  qs[qs < support[1]] = support[1]-1
-  qs[qs > support[length(support)]] = support[length(support)]
+  support <- min(s, t):(t+s-1)
+  cdf <- c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
+  qs <- floor(q)
+  qs[qs < support[1]] <- support[1]-1
+  qs[qs > support[length(support)]] <- support[length(support)]
   cdf[qs]
 }
 
 #' @export
-qsnb = function(p, prob, s, t) {
-  pr = NULL
+qsnb <- function(p, prob, s, t) {
+  pr <- NULL
   if (length(prob) > 1)
     stop("psnb prob-parameter may only have length 1")
-  support = min(s, t):t
-  cdf = c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
-  ret = foreach(pr=p, .combine=c) %do% {
-    r = NA
+  support <- min(s, t):t
+  cdf <- c(rep(0, support[1]-1), cumsum(dsnb(support, prob, s, t)))
+  ret <- foreach(pr=p, .combine=c) %do% {
+    r <- NA
     if (!is.na(pr)) {
-      r = which(pr < cdf)[1]
+      r <- which(pr < cdf)[1]
       if (is.na(r))
-        r = support[length(support)]
+        r <- support[length(support)]
     }
     if (pr > 1 || pr < 0)
-      r = NaN
+      r <- NaN
     r
   }
-  ret[ret < support[1]-1] = support[1] - 1
+  ret[ret < support[1]-1] <- support[1] - 1
   ret
 }
 
@@ -278,9 +285,9 @@ qsnb = function(p, prob, s, t) {
 #' @examples 
 #' esnb(p=0.2, s=7, t=11)
 #' @export
-esnb = function(p, s, t) {
-  ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
-  ds[,2:3] = ds[,1] * ds[,2:3]
+esnb <- function(p, s, t) {
+  ds <- dsnb_stacked(min(s,t):(s+t-1), p, s, t)
+  ds[,2:3] <- ds[,1] * ds[,2:3]
   sum(as.vector(ds[,2:3]))
 }
 
@@ -293,9 +300,9 @@ esnb = function(p, s, t) {
 #' @examples
 #' vsnb(p=0.2, s=7, t=11)
 #' @export
-vsnb = function(p, s, t) {
-  ds = dsnb_stacked(min(s,t):(s+t-1), p, s, t)
-  ds[,2:3] = ds[,1]^2 * ds[,2:3]
+vsnb <- function(p, s, t) {
+  ds <- dsnb_stacked(min(s,t):(s+t-1), p, s, t)
+  ds[,2:3] <- ds[,1]^2 * ds[,2:3]
   sum(as.vector(ds[,2:3])) - esnb(p, s, t)^2
 }
 
@@ -309,9 +316,9 @@ vsnb = function(p, s, t) {
 #' @examples 
 #' ecsnb(c(0.5, 0.5), s=7, t=11)
 #' @export
-ecsnb = function(shape, s, t) {
-  ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
-  ds[,2:3] = ds[,1] * ds[,2:3]
+ecsnb <- function(shape, s, t) {
+  ds <- cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
+  ds[,2:3] <- ds[,1] * ds[,2:3]
   sum(as.vector(ds[,2:3]))
 }
 
@@ -326,16 +333,16 @@ ecsnb = function(shape, s, t) {
 #' @examples 
 #' vcsnb(c(0.5, 0.5), s=7, t=11)
 #' @export
-vcsnb = function(shape, s, t) {
-  ds = cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
-  ds[,2:3] = ds[,1]^2 * ds[,2:3]
+vcsnb <- function(shape, s, t) {
+  ds <- cdsnb_stacked(min(s,t):(s+t-1), shape, s, t)
+  ds[,2:3] <- ds[,1]^2 * ds[,2:3]
   sum(as.vector(ds[,2:3])) - ecsnb(shape, s, t)^2 
 }
 
 #' Format a data.frame for plotting by the zplot function
 #' @param flips the seqence of ones and zeros denoting responses and 
 #' non-responses respecitively.
-flips_to_zplot_df = function(flips) {
+flips_to_zplot_df <- function(flips) {
   d <- data.frame(k=0:length(flips))
   d$head <- c(0, cumsum(flips))
   d$tail <- c(0, cumsum(!(flips)))
@@ -364,7 +371,7 @@ flips_to_zplot_df = function(flips) {
 #' @importFrom stats na.omit runif
 #' @importFrom utils tail head
 #' @examples
-#' flips = c(0, 0, 1)
+#' flips <- c(0, 0, 1)
 #' zplot(flips, 2, 3)
 #' @export
 zplot <- function(flips, s, t, show_arrows=TRUE, unif_jitter=0.2, xlab=NULL,
@@ -373,19 +380,19 @@ zplot <- function(flips, s, t, show_arrows=TRUE, unif_jitter=0.2, xlab=NULL,
   if (!is.list(flips)) {
     d <- flips_to_zplot_df(flips)
     if (show_arrows) {
-      p = ggplot(data=na.omit(d)) + 
+      p <- ggplot(data=na.omit(d)) + 
         geom_segment(mapping=aes(x=tail, y=head, xend=tailEnd,
                                  yend=headEnd), arrow=arrow()) 
     } else {
-      p = ggplot(data=na.omit(d)) + 
+      p <- ggplot(data=na.omit(d)) + 
         geom_segment(mapping=aes(x=tail, y=head, xend=tailEnd,
                                  yend=headEnd)) 
     }
   } else {
-    flip_set = lapply(flips, flips_to_zplot_df)
-    for (i in 1:length(flip_set)) {
-      flip_set[[i]] = na.omit(flip_set[[i]])
-      flip_set[[i]]$num = as.factor(i)
+    flip_set <- lapply(flips, flips_to_zplot_df)
+    for (i in seq_along(flip_set)) {
+      flip_set[[i]] <- na.omit(flip_set[[i]])
+      flip_set[[i]]$num <- as.factor(i)
       if (tail(flip_set[[i]]$headEnd, 1) == s) {
         # We hit the top barrier. Jitter on the x values
         flip_set[[i]]$tail <- flip_set[[i]]$tail + 
@@ -400,51 +407,51 @@ zplot <- function(flips, s, t, show_arrows=TRUE, unif_jitter=0.2, xlab=NULL,
       }
       # Make sure that the paths "connect".
       for (j in nrow(flip_set[[i]]):2) {
-        flip_set[[i]][j, c("head", "tail")] = 
+        flip_set[[i]][j, c("head", "tail")] <- 
           flip_set[[i]][j-1, c("headEnd", "tailEnd")]
       }
     }
-    d = Reduce(rbind, flip_set)
+    d <- Reduce(rbind, flip_set)
     if (show_arrows) {
-      p = ggplot(data=na.omit(d)) + 
+      p <- ggplot(data=na.omit(d)) + 
         geom_segment(mapping=aes(x=tail, y=head, xend=tailEnd,
                                  yend=headEnd, group=num), arrow=arrow())
     } else {
-      p = ggplot(data=na.omit(d)) + 
+      p <- ggplot(data=na.omit(d)) + 
         geom_segment(mapping=aes(x=tail, y=head, xend=tailEnd,
                                  yend=headEnd, group=num))
     }
   }
-  p = p+scale_x_continuous(breaks=0:t, limits=c(-unif_jitter, t)) +
+  p <- p+scale_x_continuous(breaks=0:t, limits=c(-unif_jitter, t)) +
     scale_y_continuous(breaks=0:s, limits=c(-unif_jitter, s)) +
     geom_segment(x=0, y=s, xend=t-1, yend=s, color="red") +
     geom_segment(x=t, y=0, xend=t, yend=s-1, color="green")
   if (!is.null(xlab))
-    p = p + xlab(xlab)
+    p <- p + xlab(xlab)
   if (!is.null(ylab))
-    p = p + ylab(ylab)
+    p <- p + ylab(ylab)
   p
 }
 
-stairs = function(p, xstart, xend) {
-  x = c(xstart, rep((xstart+1):xend, each=2))
-  y = rep(0:(xend-xstart), each=2)
-  y = y[-length(y)]
+stairs <- function(p, xstart, xend) {
+  x <- c(xstart, rep((xstart+1):xend, each=2))
+  y <- rep(0:(xend-xstart), each=2)
+  y <- y[-length(y)]
   for (i in 1:(length(x)-1)) {
-    p = p + geom_segment(x=x[i], y=y[i], xend=x[i+1], yend=y[i+1],
+    p <- p + geom_segment(x=x[i], y=y[i], xend=x[i+1], yend=y[i+1],
                          color="green")
   }
   p
 }
 
-flips_to_kplot_df = function(flips) {
-  d = data.frame(k=0:length(flips))
-  d$head = c(0, cumsum(flips))
-  d$tail= c(0, cumsum(1-flips))
-  d$headEnd = c(d$head[-1], NA)
-  d$tailEnd = c(d$tail[-1], NA)
-  d$path = c(0, cumsum(flips))
-  d$k = 0:(nrow(d)-1)
+flips_to_kplot_df <- function(flips) {
+  d <- data.frame(k=0:length(flips))
+  d$head <- c(0, cumsum(flips))
+  d$tail <- c(0, cumsum(1-flips))
+  d$headEnd <- c(d$head[-1], NA)
+  d$tailEnd <- c(d$tail[-1], NA)
+  d$path <- c(0, cumsum(flips))
+  d$k <- 0:(nrow(d)-1)
   d
 }
 
@@ -458,45 +465,45 @@ flips_to_kplot_df = function(flips) {
 #' @param t the right barrier for the Bernoulli process.
 #' @param bw should the plot be in black and white?
 #' @examples
-#' flips = c(0, 0, 1)
+#' flips <- c(0, 0, 1)
 #' kplot(flips, 2, 3)
 #' @export
-kplot = function(flips, s, t, bw=FALSE) {
+kplot <- function(flips, s, t, bw=FALSE) {
   k <- path <- num <- NULL
   if (!is.list(flips)) {
     d <- flips_to_kplot_df(flips)
     if (bw) {
-      p <- qplot(k, path, data = d, geom = "line") +
-        scale_x_continuous(breaks = 0:(t + s), limits = c(0, t + s)) +
-        scale_y_continuous(breaks = 0:s, limits=c(0, s+0.15)) +
+      p <- qplot(k, path, data=d, geom="line") +
+        scale_x_continuous(breaks=0:(t + s), limits = c(0, t + s)) +
+        scale_y_continuous(breaks=0:s, limits=c(0, s+0.15)) +
         geom_segment(x=s, y=s, xend=(t+s-1), yend=s, linetype=2) +
         geom_segment(x=t, y=0, xend=(s+t-1), yend=s-1, linetype=2)
     } else {
-      p <- qplot(k, path, data = d, geom = "line") +
-        scale_x_continuous(breaks = 0:(t + s), limits = c(0, t + s)) +
-        scale_y_continuous(breaks = 0:s, limits=c(0, s+0.15)) +
+      p <- qplot(k, path, data=d, geom="line") +
+        scale_x_continuous(breaks=0:(t + s), limits=c(0, t + s)) +
+        scale_y_continuous(breaks=0:s, limits=c(0, s+0.15)) +
         geom_segment(x=s,y=s,xend=(t+s-1),yend=s, color="green", linetype=1) +
         geom_segment(x=t, y=0, xend=(s+t-1), yend=s-1, col="red")
     }
   } else {
     flip_set <- lapply(flips, flips_to_kplot_df)
-    for (i in 1:length(flip_set)) {
+    for (i in seq_along(flip_set)) {
       flip_set[[i]]$num <- as.factor(i)
       flip_set[[i]]$k <- jitter(flip_set[[i]]$k)
       flip_set[[i]]$k[flip_set[[i]]$k < 0] <- 0
     }
     d <- Reduce(rbind, flip_set)[, -(4:5)]
     if (bw) {
-      p <- qplot(k, path, data = d, geom = "path", group=num) +
-        scale_x_continuous(breaks=0:(t+s), limits = c(0, t+s)) +
-        geom_segment(x = s, y = s, xend = (t + s - 1), yend = s,
+      p <- qplot(k, path, data=d, geom="path", group=num) +
+        scale_x_continuous(breaks=0:(t+s), limits=c(0, t+s)) +
+        geom_segment(x=s, y=s, xend=(t + s - 1), yend=s,
                      linetype=2) +
         geom_segment(x=t, y=0, xend=(s+t-1), yend=s-1, linetype=2)
     } else {
-      p <- qplot(k, path, data = d, geom = "path", group=num) +
+      p <- qplot(k, path, data=d, geom="path", group=num) +
         scale_x_continuous(breaks=0:(t+s), limits = c(0, t+s)) +
-        geom_segment(x = s, y = s, xend = (t + s - 1), yend = s,
-                     color = "green") +
+        geom_segment(x=s, y=s, xend=(t + s - 1), yend=s,
+                     color="green") +
         geom_segment(x=t, y=0, xend=(s+t-1), yend=s-1, col="red")
     }
   }
@@ -517,19 +524,19 @@ kplot = function(flips, s, t, bw=FALSE) {
 #' @examples
 #' power_significance_plot(17, 0.2, 0.4)
 #' @export
-power_significance_plot = function(n, pNull, pAlt){
+power_significance_plot <- function(n, pNull, pAlt){
   value <- Significance <- Power <- si <- s <- `Design Feature` <- NULL
 
-  designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
-    ti = n + 1 - si
+  designs <- foreach (si=seq_len(n-1), .combine=rbind) %do% {
+    ti <- n + 1 - si
     c(si, ti, single_stage_significance(pNull, si, ti), 
       single_stage_power(pAlt, si, ti), esnb(pNull, si, ti))
   }
-  rownames(designs) = NULL
-  colnames(designs) = c("s", "t", "Significance", "Power", "ess")
-  designs = as.data.frame(designs)
+  rownames(designs) <- NULL
+  colnames(designs) <- c("s", "t", "Significance", "Power", "ess")
+  designs <- as.data.frame(designs)
   
-  designs_long = gather(designs, `Design Feature`, value, Significance:Power)
+  designs_long <- gather(designs, `Design Feature`, value, Significance:Power)
   
   ggplot(designs_long, aes(x=s, y=value, color=`Design Feature`)) + 
     geom_line() + ylab("Probability") + 
@@ -553,22 +560,23 @@ power_significance_plot = function(n, pNull, pAlt){
 #' @examples
 #' power_significance_ROC(17, 0.2, 0.4)
 #' @export
-power_significance_ROC = function(n, pNull, pAlt, all_labels=FALSE){
+power_significance_ROC <- function(n, pNull, pAlt, all_labels=FALSE){
   si <- Power <- Significance <- s <- NULL
-  designs = foreach (si=seq_len(n-1), .combine=rbind) %do% {
-    ti = n + 1 - si
+  designs <- foreach (si=seq_len(n-1), .combine=rbind) %do% {
+    ti <- n + 1 - si
     c(si, ti, single_stage_significance(pNull, si, ti), single_stage_power(pAlt, si, ti),
       esnb(pNull, si, ti))
   }
-  rownames(designs) = NULL
-  colnames(designs) = c("s", "t", "Significance", "Power", "ess")
-  designs = as.data.frame(designs)
+  rownames(designs) <- NULL
+  colnames(designs) <- c("s", "t", "Significance", "Power", "ess")
+  designs <- as.data.frame(designs)
   
-  data_pos = designs[1:(n-1), c("Power", "Significance", "s")]
-  data_pos$Power = data_pos$Power + 0.02
-  data_pos$Significance = data_pos$Significance - 0.02
+  data_pos <- designs[1:(n-1), c("Power", "Significance", "s")]
+  data_pos$Power <- data_pos$Power + 0.02
+  data_pos$Significance <- data_pos$Significance - 0.02
   # stop labeling when power < .05 or significance>.95 when all_labels=FALSE
-  if(all_labels==FALSE)  data_pos[which(data_pos$Power<0.05 | data_pos$Significance>.95), "s"] <- ""
+  if(all_labels==FALSE)  
+    data_pos[which(data_pos$Power<0.05 | data_pos$Significance>.95), "s"] <- ""
   ggplot(designs, aes(x=Power, y=1-Significance)) + 
     geom_line() +   
     geom_text(data=data_pos, aes(x=Power, y=1-Significance, label=s)) +
@@ -600,22 +608,22 @@ power_significance_ROC = function(n, pNull, pAlt, all_labels=FALSE){
 #'          and Stage 2 (n2).
 #' @param p vector containing the probability of successful outcomes
 #'          in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis.
-#' @param pearly desired probability of early stopping (default = .1).  
+#' @param pearly desired probability of early stopping (default is 0.1).  
 #' Not necessary for determining critical values for the one-stage design.
-#' @param alpha desired significance level (default = .1).
+#' @param alpha desired significance level (default is 0.1).
 #' @importFrom stats qbinom
 #' @examples
-#' critical_values(n = 36, p=.2, alpha=.1)
-#' critical_values( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
+#' critical_values(n=36, p=0.2, alpha=.1)
+#' critical_values(n=c( 5, 31), p=c(.8,.2), pearly=.1, alpha=.1)
 #' @export
-critical_values = function(n, p, pearly = .1, alpha = .1) {
+critical_values <- function(n, p, pearly=.1, alpha=.1) {
   if(length(p) != length(n))
     stop('Parameters p and n must be the same length (both length 1 for the one-stage design, or both length 2 for the two-stage design)')
   
   # one-stage design
-  if(length(p)==1 && length(n)==1){
+  if(length(p) == 1 && length(n) == 1){
     
-    if (!ph2valid(p, n, r = 0) ||
+    if (!ph2valid(p, n, r=0) ||
         pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
     {
       warning("Invalid parameter values")
@@ -628,7 +636,7 @@ critical_values = function(n, p, pearly = .1, alpha = .1) {
   ## two-stage design
   else{
     
-    if (!ph2valid(p, n, r = c(0, 0)) ||
+    if (!ph2valid(p, n, r=c(0, 0)) ||
         pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
     {
       warning("Invalid parameter values, pearly and alpha must be in [0, 1]")
@@ -640,7 +648,7 @@ critical_values = function(n, p, pearly = .1, alpha = .1) {
    for (j in 0 : n[1]){
     
     # r1 based on pearly
-    if (prob_early_stop(p, n, r = c(j, 0)) > pearly)
+    if (prob_early_stop(p, n, r=c(j, 0)) > pearly)
       
     return(c(max(j - 1, 0), r2))
   }
@@ -661,9 +669,9 @@ critical_values = function(n, p, pearly = .1, alpha = .1) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2) 
 #' @examples
-#' prob_early_stop(p = c(.8, .2), n = c(25, 9), r = c(17, 11))
+#' prob_early_stop(p=c(0.8, 0.2), n=c(25, 9), r=c(17, 11))
 #' @export
-prob_early_stop= function(p, n, r) {
+prob_early_stop <- function(p, n, r) {
   if( ! ph2valid(p, n, r)){
     warning("Invalid parameter values")
     return(NaN)
@@ -681,7 +689,6 @@ prob_early_stop= function(p, n, r) {
   
   else r1 <- r
   
-  
   if(n1 <= 0) return(0)    # no patients -> no event
   
   if(r1 <= 0) return(0)    # avoids some rounding errors
@@ -690,9 +697,7 @@ prob_early_stop= function(p, n, r) {
   
   j <- min(r1, n1) : n1    # range of X1
   
-  probEarlyStop<- 1 - sum(dbinom(j, n1, p1))
-  
-  return(probEarlyStop)
+  1 - sum(dbinom(j, n1, p1))
 }
 
 #' Expected sample size and SD for Stage 1 of the two-stage design 
@@ -706,9 +711,9 @@ prob_early_stop= function(p, n, r) {
 #' @param r a vector containing the minimum number of Stage 1 successes to continue to 
 #' Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2) 
 #' @examples
-#' expected_stage1_sample_size(p = c(.8, .2), n = c(5, 31), r = c(3, 11))
+#' expected_stage1_sample_size(p=c(.8, .2), n=c(5, 31), r=c(3, 11))
 #' @export
-expected_stage1_sample_size= function(p, n, r) {
+expected_stage1_sample_size <- function(p, n, r) {
   if(length(p) != length(n) | length(n) != length(r) | length(p) != length(r))
     stop('Parameters p, n, and r must all be the same length (all length 1 for the one-stage design, or all length 2 for the two-stage design)')
   if(length(p) > 1){ p1 <- p[1] # p can be vector or scalar
