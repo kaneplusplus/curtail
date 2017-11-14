@@ -4,9 +4,11 @@
 \alias{critical_values}
 \title{Find critical values for decision making during the one-stage or two-stage trial}
 \usage{
-critical_values(n, p, pearly = 0.1, alpha = 0.1)
+critical_values(x, alpha = 0.1, p_early = 0.1)
 }
 \arguments{
+\item{alpha}{desired significance level (default is 0.1).}
+
 \item{n}{vector containing sample sizes planned for Stage 1 (n1) 
 and Stage 2 (n2).}
 
@@ -15,8 +17,6 @@ in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis.}
 
 \item{pearly}{desired probability of early stopping (default is 0.1).
 Not necessary for determining critical values for the one-stage design.}
-
-\item{alpha}{desired significance level (default is 0.1).}
 }
 \description{
 Finds the critical number of successes necessary to reject 

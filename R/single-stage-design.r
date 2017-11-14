@@ -80,15 +80,17 @@ power.single_stage_curtail_trial <- function(x) {
 }
 
 #' @export
-sample_size <- function(x) {
-  UseMethod("sample_size")
+expected_sample_size <- function(x) {
+  UseMethod("expected_sample_size")
 }
 
 #' @export
-sample_size.single_stage_curtail_trial <- function(x) {
+expected_sample_size.single_stage_curtail_trial <- function(x) {
   foreach(i=1:nrow(x), .combine=rbind) %do% {
-    data.frame(mean=sum((1:(s+t-1)) * ph2snb(p, s, t)), 
-               sd=sqrt(sum((1:(s+t-1))^2 * ph2snb(p, s, t)) - e^2))
+    mean <- sum((1:(x$s[i]+x$t[i]-1)) * ph2snb(x$p_null[i], x$s[i], x$t[i]))
+    sd <- sqrt(sum((1:(x$s[i]+x$t[i]-1))^2 * 
+      ph2snb(x$p_null[i], x$s[i], x$t[i])) - mean^2)
+    data.frame(mean=mean, sd=sd)
   }
 }
 
@@ -112,4 +114,22 @@ critical_values.single_stage_curtail_trial <-
   1 + qbinom(1 - alpha, x$s + x$t - 1, x$p_null)
 }
 
+#' @export
+print.single_stage_curtail_trial <- function(object, ...) {
+  if (nrow(object) == 1) {
+    # It's a single, single stage curtail trial.
+    cat("\n")
+    cat(" Single-Stage Curtail Trial\n")
+    cat("\n")
+    cat("Null response rate: ", object$p_null[1], "\n")
+    cat("Alternative response rate: ", object$p_alt[1], "\n")
+    cat("Responses to stop the trial: ", object$s[1], "\n")
+    cat("Non-responses to stop the trial: ", object$t[1], "\n")
+    cat("Power: ", power(object), "\n")
+    cat("Significance: ", significance(object), "\n")
+    ess <- expected_sample_size(object)
+    cat("Expected sample size: ", ess$mean, "\n")
+    cat("Sample size standard deviation: ", ess$sd, "\n\n")
+  }
+}
 
