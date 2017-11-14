@@ -20,5 +20,5 @@ Mean and standard deviation of the minimum number of patients to make a decision
 continue to Stage 2 or else terminate early.
 }
 \examples{
-expected_stage1_sample_size(p = c(.8, .2), n = c(5, 31), r = c(3, 11))
+expected_stage1_sample_size(p=c(.8, .2), n=c(5, 31), r=c(3, 11))
 }

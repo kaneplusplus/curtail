@@ -20,10 +20,10 @@ successes to reject the null hypothesis (r2) or a scalar containing r1}
 \description{
 Returns the probability density function for the number of events
 to reach r= r1 successes in Stage 1 with p = p1 probability of success.
-Can also be the number of events to reach r failures with p = (1-p1) probability
-of failure.
+Can also be the number of events to reach r failures with p <- (1-p1) 
+probability of failure.
 }
 \examples{
-# ph2tnb(p = .8, n = 6, r = 4) 
-# ph2tnb(p = .2, n = 6, r = 3) 
+# ph2tnb(p=0.8, n=6, r=4) 
+# ph2tnb(p=0.2, n=6, r=3) 
 }

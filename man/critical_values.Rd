@@ -13,10 +13,10 @@ and Stage 2 (n2).}
 \item{p}{vector containing the probability of successful outcomes
 in Stage 1 (p1) and Stage 2 (p2) under the null hypothesis.}
 
-\item{pearly}{desired probability of early stopping (default = .1).
+\item{pearly}{desired probability of early stopping (default is 0.1).
 Not necessary for determining critical values for the one-stage design.}
 
-\item{alpha}{desired significance level (default = .1).}
+\item{alpha}{desired significance level (default is 0.1).}
 }
 \description{
 Finds the critical number of successes necessary to reject 
@@ -38,6 +38,6 @@ Find r2 from Binomial model with no early stopping
 and significance level alpha.
 }
 \examples{
-critical_values(n = 36, p=.2, alpha=.1)
-critical_values( n = c( 5, 31), p = c(.8,.2), pearly = .1, alpha = .1)
+critical_values(n=36, p=0.2, alpha=.1)
+critical_values(n=c( 5, 31), p=c(.8,.2), pearly=.1, alpha=.1)
 }

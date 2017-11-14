@@ -22,6 +22,6 @@ Evaluate the minimax probability that the maximum sample size n1+n2 is
 required to complete the trial
 }
 \examples{
-minimax_design(p=c(.8, .2), n=c(3,33), r=critical_values(n=c(3,33), 
-  p=c(.8, .2), pearly=.1, alpha=.1))
+minimax_design(p=c(0.8, 0.2), n=c(3,33), r=critical_values(n=c(3,33), 
+  p=c(0.8, 0.2), pearly=0.1, alpha=0.1))
 }

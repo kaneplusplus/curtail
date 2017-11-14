@@ -10,7 +10,8 @@ best_designs(p, ntot, pearly = 0.1, alpha = 0.1)
 \item{p}{vector containing the probability of successful outcomes
 in Stage 1 (p1) and Stage 2 (p2)}
 
-\item{ntot}{scalar containing the total sample size planned for the trial (n1+n2)}
+\item{ntot}{scalar containing the total sample size planned for the 
+trial (n1+n2)}
 
 \item{pearly}{desired probability of early stopping (default = .1).}
 
@@ -21,7 +22,7 @@ Returns the minimax and optimal designs and their associated statistical
 properties.
 }
 \examples{
-best_designs(c(.8, .2), 36)
-best_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
-best_designs(c(.7, .3), 40, pearly = .08, alpha=.1)$designs
+best_designs(c(0.8, 0.2), 36)
+best_designs(c(0.7, 0.3), 40, pearly = 0.08, alpha=0.1)
+best_designs(c(0.7, 0.3), 40, pearly = 0.08, alpha=0.1)$designs
 }

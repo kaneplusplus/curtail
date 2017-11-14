@@ -22,6 +22,6 @@ The expected number of patients who are enrolled and followed to their
 endpoint before critical endpoints in Stage 1 and Stage 2 are achieved
 }
 \examples{
-expected_total_sample_size(p = c(.8, .2), n=c(6, 30), r=c(4, 11))
-expected_total_sample_size(p = c(.8, .2), n = c(18, 18), r = c(12, 11))
+expected_total_sample_size(p=c(0.8, 0.2), n=c(6, 30), r=c(4, 11))
+expected_total_sample_size(p=c(0.8, 0.2), n=c(18, 18), r=c(12, 11))
 }

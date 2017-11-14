@@ -7,15 +7,15 @@
 single_stage_significance(pNull, s, t)
 }
 \arguments{
-\item{pNull}{probability of success under the null hypthesis}
+\item{pNull}{probability of success under the null hypothesis}
 
 \item{s}{number of successes to stop the trial}
 
 \item{t}{number of failures to stop the trial}
 }
 \description{
-Calculates the probability of rejecting the null hypothesis assuming the null
-probability of success
+Calculates the probability of rejecting the null hypothesis assuming the 
+null probability of success
 }
 \examples{
 single_stage_significance(0.2, 7, 11)

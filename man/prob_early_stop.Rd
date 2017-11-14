@@ -21,5 +21,5 @@ successes to reject the null hypothesis (r2)}
 Calculates the probability of stopping the trial after Stage 1
 }
 \examples{
-prob_early_stop(p = c(.8, .2), n = c(25, 9), r = c(17, 11))
+prob_early_stop(p=c(0.8, 0.2), n=c(25, 9), r=c(17, 11))
 }
