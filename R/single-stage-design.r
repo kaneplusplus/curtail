@@ -13,6 +13,11 @@ setMethod("single_stage_curtail_trial",
   function(p_null, p_alt, s, t) {
     ret <- data.frame(p_null=p_null, p_alt=p_alt, s=s, t=t)
     class(ret) <- c("single_stage_curtail_trial", class(ret))
+    ret$power <- power(ret)
+    ret$significance <- significance(ret)
+    ess <- expected_sample_size(ret)
+    ret$mean_ss <- ess$mean
+    ret$sd <- ess$sd_ss
     ret
   })
 
@@ -29,6 +34,11 @@ setMethod("single_stage_curtail_trial",
       p_alt=rep(p_alt, length(si)), s=si, t=ti)
     class(ret) <- c("single_stage_curtail_trial", 
       "single_stage_curtail_trial_roc", class(ret))
+    ret$power <- power(ret)
+    ret$significance <- significance(ret)
+    ess <- expected_sample_size(ret)
+    ret$mean_ss <- ess$mean_ss
+    ret$sd_ss <- ess$sd_ss
     ret
   })
 
@@ -99,14 +109,13 @@ critical_values <- function(x, alpha=0.1, p_early=0.1) {
   UseMethod("critical_values")
 }
 
+# The following isn't right. Take the individual parameters.
+
 #' @export
 critical_values.single_stage_curtail_trial <- 
   function(x, alpha=0.1, p_early=NULL) {
   if (!is.null(p_early)) {
     warning("p_early specified but not used.")
-  }
-  if ((p_early > 1) || (p_early < 0)) {
-    stop("p_early must be between zero and one inclusive.")
   }
   if ((alpha > 1) || (alpha < 0)) {
     stop("alpha must be between zero and one inclusive.")
@@ -115,21 +124,21 @@ critical_values.single_stage_curtail_trial <-
 }
 
 #' @export
-print.single_stage_curtail_trial <- function(object, ...) {
-  if (nrow(object) == 1) {
-    # It's a single, single stage curtail trial.
-    cat("\n")
-    cat(" Single-Stage Curtail Trial\n")
-    cat("\n")
-    cat("Null response rate: ", object$p_null[1], "\n")
-    cat("Alternative response rate: ", object$p_alt[1], "\n")
-    cat("Responses to stop the trial: ", object$s[1], "\n")
-    cat("Non-responses to stop the trial: ", object$t[1], "\n")
-    cat("Power: ", power(object), "\n")
-    cat("Significance: ", significance(object), "\n")
-    ess <- expected_sample_size(object)
-    cat("Expected sample size: ", ess$mean, "\n")
-    cat("Sample size standard deviation: ", ess$sd, "\n\n")
-  }
-}
+#print.single_stage_curtail_trial <- function(object, ...) {
+#  if (nrow(object) == 1) {
+#    ret <- object
+#    # It's a single, single stage curtail trial.
+#    cat("\n")
+#    cat(" Single-Stage Curtail Trial\n")
+#    cat("\n")
+#    cat("Null response rate: ", object$p_null[1], "\n")
+#    cat("Alternative response rate: ", object$p_alt[1], "\n")
+#    cat("Responses to stop the trial: ", object$s[1], "\n")
+#    cat("Non-responses to stop the trial: ", object$t[1], "\n")
+#    cat("Power: ", object$power, "\n")
+#    cat("Significance: ", object$significance, "\n")
+#    cat("Expected sample size: ", object$mean, "\n")
+#    cat("Sample size standard deviation: ", object$sd, "\n\n")
+#  }
+#}
 
