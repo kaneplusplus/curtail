@@ -5,7 +5,9 @@ setGeneric("two_stage_curtail_trial", function(p_null, p_alt, n, n_total, r,
   standardGeneric("two_stage_curtail_trial")
 })
 
-# Case 1 - User inputs p, n, and r
+
+#' Create a two_stage_curtail_trial
+#' Case 1 - User inputs p, n, and r
 #' @examples
 #' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
 #' n=c(6, 30), r=c(4, 11))
@@ -26,6 +28,7 @@ setMethod("two_stage_curtail_trial",
             ret
           })
 
+#' Create a two_stage_curtail_trial
 #' Case 2:  User inputs p, n
 #' Using default values of alpha and prob_early
 #' @examples
@@ -50,7 +53,7 @@ setMethod("two_stage_curtail_trial",
             ret
           })
 
-
+#' Create a two_stage_curtail_trial
 #' Case 3:  User inputs p, n, prob_early, alpha
 #' @examples
 #' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
@@ -74,6 +77,7 @@ setMethod("two_stage_curtail_trial",
             ret
           })
 
+#' Create a two_stage_curtail_trial
 #' Case 4:  User inputs p, n_total, prob_early, alpha
 #' @examples
 #' trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
@@ -108,6 +112,7 @@ setMethod("two_stage_curtail_trial",
             ret
 })
 
+#' Create a two_stage_curtail_trial
 #' Case 5:  User inputs p, n_total
 #' Using default values of prob_early and alpha, with n_total
 #' @examples

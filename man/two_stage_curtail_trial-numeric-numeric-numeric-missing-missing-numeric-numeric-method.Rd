@@ -3,13 +3,15 @@
 \docType{methods}
 \name{two_stage_curtail_trial,numeric,numeric,numeric,missing,missing,numeric,numeric-method}
 \alias{two_stage_curtail_trial,numeric,numeric,numeric,missing,missing,numeric,numeric-method}
-\title{Case 3:  User inputs p, n, prob_early, alpha}
+\title{Create a two_stage_curtail_trial
+Case 3:  User inputs p, n, prob_early, alpha}
 \usage{
 
   \S4method{two_stage_curtail_trial}{numeric,numeric,numeric,missing,missing,numeric,numeric}(p_null,
   p_alt, n, prob_early, alpha)
 }
 \description{
+Create a two_stage_curtail_trial
 Case 3:  User inputs p, n, prob_early, alpha
 }
 \examples{

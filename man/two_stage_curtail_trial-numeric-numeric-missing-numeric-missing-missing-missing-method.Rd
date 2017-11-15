@@ -3,7 +3,8 @@
 \docType{methods}
 \name{two_stage_curtail_trial,numeric,numeric,missing,numeric,missing,missing,missing-method}
 \alias{two_stage_curtail_trial,numeric,numeric,missing,numeric,missing,missing,missing-method}
-\title{Case 5:  User inputs p, n_total
+\title{Create a two_stage_curtail_trial
+Case 5:  User inputs p, n_total
 Using default values of prob_early and alpha, with n_total}
 \usage{
 
@@ -11,6 +12,7 @@ Using default values of prob_early and alpha, with n_total}
   p_alt, n_total, prob_early, alpha)
 }
 \description{
+Create a two_stage_curtail_trial
 Case 5:  User inputs p, n_total
 Using default values of prob_early and alpha, with n_total
 }
