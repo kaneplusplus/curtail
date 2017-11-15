@@ -100,8 +100,8 @@ setMethod("two_stage_curtail_trial",
             ret <- data.frame(p_null=matrix(rep(p_null,length(n1)), ncol=2, 
                   byrow=TRUE), p_alt=matrix(rep(p_alt,length(n1)), ncol=2, 
                   byrow=TRUE), n.1 = n1, n.2 = n2, r=r)
-            if(min(ret$r.1==0)){
-              ret <- ret[-which(ret$r.1==0),]
+            if(min(ret$r.1)==0){
+              ret <- subset(ret, r.1>0)
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
@@ -134,8 +134,8 @@ setMethod("two_stage_curtail_trial",
             ret <- data.frame(p_null=matrix(rep(p_null,length(n1)), ncol=2, 
                                             byrow=TRUE), p_alt=matrix(rep(p_alt,length(n1)), ncol=2, 
                                                                       byrow=TRUE), n.1 = n1, n.2 = n2, r=r)
-            if(min(ret$r.1==0)){
-              ret <- ret[-which(ret$r.1==0),]
+            if(min(ret$r.1)==0){
+              ret <- subset(ret, r.1>0)
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
@@ -143,14 +143,14 @@ setMethod("two_stage_curtail_trial",
           })
 
 #' @import ggplot2
-#' @importFrom reshape melt
+#' @importFrom tidyr gather
 #' @export
 #' 
 plot.two_stage_curtail_trial_sawtooth <- function(x, ...) {
   x["Optimal Criteria"] <- sample_size(x)
   x["Minimax Criteria"] <- minimax_probability(x)
-
-  m <- melt(subset(x, select=c("n.1", "Optimal Criteria", "Minimax Criteria")), id.var="n.1")
+  y <- subset(x, select=c("n.1", "Optimal Criteria", "Minimax Criteria"))
+  m <- gather(y, variable, value, -n.1)
   ggplot(m, aes(x = n.1, y = value)) + geom_line() + 
     facet_grid(variable ~ ., scales = "free_y") + xlab(expression(n[1]))+ 
     ylab("")
