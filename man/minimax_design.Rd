@@ -4,7 +4,7 @@
 \alias{minimax_design}
 \title{Evaluate the probability that the maximum sample size is needed for the two-stage design}
 \usage{
-minimax_design(p, n, r)
+minimax_design(x)
 }
 \arguments{
 \item{p}{vector containing the probability of successful outcomes
