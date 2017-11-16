@@ -4,7 +4,8 @@
 \alias{two_stage_curtail_trial}
 \title{Generic function for creating single-stage curtail trials}
 \usage{
-two_stage_curtail_trial(p_null, p_alt, n, n_total, r, prob_early, alpha)
+two_stage_curtail_trial(p1_null, p2_null, p1_alt, p2_alt, n1, n2, n_total, r1,
+  r2, prob_early, alpha)
 }
 \description{
 Generic function for creating single-stage curtail trials

@@ -1,7 +1,8 @@
 #' Generic function for creating single-stage curtail trials
 #' @export
-setGeneric("two_stage_curtail_trial", function(p_null, p_alt, n, n_total, r,
-                                               prob_early, alpha) {
+setGeneric("two_stage_curtail_trial", 
+           function(p1_null, p2_null, p1_alt, p2_alt, n1, n2, n_total, 
+                    r1, r2, prob_early, alpha) {
   standardGeneric("two_stage_curtail_trial")
 })
 
@@ -9,22 +10,32 @@ setGeneric("two_stage_curtail_trial", function(p_null, p_alt, n, n_total, r,
 #' Create a two_stage_curtail_trial
 #' Case 1 - User inputs p, n, and r
 #' @examples
-#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-#' n=c(6, 30), r=c(4, 11))
+#' trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, r1 = 4, r2 = 11)
 #' @export
 setMethod("two_stage_curtail_trial",
-          signature(p_null="numeric", p_alt="numeric", n="numeric", 
-                    n_total="missing",r="numeric",
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="numeric", n2="numeric", n_total="missing",
+                    r1="numeric", r2="numeric", 
                     prob_early="missing", alpha="missing"),
-          function(p_null, p_alt, n, r) {
-            two_stage_valid_parameters(p_null=p_null, p_alt=p_alt, 
-                                           n=n, n_total=NULL, r=r, 
-                                           prob_early=NULL, alpha=NULL)
-            Power <- Significance <- ess <- NULL
-            ret <- data.frame(p_null.1=p_null[1], p_null.2=p_null[2],
-                              p_alt.1=p_alt[1],p_alt.2=p_alt[2], n.1=n[1], 
-                              n.2=n[2], r.1=r[1], r.2=r[2])
+          function(p1_null, p2_null, p1_alt, p2_alt, 
+                   n1, n2, r1, r2) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null), 
+                          p_alt=c(p1_alt, p2_alt), n=c(n1, n2), 
+                          n_total=NULL, r=c(r1, r2), prob_early=NULL, 
+                          alpha=NULL)
+            ret <- data.frame(p1_null=p1_null, p2_null=p2_null,
+                              p1_alt=p1_alt, p2_alt=p2_alt, n1=n1, 
+                              n2=n2, r1=r1, r2=r2)
             class(ret) <- c("two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
             ret
           })
 
@@ -36,20 +47,29 @@ setMethod("two_stage_curtail_trial",
 #' n=c(6, 30))
 #' @export
 setMethod("two_stage_curtail_trial",
-          signature(p_null="numeric", p_alt="numeric", n="numeric", 
-                    n_total="missing",r="missing",
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="numeric", n2="numeric", n_total="missing",
+                    r1="missing", r2="missing", 
                     prob_early="missing", alpha="missing"),
-          function(p_null, p_alt, n, r) {
-            two_stage_valid_parameters(p_null=p_null, p_alt=p_alt, 
-                                           n=n, n_total=NULL, r=NULL, 
-                                           prob_early=NULL, alpha=NULL)
-            Power <- Significance <- ESS <- NULL
- 
-            r <- two_stage_critical_values(n, p_null)
-            ret <- data.frame(p_null.1=p_null[1], p_null.2=p_null[2],
-                              p_alt.1=p_alt[1],p_alt.2=p_alt[2], n.1=n[1], 
-                              n.2=n[2], r.1=r[1], r.2=r[2])
+          function(p1_null, p2_null, p1_alt, p2_alt, n1, n2) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null), 
+                                       p_alt=c(p1_alt, p2_alt), 
+                                       n=c(n1, n2), n_total=NULL, r=NULL, 
+                                       prob_early=NULL, alpha=NULL)
+            r <- two_stage_critical_values(c(n1, n2), 
+                                           c(p1_null, p2_null))
+            ret <- data.frame(p1_null=p1_null, p2_null=p2_null,
+                              p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
+                              n2=n2, r1=r[1], r2=r[2])
             class(ret) <- c("two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
             ret
           })
 
@@ -60,55 +80,82 @@ setMethod("two_stage_curtail_trial",
 #' n=c(6, 30), prob_early=0.1, alpha=0.1)
 #' @export
 setMethod("two_stage_curtail_trial",
-          signature(p_null="numeric", p_alt="numeric", n="numeric", 
-                    n_total="missing", r="missing", 
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="missing", n2="missing", n_total="missing",
+                    r1="missing", r2="missing", 
                     prob_early="numeric", alpha="numeric"),
-          function(p_null, p_alt, n, prob_early, alpha) {
-            two_stage_valid_parameters(p_null=p_null, p_alt=p_alt, 
-                                n=n, n_total=NULL, r=NULL,
-                                prob_early=prob_early, alpha=alpha)
+          function(p1_null, p2_null, p1_alt, p2_alt, n1, n2,
+                   prob_early, alpha) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null), 
+                                       p_alt=c(p1_alt, p2_alt), 
+                                       n=c(n1, n2), n_total=NULL, r=NULL,
+                                       prob_early=prob_early, alpha=alpha)
             
-            r <- Power <- Significance <- ess <- NULL
-            r <- two_stage_critical_values(n, p_null, prob_early, alpha)
-            ret <- data.frame(p_null.1=p_null[1], p_null.2=p_null[2],
-                              p_alt.1=p_alt[1],p_alt.2=p_alt[2], n.1=n[1], 
-                              n.2=n[2], r.1=r[1], r.2=r[2])
+            r <- two_stage_critical_values(c(n1, n2), 
+                                           c(p1_null, p2_null), 
+                                           prob_early, alpha)
+            
+            ret <- data.frame(p1_null=p1_null, p2_null=p2_null,
+                              p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
+                              n2=n2, r1=r[1], r2=r[2])
             class(ret) <- c("two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
             ret
           })
 
 #' Create a two_stage_curtail_trial
 #' Case 4:  User inputs p, n_total, prob_early, alpha
 #' @examples
-#' trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-#' n_total=36, prob_early=0.1. alpha=0.1)
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
 #' @export
 setMethod("two_stage_curtail_trial",
-          signature(p_null="numeric", p_alt="numeric", n="missing", 
-                    n_total="numeric", r="missing", 
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="missing", n2="missing", n_total="numeric",
+                    r1="missing", r2="missing", 
                     prob_early="numeric", alpha="numeric"),
-          function(p_null, p_alt, n_total, prob_early, alpha) {
-            two_stage_valid_parameters(p_null=p_null, 
-                                      p_alt=p_alt, n=NULL, n_total=n_total,
-                                      r = NULL, prob_early=prob_early, 
-                                      alpha=alpha)
+          function(p1_null, p2_null, p1_alt, p2_alt, n_total, 
+                   prob_early, alpha) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null),
+                                       p_alt=c(p1_alt, p2_alt),
+                                       n=NULL, n_total=n_total, r = NULL, 
+                                       prob_early=prob_early, 
+                                       alpha=alpha)
             
-            n1 <- Power <- Significance <- ess <- n <- r <- NULL
             n1 <- seq_len(n_total-1)
             n2 <- n_total - n1
             n <- cbind(n1, n2)
             r <- matrix(apply(n, 1, function(x){
-              two_stage_critical_values(x, p_null,prob_early, alpha)
+              two_stage_critical_values(x, c(p1_null, p2_null),
+                                        prob_early, alpha)
             }), nrow=length(n1), ncol=2, byrow=TRUE)
 
-            ret <- data.frame(p_null=matrix(rep(p_null,length(n1)), ncol=2, 
-                  byrow=TRUE), p_alt=matrix(rep(p_alt,length(n1)), ncol=2, 
-                  byrow=TRUE), n.1 = n1, n.2 = n2, r=r)
-            if(min(ret$r.1)==0){
-              ret <- subset(ret, r.1>0)
+            ret <- data.frame(p1_null=rep(p1_null, length(n1)),
+                              p2_null=rep(p2_null, length(n1)),
+                              p1_alt=rep(p1_alt, length(n1)),
+                              p2_alt=rep(p2_alt, length(n1)),
+                              n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+            if(min(ret$r1)==0){
+              ret <- subset(ret, r1>0)
+              rownames(ret) <- NULL
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
             ret
 })
 
@@ -120,30 +167,43 @@ setMethod("two_stage_curtail_trial",
 #' n_total=36)
 #' @export
 setMethod("two_stage_curtail_trial",
-          signature(p_null="numeric", p_alt="numeric", n="missing", 
-                    n_total="numeric", r="missing", 
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="missing", n2="missing", n_total="numeric",
+                    r1="missing", r2="missing", 
                     prob_early="missing", alpha="missing"),
-          function(p_null, p_alt, n_total, prob_early, alpha) {
-            two_stage_valid_parameters(p_null=p_null, p_alt=p_alt, n=NULL,
+          function(p1_null, p2_null, p1_alt, p2_alt, n_total, 
+                   prob_early, alpha) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null), 
+                                       p_alt=c(p1_alt, p2_alt), n=NULL,
                                        n_total=n_total, r=NULL, 
                                        prob_early=NULL, alpha=NULL)
             
-            n1 <- Power <- Significance <- ess <- n <- r <- NULL
             n1 <- seq_len(n_total-1)
             n2 <- n_total - n1
             n <- cbind(n1, n2)
             r <- matrix(apply(n, 1, function(x){
-              two_stage_critical_values(x, p_null)
+              two_stage_critical_values(x, c(p1_null, p2_null))
             }), nrow=length(n1), ncol=2, byrow=TRUE)
             
-            ret <- data.frame(p_null=matrix(rep(p_null,length(n1)), ncol=2, 
-                                            byrow=TRUE), p_alt=matrix(rep(p_alt,length(n1)), ncol=2, 
-                                                                      byrow=TRUE), n.1 = n1, n.2 = n2, r=r)
-            if(min(ret$r.1)==0){
-              ret <- subset(ret, r.1>0)
+            ret <- data.frame(p1_null=rep(p1_null, length(n1)),
+                              p2_null=rep(p2_null, length(n1)),
+                              p1_alt=rep(p1_alt, length(n1)),
+                              p2_alt=rep(p2_alt, length(n1)),
+                              n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+            if(min(ret$r1)==0){
+              ret <- subset(ret, r1>0)
+              rownames(ret) <- NULL
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
             ret
           })
 
@@ -152,11 +212,10 @@ setMethod("two_stage_curtail_trial",
 #' @export
 #' 
 plot.two_stage_curtail_trial_sawtooth <- function(x, ...) {
-  x["Optimal Criteria"] <- sample_size(x)
-  x["Minimax Criteria"] <- minimax_probability(x)
-  y <- subset(x, select=c("n.1", "Optimal Criteria", "Minimax Criteria"))
-  m <- gather(y, variable, value, -n.1)
-  ggplot(m, aes(x = n.1, y = value)) + geom_line() + 
+  y <- subset(x, select=c("n1", "mean_ss_null", "minimax_prob"))
+  names(y) <- c("n1", "Optimal Criteria", "Minimax Criteria")
+  m <- gather(y, variable, value, -n1)
+  ggplot(m, aes(x = n1, y = value)) + geom_line() + 
     facet_grid(variable ~ ., scales = "free_y") + xlab(expression(n[1]))+ 
     ylab("")
 }
@@ -164,9 +223,9 @@ plot.two_stage_curtail_trial_sawtooth <- function(x, ...) {
 #' @export
 significance.two_stage_curtail_trial <- function(x) {
   apply(x, 1, function(x){
-    p <- x[c("p_null.1", "p_null.2")]
-    n <- x[c("n.1", "n.2")]
-    r <- x[c("r.1", "r.2")]
+    p <- as.numeric(x[c("p1_null", "p2_null")])
+    n <- as.numeric(x[c("n1", "n2")])
+    r <- as.numeric(x[c("r1", "r2")])
     
     reject <- 0 
     
@@ -199,9 +258,9 @@ significance.two_stage_curtail_trial <- function(x) {
 power.two_stage_curtail_trial <- function(x) {
   apply(x, 1,
         function(x) {
-          p <- x[c("p_alt.1", "p_alt.2")]
-          n <- x[c("n.1", "n.2")]
-          r <- x[c("r.1", "r.2")]
+          p <- as.numeric(x[c("p1_alt", "p2_alt")])
+          n <- as.numeric(x[c("n1", "n2")])
+          r <- as.numeric(x[c("r1", "r2")])
           
           reject <- 0 
           
@@ -230,12 +289,195 @@ power.two_stage_curtail_trial <- function(x) {
 }
 
 #' @export
-sample_size.two_stage_curtail_trial <- function(x) {
+expected_sample_size.two_stage_curtail_trial <- function(x) {
   
   apply(x, 1,
         function(x) {
-          expected_total_sample_size(p = c(x["p_null.1"], x["p_null.2"]), 
-                                     n = c(x["n.1"], x["n.2"]), r=c(x["r.1"], x["r.2"]))
+          p <- as.numeric(x[c("p1_null", "p2_null")])
+          n <- as.numeric(x[c("n1", "n2")])
+          r <- as.numeric(x[c("r1", "r2")])
+          
+          # Probability of stopping early
+          pearly <- prob_early_stop(p, n, r)  
+          
+          #Pr(Y1=y1|continue to stage 2)
+          # truncated negative binomial distribution
+          # number of trials until we reach r1 successes 
+          # r1 <= y1 <= n1
+          prY1Continue <- function(y1, r1, n1, p1) {
+            if( y1 < r1 || y1 > n1){    
+              warning("Invalid parameter values")
+              return(NaN)
+            }
+            num <- factorial(y1-1) / factorial(y1-r1)
+            denom <- sum(sapply(r1:n1, function(j) {
+                            factorial(j-1)/factorial(j-r1) *(1-p1)^(j-y1)
+                            }))
+            
+            if (is.na(num/denom)) { 
+              return(0)
+            } else {
+              return(num/denom)
+            }
+          }
+          
+          # Pr(Y1=y1|stop early)
+          # truncated negative binomial distribution
+          # number of trials until we reach n1-r1+1 failures
+          # n1-r1+1 <= y1 <= n1
+          
+          prY1Stop <- function(y1, r1, n1, p1) {
+            if (y1 < n1-r1+1 || y1 > n1) { 
+              warning("Invalid parameter values")
+              return(NaN)
+            }
+            num <- factorial(y1-1) / factorial(y1-1-n1+r1)
+            
+            denom <- sum(sapply((n1-r1+1):n1, function(j) {
+                            factorial(j-1)/factorial(j-1-n1+r1) * p1^(j-y1)
+                            }))
+            
+            if(is.na(num/denom)){ 
+              return(0)
+            } else {
+              return(num/denom)
+            }
+          }
+          
+          ### expected value of Y1 | continue to Stage 2
+          EY1Continue <- sum(sapply(r[1]:n[1], function(i) {
+                                      i * prY1Continue(i, r[1], n[1], p[1])
+                                    }))
+          
+          ### expected value of Y1|stop early
+          EY1Stop <- sum(sapply((n[1]-r[1]+1):n[1], function(i) {
+                                  i*prY1Stop(i, r[1], n[1], p[1])
+                                }))
+          
+          ### expected value of y2|continue to Stage 2
+          # i = possible values of y1
+          # j = possible values of x12
+          py1 <- sapply(r[1]:n[1], function(i) {
+                          prY1Continue(i, r[1], n[1], p[1])
+                        })
+          
+          px12 <- sapply(0:r[1], function(j) {
+                           dbinom(j, r[1], p[2]/p[1])
+                         })
+          
+          #for the snb distribution,
+          #s <- r[2]-j
+          #t <- n[2]+n[1]-i-r[2]+j+1
+          ey2 <- function(y1) {
+            sapply(0:r[1], function(j) {
+                     esnb(p[2], s=ifelse((r[2]-j)>0, (r[2]-j), 0), 
+                          t=ifelse((n[2]+n[1]-y1-r[2]+j+1)>0, 
+                                   n[2]+n[1]-y1-r[2]+j+1, 0))
+                   })
+          }
+          
+          a <- sapply(r[1]:n[1], function(y1) sum(px12*ey2(y1)))
+          EY2Continue <- sum(py1*a)
+          
+          return((EY1Stop*pearly) + ((EY1Continue+EY2Continue)*(1-pearly))) 
+        })
+}
+
+#' @export
+expected_sample_size_alt <- function(x) {
+  UseMethod("expected_sample_size_alt")
+}
+
+expected_sample_size_alt.two_stage_curtail_trial <- function(x) {
+  apply(x, 1,
+        function(x) {
+          p <- as.numeric(x[c("p1_alt", "p2_alt")])
+          n <- as.numeric(x[c("n1", "n2")])
+          r <- as.numeric(x[c("r1", "r2")])
+          
+          # Probability of stopping early
+          pearly <- prob_early_stop(p, n, r)  
+          
+          #Pr(Y1=y1|continue to stage 2)
+          # truncated negative binomial distribution
+          # number of trials until we reach r1 successes 
+          # r1 <= y1 <= n1
+          prY1Continue <- function(y1, r1, n1, p1) {
+            if( y1 < r1 || y1 > n1){    
+              warning("Invalid parameter values")
+              return(NaN)
+            }
+            num <- factorial(y1-1) / factorial(y1-r1)
+            denom <- sum(sapply(r1:n1, function(j) {
+              factorial(j-1)/factorial(j-r1) *(1-p1)^(j-y1)
+            }))
+            
+            if (is.na(num/denom)) { 
+              return(0)
+            } else {
+              return(num/denom)
+            }
+          }
+          
+          # Pr(Y1=y1|stop early)
+          # truncated negative binomial distribution
+          # number of trials until we reach n1-r1+1 failures
+          # n1-r1+1 <= y1 <= n1
+          
+          prY1Stop <- function(y1, r1, n1, p1) {
+            if (y1 < n1-r1+1 || y1 > n1) { 
+              warning("Invalid parameter values")
+              return(NaN)
+            }
+            num <- factorial(y1-1) / factorial(y1-1-n1+r1)
+            
+            denom <- sum(sapply((n1-r1+1):n1, function(j) {
+              factorial(j-1)/factorial(j-1-n1+r1) * p1^(j-y1)
+            }))
+            
+            if(is.na(num/denom)){ 
+              return(0)
+            } else {
+              return(num/denom)
+            }
+          }
+          
+          ### expected value of Y1 | continue to Stage 2
+          EY1Continue <- sum(sapply(r[1]:n[1], function(i) {
+            i * prY1Continue(i, r[1], n[1], p[1])
+          }))
+          
+          ### expected value of Y1|stop early
+          EY1Stop <- sum(sapply((n[1]-r[1]+1):n[1], function(i) {
+            i*prY1Stop(i, r[1], n[1], p[1])
+          }))
+          
+          ### expected value of y2|continue to Stage 2
+          # i = possible values of y1
+          # j = possible values of x12
+          py1 <- sapply(r[1]:n[1], function(i) {
+            prY1Continue(i, r[1], n[1], p[1])
+          })
+          
+          px12 <- sapply(0:r[1], function(j) {
+            dbinom(j, r[1], p[2]/p[1])
+          })
+          
+          #for the snb distribution,
+          #s <- r[2]-j
+          #t <- n[2]+n[1]-i-r[2]+j+1
+          ey2 <- function(y1) {
+            sapply(0:r[1], function(j) {
+              esnb(p[2], s=ifelse((r[2]-j)>0, (r[2]-j), 0), 
+                   t=ifelse((n[2]+n[1]-y1-r[2]+j+1)>0, 
+                            n[2]+n[1]-y1-r[2]+j+1, 0))
+            })
+          }
+          
+          a <- sapply(r[1]:n[1], function(y1) sum(px12*ey2(y1)))
+          EY2Continue <- sum(py1*a)
+          
+          return((EY1Stop*pearly) + ((EY1Continue+EY2Continue)*(1-pearly))) 
         })
 }
 
@@ -246,23 +488,20 @@ stage1_sample_size <- function(x) {
 
 #' @export
 stage1_sample_size.two_stage_curtail_trial <- function(x) {
-  
   apply(x, 1,
         function(x) {
           
-          n1 <- x["n.1"]
-          r1 <- x["r.1"]
-          p1 <- x["p_null.1"]
+          n1 <- as.numeric(x["n1"])
+          r1 <- as.numeric(x["r1"])
+          p1 <- as.numeric(x["p1_null"])
           
           tt <- n1 - r1 + 1  # Number of failures to stop early
           
           e <- esnb(p1, r1, tt)  # Expected value
           
           v <- vsnb(p1, r1, tt)   # variance
-          
-          eAndSD<-list("Expectation"=e, "Standard_Deviation"=sqrt(v))
-          
-          eAndSD  # Expected value and SD
+          sd <- sqrt(v)
+          e
           
         })
 }
@@ -273,12 +512,15 @@ PET <- function(x) {
 }
 
 PET.two_stage_curtail_trial <- function(x){
-  
   apply(x, 1,
         function(x) {
-          j <- min(x[c("r.1", "n.1")]) : x["n.1"] # range of X1
+          r1 <- as.numeric(x["r1"])
+          n1 <- as.numeric(x["n1"])
+          p1 <- as.numeric(x["p1_null"])
           
-          1 - sum(dbinom(j, x["n.1"], x["p_null.1"]))
+          j <- min(r1, n1) : n1 # range of X1
+          
+          1 - sum(dbinom(j, n1, p1))
         }) 
 }
 
@@ -291,9 +533,9 @@ minimax_probability.two_stage_curtail_trial <- function(x){
   
   apply(x, 1,
         function(x) {
-          n <- c(x["n.1"], x["n.2"])
-          p <- c(x["p_null.1"], x["p_null.2"])
-          r <- c(x["r.1"], x["r.2"])
+          n <- as.numeric(c(x["n1"], x["n2"]))
+          p <- as.numeric(c(x["p1_null"], x["p2_null"]))
+          r <- as.numeric(c(x["r1"], x["r2"]))
           if (r[1]==0) {
             return(choose(n[1]+n[2]-1, r[2]-1)*p[2]^(r[2]-1)*
                      (1-p[2])^(n[1]+n[2]-r[2]))
@@ -336,9 +578,7 @@ minimax_design <- function(x) {
 
 #' @export
 minimax_design.two_stage_curtail_trial_sawtooth <- function(x){
-  x$minimax_probability <- minimax_probability(x)
-  class(x) <- c("two_stage_curtail_trial", "data.frame")
-  x[which.min(x$minimax_probability),]
+  x[which.min(x$minimax_prob),]
   
 }
 
@@ -350,9 +590,7 @@ optimal_design <- function(x) {
 
 #' @export
 optimal_design.two_stage_curtail_trial_sawtooth <- function(x){
-  x$sample_size <- sample_size(x)
-  class(x) <- c("two_stage_curtail_trial", "data.frame")
-  x[which.min(x$sample_size),]
+  x[which.min(x$mean_ss_null),]
 }
 
 summary.two_stage_curtail_trial_sawtooth <- function(x){
@@ -377,25 +615,43 @@ summary.two_stage_curtail_trial <- function(x){
 two_stage_valid_parameters <- function(p_null, p_alt, n, n_total, r, 
                                        prob_early, alpha){
   
-  if(!is.null(p_null) && (any(p_null > 1) | any(p_null < 0))) stop("p_null should be between 
-                                             0 and 1") 
-  if(!is.null(p_alt) && (any(p_alt > 1) | any(p_alt < 0))) stop("p_alt should be between 
-                                           0 and 1") 
-  if(!is.null(n) && any(!is.wholenumber(n))) stop("n1 and n2 should be whole 
-                                                 numbers") 
-  if(!is.null(n) && any(n < 1)) stop("n1 and n2 should be at least 1") 
-  if(!is.null(r) && any(r < 0)) stop("r1 and r2 should not be less than 0")
-  if(!is.null(r) && !is.null(n) && r[1] > n[1]) stop("r1 should be less than 
-                                                   or equal to n1")
+  if(!is.null(p_null) && (any(p_null > 1) || any(p_null < 0))){
+    stop("p1_null and p2_null should be between 0 and 1") 
+  } 
+  if(!is.null(p_alt) && (any(p_alt > 1) || any(p_alt < 0))){
+    stop("p1_alt and p2_alt should be between 0 and 1") 
+  } 
+  if(!is.null(n) && any(!is.wholenumber(n))){
+    stop("n1 and n2 must be be integers") 
+  } 
+  if(!is.null(n) && any(n < 1)){
+    stop("n1 and n2 should be at least 1") 
+  } 
+  if(!is.null(r) && any(r < 0)){
+    stop("r1 and r2 should not be less than 0")
+  } 
+  if(!is.null(r) && !is.null(n) && r[1] > n[1]){
+    stop("r1 should be less than or equal to n1")
+  } 
   # Must have: 0 <= r2 <= n1+n2
-  if(!is.null(r) && !is.null(n) && r[2] > sum(n)) stop("r2 should be less than 
-                                                     or equal to n1+n2")
-  if(!is.null(r) && any(!is.wholenumber(r))) stop("r1 and r2 should be whole numbers")
-  if(!is.null(n_total) && !is.wholenumber(n_total)) stop("n_total should be a whole number") 
-  if(!is.null(n_total) && n_total < 2) stop("n_total should be at least 2")
-  if(!is.null(alpha) && (alpha > 1 | alpha < 0)) stop("alpha should be between 0 and 1")
-  if(!is.null(prob_early) && (prob_early > 1 | prob_early < 0)) stop("prob_early should be between
-                                           0 and 1")
+  if(!is.null(r) && !is.null(n) && r[2] > sum(n)){
+    stop("r2 should be less than or equal to n1+n2")
+  } 
+  if(!is.null(r) && any(!is.wholenumber(r))){
+    stop("r1 and r2 should be integers")
+  } 
+  if(!is.null(n_total) && !is.wholenumber(n_total)){
+    stop("n_total should be an integer") 
+  } 
+  if(!is.null(n_total) && n_total < 2){
+    stop("n_total should be at least 2")
+  } 
+  if(!is.null(alpha) && (alpha > 1 | alpha < 0)){
+    stop("alpha should be between 0 and 1")
+  } 
+  if(!is.null(prob_early) && (prob_early > 1 || prob_early < 0)){
+    stop("prob_early should be between 0 and 1")
+  }
 }
 
 prob_early_stop <- function(p, n, r){
