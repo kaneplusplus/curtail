@@ -73,6 +73,7 @@ setMethod("two_stage_curtail_trial",
             ret
           })
 
+
 #' Create a two_stage_curtail_trial
 #' Case 3:  User inputs p, n, prob_early, alpha
 #' @examples
@@ -82,7 +83,7 @@ setMethod("two_stage_curtail_trial",
 setMethod("two_stage_curtail_trial",
           signature(p1_null="numeric", p2_null="numeric", 
                     p1_alt="numeric",  p2_alt="numeric", 
-                    n1="missing", n2="missing", n_total="missing",
+                    n1="numeric", n2="numeric", n_total="missing",
                     r1="missing", r2="missing", 
                     prob_early="numeric", alpha="numeric"),
           function(p1_null, p2_null, p1_alt, p2_alt, n1, n2,
@@ -95,6 +96,79 @@ setMethod("two_stage_curtail_trial",
             r <- two_stage_critical_values(c(n1, n2), 
                                            c(p1_null, p2_null), 
                                            prob_early, alpha)
+            
+            ret <- data.frame(p1_null=p1_null, p2_null=p2_null,
+                              p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
+                              n2=n2, r1=r[1], r2=r[2])
+            class(ret) <- c("two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
+            ret
+          })
+#' Create a two_stage_curtail_trial
+#' Case 3a:  User inputs p, n, prob_early
+#' @examples
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30), prob_early=0.1, alpha=0.1)
+#' @export
+setMethod("two_stage_curtail_trial",
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="numeric", n2="numeric", n_total="missing",
+                    r1="missing", r2="missing", 
+                    prob_early="numeric", alpha="missing"),
+          function(p1_null, p2_null, p1_alt, p2_alt, n1, n2,
+                   prob_early, alpha) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null), 
+                                       p_alt=c(p1_alt, p2_alt), 
+                                       n=c(n1, n2), n_total=NULL, r=NULL,
+                                       prob_early=prob_early, alpha=NULL)
+            
+            r <- two_stage_critical_values(c(n1, n2), 
+                                           c(p1_null, p2_null), 
+                                           pearly=prob_early)
+            
+            ret <- data.frame(p1_null=p1_null, p2_null=p2_null,
+                              p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
+                              n2=n2, r1=r[1], r2=r[2])
+            class(ret) <- c("two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
+            ret
+          })
+
+#' Create a two_stage_curtail_trial
+#' Case 3b:  User inputs p, n, alpha
+#' @examples
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30), prob_early=0.1, alpha=0.1)
+#' @export
+setMethod("two_stage_curtail_trial",
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="numeric", n2="numeric", n_total="missing",
+                    r1="missing", r2="missing", 
+                    prob_early="missing", alpha="numeric"),
+          function(p1_null, p2_null, p1_alt, p2_alt, n1, n2,
+                   prob_early, alpha) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null), 
+                                       p_alt=c(p1_alt, p2_alt), 
+                                       n=c(n1, n2), n_total=NULL, r=NULL,
+                                       prob_early=NULL, alpha=alpha)
+            
+            r <- two_stage_critical_values(c(n1, n2), 
+                                           c(p1_null, p2_null), 
+                                           alpha=alpha)
             
             ret <- data.frame(p1_null=p1_null, p2_null=p2_null,
                               p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
@@ -160,6 +234,101 @@ setMethod("two_stage_curtail_trial",
 })
 
 #' Create a two_stage_curtail_trial
+#' Case 4a:  User inputs p, n_total, prob_early
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+#' @export
+setMethod("two_stage_curtail_trial",
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="missing", n2="missing", n_total="numeric",
+                    r1="missing", r2="missing", 
+                    prob_early="numeric", alpha="missing"),
+          function(p1_null, p2_null, p1_alt, p2_alt, n_total, 
+                   prob_early, alpha) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null),
+                                       p_alt=c(p1_alt, p2_alt),
+                                       n=NULL, n_total=n_total, r = NULL, 
+                                       prob_early=prob_early, 
+                                       alpha=NULL)
+            
+            n1 <- seq_len(n_total-1)
+            n2 <- n_total - n1
+            n <- cbind(n1, n2)
+            r <- matrix(apply(n, 1, function(x){
+              two_stage_critical_values(x, c(p1_null, p2_null),
+                                        pearly=prob_early)
+            }), nrow=length(n1), ncol=2, byrow=TRUE)
+            
+            ret <- data.frame(p1_null=rep(p1_null, length(n1)),
+                              p2_null=rep(p2_null, length(n1)),
+                              p1_alt=rep(p1_alt, length(n1)),
+                              p2_alt=rep(p2_alt, length(n1)),
+                              n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+            if(min(ret$r1)==0){
+              ret <- subset(ret, r1>0)
+              rownames(ret) <- NULL
+            }
+            class(ret) <- c("two_stage_curtail_trial_sawtooth", 
+                            "two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
+            ret
+          })
+#' Create a two_stage_curtail_trial
+#' Case 4b:  User inputs p, n_total, alpha
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+#' @export
+setMethod("two_stage_curtail_trial",
+          signature(p1_null="numeric", p2_null="numeric", 
+                    p1_alt="numeric",  p2_alt="numeric", 
+                    n1="missing", n2="missing", n_total="numeric",
+                    r1="missing", r2="missing", 
+                    prob_early="missing", alpha="numeric"),
+          function(p1_null, p2_null, p1_alt, p2_alt, n_total, 
+                   prob_early, alpha) {
+            two_stage_valid_parameters(p_null=c(p1_null, p2_null),
+                                       p_alt=c(p1_alt, p2_alt),
+                                       n=NULL, n_total=n_total, r = NULL, 
+                                       prob_early=NULL, alpha=alpha)
+            
+            n1 <- seq_len(n_total-1)
+            n2 <- n_total - n1
+            n <- cbind(n1, n2)
+            r <- matrix(apply(n, 1, function(x){
+              two_stage_critical_values(x, c(p1_null, p2_null),
+                                        alpha=alpha)
+            }), nrow=length(n1), ncol=2, byrow=TRUE)
+            
+            ret <- data.frame(p1_null=rep(p1_null, length(n1)),
+                              p2_null=rep(p2_null, length(n1)),
+                              p1_alt=rep(p1_alt, length(n1)),
+                              p2_alt=rep(p2_alt, length(n1)),
+                              n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+            if(min(ret$r1)==0){
+              ret <- subset(ret, r1>0)
+              rownames(ret) <- NULL
+            }
+            class(ret) <- c("two_stage_curtail_trial_sawtooth", 
+                            "two_stage_curtail_trial", class(ret))
+            ret$power <- power(ret)
+            ret$significance <- significance(ret)
+            ret$stage1_mean_ss <- stage1_sample_size(ret)
+            ret$mean_ss_null <- expected_sample_size(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt(ret)
+            ret$PET <- PET(ret)
+            ret$minimax_prob <- minimax_probability(ret)
+            ret
+          })
+#' Create a two_stage_curtail_trial
 #' Case 5:  User inputs p, n_total
 #' Using default values of prob_early and alpha, with n_total
 #' @examples
@@ -205,6 +374,23 @@ setMethod("two_stage_curtail_trial",
             ret$PET <- PET(ret)
             ret$minimax_prob <- minimax_probability(ret)
             ret
+          })
+
+#' Create a two_stage_curtail_trial
+#' Case 6:  Anything else
+#' @examples
+#' trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n_total=36)
+#' @export
+setMethod("two_stage_curtail_trial",
+          signature(p1_null="ANY", p2_null="ANY", 
+                    p1_alt="ANY",  p2_alt="ANY", 
+                    n1="ANY", n2="ANY", n_total="ANY",
+                    r1="ANY", r2="ANY", 
+                    prob_early="ANY", alpha="ANY"),
+          function(p1_null, p2_null, p1_alt, p2_alt, n1, n2, n_total, 
+                   r1, r2, prob_early, alpha) {
+            stop("Design parameters not entered correctly. Refer to documentation")
           })
 
 #' @import ggplot2
