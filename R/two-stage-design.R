@@ -1,4 +1,39 @@
-#' Generic function for creating single-stage curtail trials
+#' Create a two stage curtailed trial design
+#'
+#' @description WHAT DOES THE FUNCTION DO?
+#' @param p1_null TODO:write this
+#' @param p2_null TODO:write this
+#' @param p1_alt TODO:write this
+#' @param p2_alt TODO:write this
+#' @param n1 TODO:write this
+#' @param n2 TODO:write this
+#' @param n_total TODO:write this
+#' @param r1 TODO:write this
+#' @param r2 TODO:write this
+#' @param prob_early TODO:write this
+#' @param alpha TODO:write this
+#' @details
+#' WHAT ARE THE DIFFERENT WAYS OF SPECIFYING THIS TRIAL
+#' @examples
+#' # Case 1
+#' trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, r1 = 4, r2 = 11)
+#' 
+#' # Case 2
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30))
+#'
+#' # Case 3
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30), prob_early=0.1, alpha=0.1)
+#' 
+#' # Case 4
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+#' 
+#' # Case 5
+#' trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n_total=36)
 #' @export
 setGeneric("two_stage_curtail_trial", 
            function(p1_null, p2_null, p1_alt, p2_alt, n1, n2, n_total, 
@@ -7,11 +42,6 @@ setGeneric("two_stage_curtail_trial",
 })
 
 
-#' Create a two_stage_curtail_trial
-#' Case 1 - User inputs p, n, and r
-#' @examples
-#' trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
-#' p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, r1 = 4, r2 = 11)
 #' @export
 setMethod("two_stage_curtail_trial",
           signature(p1_null="numeric", p2_null="numeric", 
@@ -39,12 +69,9 @@ setMethod("two_stage_curtail_trial",
             ret
           })
 
-#' Create a two_stage_curtail_trial
-#' Case 2:  User inputs p, n
-#' Using default values of alpha and prob_early
-#' @examples
-#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-#' n=c(6, 30))
+# Create a two_stage_curtail_trial
+# Case 2:  User inputs p, n
+# Using default values of alpha and prob_early
 #' @export
 setMethod("two_stage_curtail_trial",
           signature(p1_null="numeric", p2_null="numeric", 
@@ -74,11 +101,8 @@ setMethod("two_stage_curtail_trial",
           })
 
 
-#' Create a two_stage_curtail_trial
-#' Case 3:  User inputs p, n, prob_early, alpha
-#' @examples
-#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-#' n=c(6, 30), prob_early=0.1, alpha=0.1)
+# Create a two_stage_curtail_trial
+# Case 3:  User inputs p, n, prob_early, alpha
 #' @export
 setMethod("two_stage_curtail_trial",
           signature(p1_null="numeric", p2_null="numeric", 
@@ -184,11 +208,8 @@ setMethod("two_stage_curtail_trial",
             ret
           })
 
-#' Create a two_stage_curtail_trial
-#' Case 4:  User inputs p, n_total, prob_early, alpha
-#' @examples
-#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
-#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+# Create a two_stage_curtail_trial
+# Case 4:  User inputs p, n_total, prob_early, alpha
 #' @export
 setMethod("two_stage_curtail_trial",
           signature(p1_null="numeric", p2_null="numeric", 
@@ -328,12 +349,9 @@ setMethod("two_stage_curtail_trial",
             ret$minimax_prob <- minimax_probability(ret)
             ret
           })
-#' Create a two_stage_curtail_trial
-#' Case 5:  User inputs p, n_total
-#' Using default values of prob_early and alpha, with n_total
-#' @examples
-#' trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-#' n_total=36)
+# Create a two_stage_curtail_trial
+# Case 5:  User inputs p, n_total
+# Using default values of prob_early and alpha, with n_total
 #' @export
 setMethod("two_stage_curtail_trial",
           signature(p1_null="numeric", p2_null="numeric", 

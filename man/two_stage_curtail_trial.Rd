@@ -2,11 +2,58 @@
 % Please edit documentation in R/two-stage-design.R
 \name{two_stage_curtail_trial}
 \alias{two_stage_curtail_trial}
-\title{Generic function for creating single-stage curtail trials}
+\title{Create a two stage curtailed trial design}
 \usage{
 two_stage_curtail_trial(p1_null, p2_null, p1_alt, p2_alt, n1, n2, n_total, r1,
   r2, prob_early, alpha)
 }
+\arguments{
+\item{p1_null}{TODO:write this}
+
+\item{p2_null}{TODO:write this}
+
+\item{p1_alt}{TODO:write this}
+
+\item{p2_alt}{TODO:write this}
+
+\item{n1}{TODO:write this}
+
+\item{n2}{TODO:write this}
+
+\item{n_total}{TODO:write this}
+
+\item{r1}{TODO:write this}
+
+\item{r2}{TODO:write this}
+
+\item{prob_early}{TODO:write this}
+
+\item{alpha}{TODO:write this}
+}
 \description{
-Generic function for creating single-stage curtail trials
+WHAT DOES THE FUNCTION DO?
+}
+\details{
+WHAT ARE THE DIFFERENT WAYS OF SPECIFYING THIS TRIAL
+}
+\examples{
+# Case 1
+trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, r1 = 4, r2 = 11)
+
+# Case 2
+trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+n=c(6, 30))
+
+# Case 3
+trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+n=c(6, 30), prob_early=0.1, alpha=0.1)
+
+# Case 4
+trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+
+# Case 5
+trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+n_total=36)
 }
