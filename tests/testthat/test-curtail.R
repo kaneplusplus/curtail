@@ -2,7 +2,390 @@ library(testthat)
 
 context('curtail function calls')
 
-##public functions
+#### Updated cases two-stage
+
+#' Case 1 - User inputs p, n, and r
+#' @examples
+#' trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, r1 = 4, r2 = 11)
+test_that("two_stage_curtail_trial works for case 1", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+     p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  
+  expect_equal(as.numeric(trial[1:8]), c(p1_null, p2_null, p1_alt, p2_alt, n1, n2, r1, r2))
+  expect_equal(trial$power, two_stage_power(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$significance, two_stage_significance(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$stage1_mean_ss, expected_stage1_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2))$expectation)
+  expect_equal(trial$mean_ss_null, expected_total_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$mean_ss_alt, expected_total_sample_size(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$PET, prob_early_stop(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$minimax_prob, minimax_design(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  
+  expect_is(trial, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 2:  User inputs p, n
+#' Using default values of alpha and prob_early
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30))
+test_that("two_stage_curtail_trial works for case 2", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2)
+  r1 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null))[1]
+  r2 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null))[2]
+  
+  expect_equal(as.numeric(trial[1:8]), c(p1_null, p2_null, p1_alt, p2_alt, n1, n2, r1, r2))
+  expect_equal(trial$power, two_stage_power(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$significance, two_stage_significance(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$stage1_mean_ss, expected_stage1_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2))$expectation)
+  expect_equal(trial$mean_ss_null, expected_total_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$mean_ss_alt, expected_total_sample_size(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$PET, prob_early_stop(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$minimax_prob, minimax_design(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  
+  expect_is(trial, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 3:  User inputs p, n, prob_early, alpha
+#' @examples
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30), prob_early=0.1, alpha=0.1)
+test_that("two_stage_curtail_trial works for case 3", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  prob_early <- 0.1
+  alpha <- 0.1
+
+  
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, 
+                                   prob_early=prob_early, alpha=alpha)
+  r1 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null), pearly=prob_early, alpha=alpha)[1]
+  r2 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null), pearly=prob_early, alpha=alpha)[2]
+  
+  expect_equal(as.numeric(trial[1:8]), c(p1_null, p2_null, p1_alt, p2_alt, n1, n2, r1, r2))
+  expect_equal(trial$power, two_stage_power(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$significance, two_stage_significance(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$stage1_mean_ss, expected_stage1_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2))$expectation)
+  expect_equal(trial$mean_ss_null, expected_total_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$mean_ss_alt, expected_total_sample_size(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$PET, prob_early_stop(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$minimax_prob, minimax_design(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  
+  expect_is(trial, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 3a:  User inputs p, n, prob_early
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30), prob_early=0.1)
+test_that("two_stage_curtail_trial works for case 3a", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  prob_early <- 0.1
+
+  
+  
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, 
+                                   prob_early=prob_early)
+  r1 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null), pearly=prob_early)[1]
+  r2 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null), pearly=prob_early)[2]
+  
+  expect_equal(as.numeric(trial[1:8]), c(p1_null, p2_null, p1_alt, p2_alt, n1, n2, r1, r2))
+  expect_equal(trial$power, two_stage_power(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$significance, two_stage_significance(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$stage1_mean_ss, expected_stage1_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2))$expectation)
+  expect_equal(trial$mean_ss_null, expected_total_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$mean_ss_alt, expected_total_sample_size(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$PET, prob_early_stop(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$minimax_prob, minimax_design(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  
+  expect_is(trial, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 3b:  User inputs p, n, alpha
+#' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n=c(6, 30), alpha=0.1)
+test_that("two_stage_curtail_trial works for case 3b", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  alpha <- 0.05
+  
+  
+  
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, 
+                                   alpha=alpha)
+  r1 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null), alpha=alpha)[1]
+  r2 <- two_stage_critical_values(n=c(n1, n2), p=c(p1_null, p2_null), alpha=alpha)[2]
+  
+  expect_equal(as.numeric(trial[1:8]), c(p1_null, p2_null, p1_alt, p2_alt, n1, n2, r1, r2))
+  expect_equal(trial$power, two_stage_power(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$significance, two_stage_significance(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$stage1_mean_ss, expected_stage1_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2))$expectation)
+  expect_equal(trial$mean_ss_null, expected_total_sample_size(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$mean_ss_alt, expected_total_sample_size(p = c(p1_alt, p2_alt), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$PET, prob_early_stop(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  expect_equal(trial$minimax_prob, minimax_design(p = c(p1_null, p2_null), n = c(n1, n2), r = c(r1, r2)))
+  
+  expect_is(trial, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 4:  User inputs p, n_total, prob_early, alpha
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+test_that("two_stage_curtail_trial works for case 4", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n_total <- 36
+  prob_early=0.2
+  alpha <- 0.05
+  
+
+  trials <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n_total = n_total, 
+                                   prob_early=prob_early, alpha=alpha)
+
+  
+  n1 <- seq_len(n_total-1)
+  n2 <- n_total - n1
+  n <- cbind(n1, n2)
+  r <- matrix(apply(n, 1, function(x){
+    two_stage_critical_values(x, c(p1_null, p2_null),
+                              pearly = prob_early,alpha = alpha)
+  }), nrow=length(n1), ncol=2, byrow=TRUE)
+  
+  r1 <- r[,1]
+  r2 <- r[,2]
+  df <- data.frame(p1_null=rep(p1_null, length(n1)),
+                    p2_null=rep(p2_null, length(n1)),
+                    p1_alt=rep(p1_alt, length(n1)),
+                    p2_alt=rep(p2_alt, length(n1)),
+                    n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+  if(min(df$r1)==0){
+    df <- subset(df, r1>0)
+    rownames(df) <- NULL
+  }
+  
+  expect_equal(data.frame(trials[,1:8]), df)
+  
+  expect_equal(trials$power, apply(df, MARGIN = 1, function(x) two_stage_power(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                    n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$significance, apply(df, MARGIN = 1, function(x) two_stage_significance(p = c(x["p1_null"], x["p2_null"]), 
+                                                    n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$stage1_mean_ss, apply(df, MARGIN = 1, function(x) expected_stage1_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                        n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))$expectation))
+  expect_equal(trials$mean_ss_null, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                                 n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$mean_ss_alt, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                                                                n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$PET, apply(df, MARGIN = 1, function(x) prob_early_stop(p = c(x["p1_null"], x["p2_null"]), 
+                                                                             n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$minimax_prob, apply(df, MARGIN = 1, function(x) minimax_design(p = c(x["p1_null"], x["p2_null"]), 
+                                                                         n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  
+  expect_is(trials, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 4a:  User inputs p, n_total, prob_early
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+test_that("two_stage_curtail_trial works for case 4a", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n_total <- 36
+  prob_early=0.2
+
+  trials <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n_total=n_total, 
+                                   prob_early=prob_early)
+  n1 <- seq_len(n_total-1)
+  n2 <- n_total - n1
+  n <- cbind(n1, n2)
+  r <- matrix(apply(n, 1, function(x){
+    two_stage_critical_values(x, c(p1_null, p2_null),
+                              pearly = prob_early)
+  }), nrow=length(n1), ncol=2, byrow=TRUE)
+  
+  r1 <- r[,1]
+  r2 <- r[,2]
+  df <- data.frame(p1_null=rep(p1_null, length(n1)),
+                   p2_null=rep(p2_null, length(n1)),
+                   p1_alt=rep(p1_alt, length(n1)),
+                   p2_alt=rep(p2_alt, length(n1)),
+                   n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+  if(min(df$r1)==0){
+    df <- subset(df, r1>0)
+    rownames(df) <- NULL
+  }
+  
+  expect_equal(data.frame(trials[,1:8]), df)
+  
+  expect_equal(trials$power, apply(df, MARGIN = 1, function(x) two_stage_power(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                                               n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$significance, apply(df, MARGIN = 1, function(x) two_stage_significance(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                             n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$stage1_mean_ss, apply(df, MARGIN = 1, function(x) expected_stage1_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                                    n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))$expectation))
+  expect_equal(trials$mean_ss_null, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                                 n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$mean_ss_alt, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                                                                n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$PET, apply(df, MARGIN = 1, function(x) prob_early_stop(p = c(x["p1_null"], x["p2_null"]), 
+                                                                             n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$minimax_prob, apply(df, MARGIN = 1, function(x) minimax_design(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                     n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  
+  expect_is(trials, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 4b:  User inputs p, n_total, alpha
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, alpha=0.1)
+test_that("two_stage_curtail_trial works for case 4b", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n_total <- 36
+  alpha <- 0.05
+  
+  trials <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                    p1_alt = p1_alt, p2_alt = p2_alt, n_total=n_total, 
+                                    alpha=alpha)
+  n1 <- seq_len(n_total-1)
+  n2 <- n_total - n1
+  n <- cbind(n1, n2)
+  r <- matrix(apply(n, 1, function(x){
+    two_stage_critical_values(x, c(p1_null, p2_null),
+                              alpha = alpha)
+  }), nrow=length(n1), ncol=2, byrow=TRUE)
+  
+  r1 <- r[,1]
+  r2 <- r[,2]
+  df <- data.frame(p1_null=rep(p1_null, length(n1)),
+                   p2_null=rep(p2_null, length(n1)),
+                   p1_alt=rep(p1_alt, length(n1)),
+                   p2_alt=rep(p2_alt, length(n1)),
+                   n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+  if(min(df$r1)==0){
+    df <- subset(df, r1>0)
+    rownames(df) <- NULL
+  }
+  
+  expect_equal(data.frame(trials[,1:8]), df)
+  
+  expect_equal(trials$power, apply(df, MARGIN = 1, function(x) two_stage_power(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                                               n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$significance, apply(df, MARGIN = 1, function(x) two_stage_significance(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                             n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$stage1_mean_ss, apply(df, MARGIN = 1, function(x) expected_stage1_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                                    n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))$expectation))
+  expect_equal(trials$mean_ss_null, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                                 n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$mean_ss_alt, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                                                                n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$PET, apply(df, MARGIN = 1, function(x) prob_early_stop(p = c(x["p1_null"], x["p2_null"]), 
+                                                                             n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$minimax_prob, apply(df, MARGIN = 1, function(x) minimax_design(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                     n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  
+  expect_is(trials, "data.frame")
+})
+
+#' Create a two_stage_curtail_trial
+#' Case 5:  User inputs p, n_total
+#' Using default values of prob_early and alpha, with n_total
+#' trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
+#' n_total=36)
+test_that("two_stage_curtail_trial works for case 5", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n_total <- 36
+
+  trials <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                    p1_alt = p1_alt, p2_alt = p2_alt, n_total=n_total)
+                                  
+  n1 <- seq_len(n_total-1)
+  n2 <- n_total - n1
+  n <- cbind(n1, n2)
+  r <- matrix(apply(n, 1, function(x){
+    two_stage_critical_values(x, c(p1_null, p2_null))
+  }), nrow=length(n1), ncol=2, byrow=TRUE)
+  
+  r1 <- r[,1]
+  r2 <- r[,2]
+  df <- data.frame(p1_null=rep(p1_null, length(n1)),
+                   p2_null=rep(p2_null, length(n1)),
+                   p1_alt=rep(p1_alt, length(n1)),
+                   p2_alt=rep(p2_alt, length(n1)),
+                   n1=n1, n2=n2, r1=r[,1], r2=r[,2])
+  if(min(df$r1)==0){
+    df <- subset(df, r1>0)
+    rownames(df) <- NULL
+  }
+  
+  expect_equal(data.frame(trials[,1:8]), df)
+  
+  expect_equal(trials$power, apply(df, MARGIN = 1, function(x) two_stage_power(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                                               n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$significance, apply(df, MARGIN = 1, function(x) two_stage_significance(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                             n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$stage1_mean_ss, apply(df, MARGIN = 1, function(x) expected_stage1_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                                    n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))$expectation))
+  expect_equal(trials$mean_ss_null, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                                 n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$mean_ss_alt, apply(df, MARGIN = 1, function(x) expected_total_sample_size(p = c(x["p1_alt"], x["p2_alt"]), 
+                                                                                                n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$PET, apply(df, MARGIN = 1, function(x) prob_early_stop(p = c(x["p1_null"], x["p2_null"]), 
+                                                                             n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  expect_equal(trials$minimax_prob, apply(df, MARGIN = 1, function(x) minimax_design(p = c(x["p1_null"], x["p2_null"]), 
+                                                                                     n = c(x["n1"], x["n2"]), r = c(x["r1"], x["r2"]))))
+  
+  expect_is(trials, "data.frame")
+})
+
+##private functions?
 
 test_that("single_stage_significance function works", {
   resp <- single_stage_significance(.2, 5, 7) 
