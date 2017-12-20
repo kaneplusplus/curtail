@@ -11,7 +11,6 @@
 #' @param t number of failures to stop the trial
 #' @examples
 #' single_stage_significance(0.2, 7, 11)
-#' @export
 single_stage_significance <- function(pNull, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=pNull, s=s, t=t)[,'s'])
 }
@@ -26,7 +25,6 @@ single_stage_significance <- function(pNull, s, t) {
 #' @param t number of failures to stop the trial
 #' @examples
 #' single_stage_power(0.5, 7, 11)
-#' @export
 single_stage_power <- function(pAlt, s, t) {
   sum(dsnb_stacked(min(s, t):(s+t-1), p=pAlt, s=s, t=t)[,'s'])
 }
@@ -43,7 +41,6 @@ single_stage_power <- function(pAlt, s, t) {
 #' @param t number of failures to stop the trial
 #' @examples
 #' single_stage_expected_sample_size(p = 0.2, s = 7, t = 11)
-#' @export
 single_stage_expected_sample_size <- function(p, s, t) {
   if(length(p) != length(s) | length(s) != length(t) | length(p) != length(t))
     stop(paste("Parameters p, s, and t must all be the same length",
@@ -69,7 +66,6 @@ single_stage_expected_sample_size <- function(p, s, t) {
 #' @importFrom tidyr gather
 #' @examples
 #' power_significance_plot(17, 0.2, 0.4)
-#' @export
 power_significance_plot <- function(n, pNull, pAlt){
   value <- Significance <- Power <- si <- s <- `Design Feature` <- NULL
 
@@ -105,7 +101,6 @@ power_significance_plot <- function(n, pNull, pAlt){
 #' @importFrom foreach foreach %do%
 #' @examples
 #' power_significance_ROC(17, 0.2, 0.4)
-#' @export
 power_significance_ROC <- function(n, pNull, pAlt, all_labels=FALSE){
   si <- Power <- Significance <- s <- NULL
   designs <- foreach (si=seq_len(n-1), .combine=rbind) %do% {
@@ -161,7 +156,6 @@ power_significance_ROC <- function(n, pNull, pAlt, all_labels=FALSE){
 #' @examples
 #' critical_values(n=36, p=0.2, alpha=.1)
 #' critical_values(n=c( 5, 31), p=c(.8,.2), pearly=.1, alpha=.1)
-#' @export
 critical_values <- function(n, p, pearly=.1, alpha=.1) {
   if(length(p) != length(n))
     stop('Parameters p and n must be the same length (both length 1 for the one-stage design, or both length 2 for the two-stage design)')
@@ -216,7 +210,6 @@ critical_values <- function(n, p, pearly=.1, alpha=.1) {
 #' successes to reject the null hypothesis (r2) 
 #' @examples
 #' prob_early_stop(p=c(0.8, 0.2), n=c(25, 9), r=c(17, 11))
-#' @export
 prob_early_stop <- function(p, n, r) {
   if( ! ph2valid(p, n, r)){
     warning("Invalid parameter values")
@@ -258,7 +251,6 @@ prob_early_stop <- function(p, n, r) {
 #' Stage 2 (r1) and the minimum number of Stage 2 successes to reject the null hypothesis (r2) 
 #' @examples
 #' expected_stage1_sample_size(p=c(.8, .2), n=c(5, 31), r=c(3, 11))
-#' @export
 expected_stage1_sample_size <- function(p, n, r) {
   if(length(p) != length(n) | length(n) != length(r) | length(p) != length(r))
     stop('Parameters p, n, and r must all be the same length (all length 1 for the one-stage design, or all length 2 for the two-stage design)')
@@ -304,7 +296,6 @@ expected_stage1_sample_size <- function(p, n, r) {
 #' expected_total_sample_size(p=c(0.8, 0.2), n=c(6, 30), r=c(4, 11))
 #' expected_total_sample_size(p=c(0.8, 0.2), n=c(18, 18), r=c(12, 11))
 #' @importFrom stats dbinom
-#' @export
 expected_total_sample_size <- function(p, n, r) {
 
   if (length(p) != 2 || length(n) != 2 || length(r) != 2) {
@@ -423,7 +414,6 @@ expected_total_sample_size <- function(p, n, r) {
 #' @examples 
 #' all_minimax_designs(c(.8, .2), 36)
 #' all_minimax_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
-#' @export
 all_minimax_designs <- function(p, ntot, pearly = .1, alpha = .1) {
 
   if (any(p > 1) || any(p < 0) || (ntot < 0) || (pearly < 0) || (pearly > 1) || 
@@ -440,7 +430,7 @@ all_minimax_designs <- function(p, ntot, pearly = .1, alpha = .1) {
   n1 <- (1:(ntot-1))[which(rcrit[1,]>0)]
   prob <- sapply(n1, 
     function(n1) {
-      minimax_design(p=p, n=c(n1, ntot-n1), 
+      minimax_design_old(p=p, n=c(n1, ntot-n1), 
                      r=critical_values(n=c(n1, ntot-n1), p=p, pearly=pearly, 
                      alpha = alpha))
     })
@@ -465,7 +455,6 @@ all_minimax_designs <- function(p, ntot, pearly = .1, alpha = .1) {
 #' @examples 
 #' all_optimal_designs(c(.8, .2), 36)
 #' all_optimal_designs(c(.7, .3), 40, pearly = .08, alpha=.1)
-#' @export
 all_optimal_designs <- function(p, ntot, pearly = .1, alpha = .1) {
   if (any(p>1) || any(p < 0) || (ntot<0) || (pearly < 0) || (pearly > 1) || 
       (alpha < 0) || (alpha > 1)) {
@@ -506,8 +495,6 @@ all_optimal_designs <- function(p, ntot, pearly = .1, alpha = .1) {
 #' best_designs(c(0.8, 0.2), 36)
 #' best_designs(c(0.7, 0.3), 40, pearly = 0.08, alpha=0.1)
 #' best_designs(c(0.7, 0.3), 40, pearly = 0.08, alpha=0.1)$designs
-
-#' @export
 best_designs <- function(p, ntot, pearly = 0.1, alpha = 0.1) {
   if (any(!is.numeric(p)) || any(p > 1) || any(p < 0) || !is.numeric(ntot) || 
       (ntot < 0) || !is.numeric(pearly) || (pearly < 0) || (pearly > 1) || 
@@ -527,7 +514,7 @@ best_designs <- function(p, ntot, pearly = 0.1, alpha = 0.1) {
   
   optimalDesign <- cbind(p[1], nOpt[1], rOpt[1], p[2], nOpt[2], rOpt[2], 
     alpha, prob_early_stop(p, nOpt, rOpt), 
-    optimalDes[1,3], minimax_design(p, nOpt, rOpt))
+    optimalDes[1,3], minimax_design_old(p, nOpt, rOpt))
   minimaxDesign <- cbind(p[1], nMini[1], rMini[1], p[2], nMini[2], rMini[2], 
     alpha, prob_early_stop(p, nMini, rMini), 
     expected_total_sample_size(p, nMini, rMini), minimaxDes[1,3])
@@ -541,7 +528,6 @@ best_designs <- function(p, ntot, pearly = 0.1, alpha = 0.1) {
 }
 
 #' @importFrom ggplot2 ggplot aes geom_line facet_grid xlab
-#' @export
 plot.ph2_design = function(x, ...) {
   n1 <- values <- NULL
   p <- x$p
@@ -573,10 +559,9 @@ plot.ph2_design = function(x, ...) {
 #' to continue to Stage 2 (r1) and the minimum number of Stage 2 
 #' successes to reject the null hypothesis (r2)
 #' @examples
-#' minimax_design(p=c(0.8, 0.2), n=c(3,33), r=critical_values(n=c(3,33), 
+#' minimax_design_old(p=c(0.8, 0.2), n=c(3,33), r=critical_values(n=c(3,33), 
 #'   p=c(0.8, 0.2), pearly=0.1, alpha=0.1))
-#' @export
-minimax_design <- function(p, n, r) {
+minimax_design_old <- function(p, n, r) {
   if (!ph2valid(p, n, r)){
     warning("Invalid parameter values")
     return(NaN) # Check validity of parameters
@@ -624,7 +609,6 @@ minimax_design <- function(p, n, r) {
 #' @examples
 #' two_stage_significance(p = c( 0.8, 0.2), n = c(12, 24), r = c(8, 11))
 #' two_stage_significance(p = c( 0.8, 0.2), n = c(6, 30), r = c(4, 11))
-#' @export
 two_stage_significance <- function(p, n, r) {
   return(prob_reject(p=p, n=n, r=r))
 }
@@ -645,7 +629,6 @@ two_stage_significance <- function(p, n, r) {
 #' @examples
 #' two_stage_power(p = c(0.8, 0.4), n = c(12, 24), r = c(8, 11))
 #' two_stage_power(p = c(0.8, 0.4), n = c(6, 30), r = c(4, 11))
-#' @export
 two_stage_power <- function(p, n, r) {
   return(prob_reject(p=p, n=n, r=r))
 }

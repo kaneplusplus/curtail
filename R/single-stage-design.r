@@ -1,10 +1,35 @@
-#' Generic function for creating single-stage curtail trials
+#' Create a single-stage curtailed trial design
+#' @description The single_stage_curtail_trial function creates a single-stage 
+#' trial object containing design parameters and statistical properties of 
+#' one or more curtailed designs
+#' @param p_null probability of success under the null hypothesis
+#' @param p_alt probability of success under the alternative hypothesis
+#' @param s number of successes to stop the trial
+#' @param t number of failures to stop the trial
+#' @param n total maximum planned sample size (n = s+t-1)
+#' @details
+#' There are two ways that the user can specify the parameters to create
+#' a single-stage curtailed trial design, as defined in the two cases below.  
+#' In case 1, the user provide sparameters values of s and t, in which case the trial
+#' object is created for that one specific design.  In the second case, the user 
+#' specifies an n rather than s and t and the trial object created contains all 
+#' possible designs (values of s and t) for the given total sample size, n.
+#' 
+#' Case 1:  User specifies p_null, p_alt, s, t
+#' 
+#' Case 2:  User specifies p_null, p_alt, n 
+#' 
+#' @examples
+#' Case 1:
+#' trial <- single_stage_curtail_trial(p_null=0.2, p_alt=0.4, s=7, t=11)
+#' 
+#' Case 2:
+#' trials <- single_stage_curtail_trial(p_null=0.2, p_alt=0.4, n=17)
 #' @export
 setGeneric("single_stage_curtail_trial", function(p_null, p_alt, s, t, n) {
   standardGeneric("single_stage_curtail_trial")
 })
 
-# @examples
 # trial <- single_stage_curtail_trial(p_null=0.2, p_alt=0.4, s=7, t=11)
 #' @export
 setMethod("single_stage_curtail_trial",
@@ -37,8 +62,8 @@ setMethod("single_stage_curtail_trial",
     ret$power <- power(ret)
     ret$significance <- significance(ret)
     ess <- expected_sample_size(ret)
-    ret$mean_ss <- ess$mean_ss
-    ret$sd_ss <- ess$sd_ss
+    ret$mean_ss <- ess$mean
+    ret$sd_ss <- ess$sd
     ret
   })
 
@@ -61,12 +86,12 @@ plot.single_stage_curtail_trial_roc <- function(x, y, ...) {
 
 }
 
-#' @export
+
 significance <- function(x) {
   UseMethod("significance")
 }
 
-#' @export
+
 significance.single_stage_curtail_trial <- function(x) {
   apply(x, 1, 
     function(x) {
@@ -75,12 +100,12 @@ significance.single_stage_curtail_trial <- function(x) {
     })
 }
 
-#' @export
+
 power <- function(x) {
   UseMethod("power")
 }
 
-#' @export
+
 power.single_stage_curtail_trial <- function(x) {
   apply(x, 1,
     function(x) {
@@ -89,12 +114,12 @@ power.single_stage_curtail_trial <- function(x) {
     })
 }
 
-#' @export
+
 expected_sample_size <- function(x) {
   UseMethod("expected_sample_size")
 }
 
-#' @export
+
 expected_sample_size.single_stage_curtail_trial <- function(x) {
   foreach(i=1:nrow(x), .combine=rbind) %do% {
     mean <- sum((1:(x$s[i]+x$t[i]-1)) * ph2snb(x$p_null[i], x$s[i], x$t[i]))
@@ -104,14 +129,13 @@ expected_sample_size.single_stage_curtail_trial <- function(x) {
   }
 }
 
-#' @export
+
 critical_values <- function(x, alpha=0.1, p_early=0.1) {
   UseMethod("critical_values")
 }
 
 # The following isn't right. Take the individual parameters.
 
-#' @export
 critical_values.single_stage_curtail_trial <- 
   function(x, alpha=0.1, p_early=NULL) {
   if (!is.null(p_early)) {
@@ -123,7 +147,7 @@ critical_values.single_stage_curtail_trial <-
   1 + qbinom(1 - alpha, x$s + x$t - 1, x$p_null)
 }
 
-#' @export
+#'
 #print.single_stage_curtail_trial <- function(object, ...) {
 #  if (nrow(object) == 1) {
 #    ret <- object

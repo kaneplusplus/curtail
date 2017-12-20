@@ -2,10 +2,42 @@
 % Please edit documentation in R/single-stage-design.r
 \name{single_stage_curtail_trial}
 \alias{single_stage_curtail_trial}
-\title{Generic function for creating single-stage curtail trials}
+\title{Create a single-stage curtailed trial design}
 \usage{
 single_stage_curtail_trial(p_null, p_alt, s, t, n)
 }
+\arguments{
+\item{p_null}{probability of success under the null hypothesis}
+
+\item{p_alt}{probability of success under the alternative hypothesis}
+
+\item{s}{number of successes to stop the trial}
+
+\item{t}{number of failures to stop the trial}
+
+\item{n}{total maximum planned sample size (n = s+t-1)}
+}
 \description{
-Generic function for creating single-stage curtail trials
+The single_stage_curtail_trial function creates a single-stage 
+trial object containing design parameters and statistical properties of 
+one or more curtailed designs
+}
+\details{
+There are two ways that the user can specify the parameters to create
+a single-stage curtailed trial design, as defined in the two cases below.  
+In case 1, the user provide sparameters values of s and t, in which case the trial
+object is created for that one specific design.  In the second case, the user 
+specifies an n rather than s and t and the trial object created contains all 
+possible designs (values of s and t) for the given total sample size, n.
+
+Case 1:  User specifies p_null, p_alt, s, t
+
+Case 2:  User specifies p_null, p_alt, n
+}
+\examples{
+Case 1:
+trial <- single_stage_curtail_trial(p_null=0.2, p_alt=0.4, s=7, t=11)
+
+Case 2:
+trials <- single_stage_curtail_trial(p_null=0.2, p_alt=0.4, n=17)
 }

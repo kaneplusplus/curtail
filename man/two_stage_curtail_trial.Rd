@@ -8,52 +8,106 @@ two_stage_curtail_trial(p1_null, p2_null, p1_alt, p2_alt, n1, n2, n_total, r1,
   r2, prob_early, alpha)
 }
 \arguments{
-\item{p1_null}{TODO:write this}
+\item{p1_null}{probability of a successful outcome in Stage 1 under the 
+null hypothesis}
 
-\item{p2_null}{TODO:write this}
+\item{p2_null}{probability of a successful outcome in Stage 2 under the 
+null hypothesis}
 
-\item{p1_alt}{TODO:write this}
+\item{p1_alt}{probability of a successful outcome in Stage 1 under the 
+alternative hypothesis}
 
-\item{p2_alt}{TODO:write this}
+\item{p2_alt}{probability of a successful outcome in Stage 2 under the 
+alternative hypothesis}
 
-\item{n1}{TODO:write this}
+\item{n1}{planned maximum sample size for Stage 1}
 
-\item{n2}{TODO:write this}
+\item{n2}{planned maximum sample size for Stage 2}
 
-\item{n_total}{TODO:write this}
+\item{n_total}{planned maximum sample size for both stages of the trial (n1 + n2)}
 
-\item{r1}{TODO:write this}
+\item{r1}{the minimum number of Stage 1 successes needed to continue to Stage 2}
 
-\item{r2}{TODO:write this}
+\item{r2}{the minimum number of Stage 2 successes needed to reject the 
+null hypothesis}
 
-\item{prob_early}{TODO:write this}
+\item{prob_early}{desired probability of early stopping in the trial under 
+p1_null (default is 0.1)}
 
-\item{alpha}{TODO:write this}
+\item{alpha}{desired significance level (default is 0.1)}
 }
 \description{
-WHAT DOES THE FUNCTION DO?
+The two_stage_curtail_trial function creates a two-stage 
+trial object containing design parameters and statistical properties of 
+one or more nested two-stage designs
 }
 \details{
-WHAT ARE THE DIFFERENT WAYS OF SPECIFYING THIS TRIAL
+There are many different ways that the user can specify the parameters to create
+a two-stage curtailed trial design.  We have broken these down into different cases
+below.  Cases 1 - 3 assume that a specific value of n1 and n2 are provided, in which
+case the trial object is created for that one specific design.  In cases 4 and 5, an
+n_total is specified instead of n1 and n2 and the trial object created contains all
+possible designs (values of n1 and n2) for the given total sample size.  The 
+minimax_design and optimal_design functions can be applied to the trial object in 
+cases 4 and 5 to find the minimax and optimal designs.  Any specification of 
+parameters that do not match one of the cases below will result in an error.
+
+Case 1:  User specifies p1_null, p2_null, p1_alt, p2_alt, n1, n2, r1, r2
+
+Case 2:  User specifies p1_null, p2_null, p1_alt, p2_alt, n1, n2 (default values
+of prob_early and alpha = 0.1 will be used to calcuate the critical values r1 
+and r2)
+
+Case 3:  User specifies p1_null, p2_null, p1_alt, p2_alt, n1, n2, prob_early, alpha
+Case 3a:  User inputs p1_null, p2_null, p1_alt, p2_alt, n1, n2, prob_early (default
+value of alpha = 0.1 is used)
+Case 3b:  User inputs p1_null, p2_null, p1_alt, p2_alt, n1, n2, alpha (default 
+value of prob_early = 0.1 is used)
+
+Case 4:  User inputs p1_null, p2_null, p1_alt, p2_alt, n_total, prob_early, alpha
+Case 4a:  User inputs p1_null, p2_null, p1_alt, p2_alt, n_total, prob_early (default
+value of alpha = 0.1 is used)
+Case 4b:  User inputs p1_null, p2_null, p1_alt, p2_alt, n_total, alpha (default
+value of prob_early = 0.1 is used)
+
+Case 5:  User inputs p1_null, p2_null, p1_alt, p2_alt, n_total (default values of 
+prob_early and alpha = 0.1 are used)
 }
 \examples{
-# Case 1
+Case 1:
 trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
 p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, r1 = 4, r2 = 11)
 
-# Case 2
-trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-n=c(6, 30))
+Case 2:
+trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30)
 
-# Case 3
-trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-n=c(6, 30), prob_early=0.1, alpha=0.1)
+Case 3
+trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, prob_early = 0.2, alpha = 0.05)
 
-# Case 4
+Case 3a:
+trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, prob_early = 0.2)
+
+Case 3b:
+trial <- two_stage_curtail_trial(p1_null = 0.8, p2_null = 0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n1 = 6, n2 = 30, alpha = 0.05)
+
+Case 4
 trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
-p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.1, alpha=0.1)
+p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
 
-# Case 5
-trials <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
-n_total=36)
+Case 4a:
+trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2)
+
+Case 4b:
+trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n_total=36, alpha = 0.05)
+
+Case 5
+trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+
 }
