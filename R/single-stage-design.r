@@ -145,6 +145,35 @@ critical_values.single_stage_curtail_trial <-
     stop("alpha must be between zero and one inclusive.")
   }
   1 + qbinom(1 - alpha, x$s + x$t - 1, x$p_null)
+  }
+
+#' Stopped negative binomial distribution mass function
+#'
+#' Returns the probability density function for minimum number of 
+#' events for either s successes or t failures.
+#'
+#' @param p probability of success in each trial. 
+#' @param s number of successes.
+#' @param t number of failures.
+#' @examples
+#' # ph2snb(p = .8, s = 3, t = 5)
+ph2snb = function(p, s, t) {
+  if( length(p) != 1 || p < 0 || p > 1 || s < 1 || t < 1 ||
+      !is.wholenumber(s) || !is.wholenumber(t)){
+    warning("Invalid parameter values")
+    return(NaN)
+  }
+  
+  tmnb <- rep(0, s + t - 1)    # zero out, over the range
+  for(j in 0 : (t - 1)) {      # Last event is success:  eq # (6)
+    tmnb[j + s] <- choose(s+j-1, s-1) * p^s * (1-p)^j
+  }
+  
+  for(j in 0 : (s - 1)) {       # Last event is failure:  eq # (7)
+    tmnb[j+t] <- tmnb[j+t] +
+      choose(t+j-1, t-1) * p^j * (1-p)^t
+  }
+  return(tmnb / sum(tmnb))    # Normalize
 }
 
 #'

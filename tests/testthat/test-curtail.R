@@ -36,7 +36,7 @@ test_that("single_stage_curtail_trial works when n is a parameter", {
   expect_equal(trials$significance, apply(df, MARGIN=1, function(x) single_stage_significance(x["p_null"], x["s"], x["t"])))
   expect_equal(trials$mean_ss, apply(df, MARGIN=1, function(x) single_stage_expected_sample_size(x["p_null"], x["s"], x["t"])$expectation))
   
-  expect_is(trial, "data.frame")
+  expect_is(trials, "data.frame")
 })
 
 
@@ -67,6 +67,129 @@ test_that("two_stage_curtail_trial works for case 1", {
   
   expect_is(trial, "data.frame")
 })
+
+#' Test significance function
+test_that("significance function works for two-stage curtail trial", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  sig <- significance(trial)
+  expect_equal(sig, trial$significance)
+  expect_is(sig, "numeric")
+})
+
+#' Test significance function
+test_that("power function works for two-stage curtail trial", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  pow <- power(trial)
+  expect_equal(pow, trial$power)
+  expect_is(pow, "numeric")
+})
+
+#' Test stage1_sample_size function
+test_that("stage1_sample_size function works for two-stage curtail trial", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  stage1 <- stage1_sample_size(trial)
+  expect_equal(stage1, trial$stage1_mean_ss)
+  expect_is(stage1, "numeric")
+})
+
+
+#' Test expected_sample_size function
+test_that("expected_sample_size function works for two-stage curtail trial", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  ess <- expected_sample_size(trial)
+  expect_equal(ess, trial$mean_ss_null)
+  expect_is(ess, "numeric")
+})
+
+
+#' Test expected_sample_size_alt function
+test_that("expected_sample_size_alt function works for two-stage curtail trial", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  essA <- expected_sample_size_alt(trial)
+  expect_equal(essA, trial$mean_ss_alt)
+  expect_is(ess, "numeric")
+})
+
+#' Test PET function
+test_that("PET function works for two-stage curtail trial", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  pet <- PET(trial)
+  expect_equal(pet, trial$PET)
+  expect_is(pet, "numeric")
+})
+
+#' Test minimax_probability function
+test_that("minimax_probability function works for two-stage curtail trial", {
+  p1_null <- 0.8
+  p2_null <- 0.2
+  p1_alt <- 0.8
+  p2_alt <- 0.4
+  n1 <- 6
+  n2 <- 30
+  r1 <- 4
+  r2 <- 11
+  trial <- two_stage_curtail_trial(p1_null = p1_null, p2_null = p2_null, 
+                                   p1_alt = p1_alt, p2_alt = p2_alt, n1=n1, n2=n2, r1=r1, r2=r2)
+  minimax <- minimax_probability(trial)
+  expect_equal(minimax, trial$minimax_prob)
+  expect_is(minimax, "numeric")
+})
+
+
 
 #' Create a two_stage_curtail_trial
 #' Case 2:  User inputs p, n
@@ -100,7 +223,6 @@ test_that("two_stage_curtail_trial works for case 2", {
 
 #' Create a two_stage_curtail_trial
 #' Case 3:  User inputs p, n, prob_early, alpha
-#' @examples
 #' trial <- two_stage_curtail_trial(p_null=c(0.8, 0.2), p_alt=c(0.8, 0.4), 
 #' n=c(6, 30), prob_early=0.1, alpha=0.1)
 test_that("two_stage_curtail_trial works for case 3", {

@@ -115,13 +115,13 @@ setMethod("two_stage_curtail_trial",
                               p1_alt=p1_alt, p2_alt=p2_alt, n1=n1, 
                               n2=n2, r1=r1, r2=r2)
             class(ret) <- c("two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 
@@ -146,13 +146,13 @@ setMethod("two_stage_curtail_trial",
                               p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
                               n2=n2, r1=r[1], r2=r[2])
             class(ret) <- c("two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 
@@ -181,13 +181,13 @@ setMethod("two_stage_curtail_trial",
                               p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
                               n2=n2, r1=r[1], r2=r[2])
             class(ret) <- c("two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 #' Create a two_stage_curtail_trial
@@ -217,13 +217,13 @@ setMethod("two_stage_curtail_trial",
                               p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
                               n2=n2, r1=r[1], r2=r[2])
             class(ret) <- c("two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 
@@ -254,13 +254,13 @@ setMethod("two_stage_curtail_trial",
                               p1_alt=p1_alt,p2_alt=p2_alt, n1=n1, 
                               n2=n2, r1=r[1], r2=r[2])
             class(ret) <- c("two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 
@@ -300,13 +300,13 @@ setMethod("two_stage_curtail_trial",
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
 })
 
@@ -349,13 +349,13 @@ setMethod("two_stage_curtail_trial",
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 #' Create a two_stage_curtail_trial
@@ -396,13 +396,13 @@ setMethod("two_stage_curtail_trial",
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 # Create a two_stage_curtail_trial
@@ -440,13 +440,13 @@ setMethod("two_stage_curtail_trial",
             }
             class(ret) <- c("two_stage_curtail_trial_sawtooth", 
                             "two_stage_curtail_trial", class(ret))
-            ret$power <- power(ret)
-            ret$significance <- significance(ret)
-            ret$stage1_mean_ss <- stage1_sample_size(ret)
-            ret$mean_ss_null <- expected_sample_size(ret)
-            ret$mean_ss_alt <- expected_sample_size_alt(ret)
-            ret$PET <- PET(ret)
-            ret$minimax_prob <- minimax_probability(ret)
+            ret$power <- power_internal(ret)
+            ret$significance <- significance_internal(ret)
+            ret$stage1_mean_ss <- stage1_sample_size_internal(ret)
+            ret$mean_ss_null <- expected_sample_size_internal(ret)
+            ret$mean_ss_alt <- expected_sample_size_alt_internal(ret)
+            ret$PET <- PET_internal(ret)
+            ret$minimax_prob <- minimax_probability_internal(ret)
             ret
           })
 
@@ -467,6 +467,7 @@ setMethod("two_stage_curtail_trial",
             stop("Design parameters not entered correctly. Refer to documentation")
           })
 
+
 #' @import ggplot2
 #' @importFrom tidyr gather
 #' @export
@@ -480,8 +481,212 @@ plot.two_stage_curtail_trial_sawtooth <- function(x, ...) {
     ylab("")
 }
 
+#'@export
+print.two_stage_curtail_trial <- function(object, ...) {
+ if (nrow(object) == 1) {
+   ret <- object
+   # It's a single, two-stage curtail trial.
+   cat("\n")
+   cat(" Two-Stage Curtail Trial\n")
+   cat("\n")
+   cat("Null response rate at time t1: ", object$p1_null[1], "\n")
+   cat("Null response rate at time t2: ", object$p2_null[1], "\n")
+   cat("Alternative response rate at time t1: ", object$p1_alt[1], "\n")
+   cat("Alternative response rate at time t2: ", object$p2_alt[1], "\n")
+   cat("Responses to continue the trial to Stage 2: ", object$r1[1], "\n")
+   cat("Responses to reject the null hypothesis: ", object$r2[1], "\n")
+   cat("Power: ", object$power, "\n")
+   cat("Significance: ", object$significance, "\n")
+   cat("Stage 1 expected sample size: ", object$stage1_mean_ss, "\n")
+   cat("Expected sample size under the null: ", object$mean_ss_null[1], "\n")
+   cat("Expected sample size under the alternative: ", object$mean_ss_alt[1], "\n")
+   cat("Probability of early termination of the trial: ", object$PET[1], "\n")
+   cat("Probability of requiring the maximum sample size: ", object$minimax_prob[1], "\n")
+ }
+}
+
+#' Power of a two-stage curtail trial
+#' @description This function returns the power (probability of rejecting the 
+#' null hypothesis when the alternative hypothesis is true) of all designs contained 
+#' in a two-stage curtail trial object
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' power(trials)
+power <- function(x) {
+  UseMethod("power")
+}
+
+#' @export
+power.two_stage_curtail_trial <- function(x) {
+  return(x$power)
+}
+
+#' Significance of a two-stage curtail trial
+#' @description This function returns the significance (probability of rejecting the 
+#' null hypothesis when the null hypothesis is true) of all designs contained in a 
+#' two-stage curtail trial object
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' significance(trials)
+#' @export
+significance <- function(x) {
+  UseMethod("significance")
+}
+
 #' @export
 significance.two_stage_curtail_trial <- function(x) {
+  return(x$significance)
+}
+
+#' Expected stage 1 sample size under the null hypothesis for a two-stage 
+#' curtail trial
+#' @description This function returns the expected sample size in stage 1 under the
+#' null hypothesis of all designs contained in a two-stage curtail trial object
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' stage1_sample_size(trials)
+#' @export
+stage1_sample_size <- function(x) {
+  UseMethod("stage1_sample_size")
+}
+
+#' @export
+stage1_sample_size.two_stage_curtail_trial <- function(x) {
+  return(x$stage1_mean_ss)
+}
+#' Expected sample size under the null hypothesis for a two-stage curtail trial
+#' @description This function returns the expected sample size under the null
+#' hypothesis of all designs contained in a two-stage curtail trial object
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' expected_sample_size(trials)
+#' @export
+expected_sample_size <- function(x) {
+  UseMethod("expected_sample_size")
+}
+
+#' @export
+expected_sample_size.two_stage_curtail_trial <- function(x) {
+  return(x$mean_ss_nul)
+}
+
+#' Expected sample size under the alternative hypothesis for a two-stage curtail trial
+#' @description This function returns the expected sample size under the alternative
+#' hypothesis of all designs contained in a two-stage curtail trial object
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' expected_sample_size_alt(trials)
+#' @export
+expected_sample_size_alt <- function(x) {
+  UseMethod("expected_sample_size_alt")
+}
+
+#' @export
+expected_sample_size_alt.two_stage_curtail_trial <- function(x) {
+  return(x$mean_ss_alt)
+}
+
+#' Probability of early termination for a two-stage curtail trial
+#' @description This function returns the probability of early termination (PET) of all 
+#' designs contained in a two-stage curtail trial object
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' PET(trials)
+#' @export
+PET <- function(x) {
+  UseMethod("PET")
+}
+
+#' @export
+PET.two_stage_curtail_trial <- function(x) {
+  return(x$PET)
+}
+
+#' Minimax probability for a two-stage curtail trial
+#' @description This function returns the probability of requiring the maximum sample
+#' size (minimax probability) of all designs contained in a two-stage curtail 
+#' trial object
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' minimax_probability(trials)
+#' @export
+minimax_probability <- function(x) {
+  UseMethod("minimax_probability")
+}
+
+#' @export
+minimax_probability.two_stage_curtail_trial <- function(x) {
+  return(x$minimax_prob)
+}
+
+
+#' Find the minimax design
+#' @description Identifies the minimax design from a trial object containing many 
+#' candidate designs for a given total sample size
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' minimax_design(trials)
+#' @export
+minimax_design <- function(x) {
+  UseMethod("minimax_design")
+}
+
+
+#' @export
+minimax_design.two_stage_curtail_trial_sawtooth <- function(x){
+  x[which.min(x$minimax_prob),]
+  
+}
+
+#' Find the optimal design
+#' @description Identifies the optimal design from a trial object containing many 
+#' candidate designs for a given total sample size
+#' @param x a two-stage curtailed trial object
+#' @examples
+#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
+#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
+#' optimal_design(trials)
+#' @export
+optimal_design <- function(x) {
+  UseMethod("optimal_design")
+}
+
+#' @export
+optimal_design.two_stage_curtail_trial_sawtooth <- function(x){
+  x[which.min(x$mean_ss_null),]
+}
+
+summary.two_stage_curtail_trial_sawtooth <- function(x){
+  opt_design <- round(optimal_design(x), 3)
+  class(opt_design) <- c("two_stage_curtail_trial", "data.frame")
+  min_design <- round(minimax_design(x), 3)
+  class(min_design) <- c("two_stage_curtail_trial", "data.frame")
+  list("Optimal_Design" = opt_design, "Minimax_Design" = min_design)
+}
+
+###############################################################
+significance_internal <- function(x) {
+  UseMethod("significance_internal")
+}
+
+#' Internal function
+significance_internal.two_stage_curtail_trial <- function(x) {
   apply(x, 1, function(x){
     p <- as.numeric(x[c("p1_null", "p2_null")])
     n <- as.numeric(x[c("n1", "n2")])
@@ -511,11 +716,14 @@ significance.two_stage_curtail_trial <- function(x) {
     }
     return(reject)
     })
-  
 }
 
-#' @export
-power.two_stage_curtail_trial <- function(x) {
+power_internal <- function(x){
+  UseMethod("power_internal")
+}
+  
+#' Internal function
+power_internal.two_stage_curtail_trial <- function(x) {
   apply(x, 1,
         function(x) {
           p <- as.numeric(x[c("p1_alt", "p2_alt")])
@@ -547,9 +755,12 @@ power.two_stage_curtail_trial <- function(x) {
           return(reject)
         })
 }
+expected_sample_size_internal <- function(x) {
+  UseMethod("expected_sample_size_internal")
+}
 
-#' @export
-expected_sample_size.two_stage_curtail_trial <- function(x) {
+#' Internal function
+expected_sample_size_internal.two_stage_curtail_trial <- function(x) {
   
   apply(x, 1,
         function(x) {
@@ -643,12 +854,12 @@ expected_sample_size.two_stage_curtail_trial <- function(x) {
         })
 }
 
-#' @export
-expected_sample_size_alt <- function(x) {
-  UseMethod("expected_sample_size_alt")
+expected_sample_size_alt_internal <- function(x) {
+  UseMethod("expected_sample_size_alt_internal")
 }
 
-expected_sample_size_alt.two_stage_curtail_trial <- function(x) {
+#' Internal Function
+expected_sample_size_alt_internal.two_stage_curtail_trial <- function(x) {
   apply(x, 1,
         function(x) {
           p <- as.numeric(x[c("p1_alt", "p2_alt")])
@@ -741,13 +952,12 @@ expected_sample_size_alt.two_stage_curtail_trial <- function(x) {
         })
 }
 
-#' @export
-stage1_sample_size <- function(x) {
-  UseMethod("stage1_sample_size")
+stage1_sample_size_internal <- function(x) {
+  UseMethod("stage1_sample_size_internal")
 }
 
-#' @export
-stage1_sample_size.two_stage_curtail_trial <- function(x) {
+#' Internal function
+stage1_sample_size_internal.two_stage_curtail_trial <- function(x) {
   apply(x, 1,
         function(x) {
           
@@ -766,12 +976,12 @@ stage1_sample_size.two_stage_curtail_trial <- function(x) {
         })
 }
 
-#' @export
-PET <- function(x) {
-  UseMethod("PET")
+
+PET_internal <- function(x) {
+  UseMethod("PET_internal")
 }
 
-PET.two_stage_curtail_trial <- function(x){
+PET_internal.two_stage_curtail_trial <- function(x){
   apply(x, 1,
         function(x) {
           r1 <- as.numeric(x["r1"])
@@ -784,12 +994,12 @@ PET.two_stage_curtail_trial <- function(x){
         }) 
 }
 
-#' @export
-minimax_probability <- function(x) {
-  UseMethod("minimax_probability")
+minimax_probability_internal <- function(x) {
+  UseMethod("minimax_probability_internal")
 }
 
-minimax_probability.two_stage_curtail_trial <- function(x){
+#' Internal Function
+minimax_probability_internal.two_stage_curtail_trial <- function(x){
   
   apply(x, 1,
         function(x) {
@@ -828,52 +1038,6 @@ minimax_probability.two_stage_curtail_trial <- function(x){
             minimaxDesign* (1 - pearly)
           }
         })
-}
-
-#' Find the minimax design
-#' @description Identifies the minimax design from a trial object containing many 
-#' candidate designs for a given total sample size
-#' @param x a two-stage curtailed trial object
-#' @examples
-#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
-#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
-#' minimax_design(trials)
-#' @export
-minimax_design <- function(x) {
-  UseMethod("minimax_design")
-}
-
-
-#' @export
-minimax_design.two_stage_curtail_trial_sawtooth <- function(x){
-  x[which.min(x$minimax_prob),]
-  
-}
-
-#' Find the optimal design
-#' @description Identifies the optimal design from a trial object containing many 
-#' candidate designs for a given total sample size
-#' @param x a two-stage curtailed trial object
-#' @examples
-#' trials <- two_stage_curtail_trial(p1_null = 0.8, p2_null=0.2, 
-#' p1_alt = 0.8, p2_alt = 0.4, n_total=36, prob_early=0.2, alpha=0.05)
-#' optimal_design(trials)
-#' @export
-optimal_design <- function(x) {
-  UseMethod("optimal_design")
-}
-
-#' @export
-optimal_design.two_stage_curtail_trial_sawtooth <- function(x){
-  x[which.min(x$mean_ss_null),]
-}
-
-summary.two_stage_curtail_trial_sawtooth <- function(x){
-  opt_design <- round(optimal_design(x), 3)
-  class(opt_design) <- c("two_stage_curtail_trial", "data.frame")
-  min_design <- round(minimax_design(x), 3)
-  class(min_design) <- c("two_stage_curtail_trial", "data.frame")
-  list("Optimal_Design" = opt_design, "Minimax_Design" = min_design)
 }
 
 
@@ -1016,13 +1180,6 @@ ph2tnb = function(p, n, r) {
 #' @examples
 #' two_stage_critical_values(n=c( 5, 31), p=c(.8,.2), pearly=.1, alpha=.1)
 two_stage_critical_values <- function(n, p, pearly=.1, alpha=.1) {
-
-    if (!ph2valid(p, n, r=c(0, 0)) ||
-        pearly < 0 || pearly > 1 || alpha < 0 || alpha > 1)
-    {
-      warning("Invalid parameter values, pearly and alpha must be in [0, 1]")
-      return (NaN)
-    }
     # Binomial critical value, r2
     r2 <- 1 + qbinom(1 - alpha, sum(n), p[2])     
     
